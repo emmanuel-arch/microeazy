@@ -15,6 +15,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createServer } from "node:net";
 import { execSync } from "node:child_process";
+import { totalmem, freemem } from "node:os";
 import { loadRegistry, select, c, heading, ROOT } from "./lib/registry.mjs";
 
 let problems = 0;
@@ -68,6 +69,31 @@ for (const [tool, cmd, needed] of [
   } catch {
     bad(tool + " is not on PATH");
   }
+}
+
+// ── Memory ───────────────────────────────────────────────────────────────────
+//
+// This is here because it cost a full afternoon to diagnose once. Two Next 16
+// dev servers with Turbopack want roughly 2 GB each on top of an editor and its
+// language servers. When Windows runs out of commit charge it does NOT report
+// "out of memory": it fails a directory rename with ACCESS_DENIED, fails a
+// process fork inside git-bash, and fails a Turbopack write with
+// ERROR_NO_SYSTEM_RESOURCES (os error 1450) — three symptoms that each look like
+// a permissions or corruption problem and are all the same shortage.
+const totalGb = totalmem() / 1024 ** 3;
+const freeGb = freemem() / 1024 ** 3;
+const webSystems = systems.filter((s) => s.port).length;
+const needGb = 1.5 + webSystems * 1.6;
+
+if (freeGb >= needGb) {
+  ok("memory", freeGb.toFixed(1) + " GB free of " + totalGb.toFixed(1) + " GB");
+} else {
+  warn(
+    "only " + freeGb.toFixed(1) + " GB free of " + totalGb.toFixed(1) + " GB",
+    "Running " + webSystems + " dev servers together wants about " + needGb.toFixed(1) + " GB.\n" +
+      "      Run one at a time (npm run dev interchange), or use the built output\n" +
+      "      (npm run build && npm run start), which costs a fraction of Turbopack dev.",
+  );
 }
 
 // ── Systems ──────────────────────────────────────────────────────────────────
