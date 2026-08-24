@@ -1,0 +1,29 @@
+{
+  "name": "microeazy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Micro Eazy ecosystem — a meta-repo that pins each system at a commit and runs them together locally.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "//": [
+    "DELIBERATELY NOT AN npm WORKSPACE. Each system is its own repository with its",
+    "own lockfile and its own Vercel project, and workspaces would hoist their",
+    "node_modules into this root — which changes what every one of those",
+    "deployments resolves at build time. The orchestration here shells out to each",
+    "system's own scripts instead, so running from the meta-repo and running from",
+    "inside a system produce identical results.",
+    "",
+    "Everything reads ecosystem/registry.json. There is no second list."
+  ],
+  "scripts": {
+    "dev": "node ecosystem/scripts/dev.mjs",
+    "doctor": "node ecosystem/scripts/doctor.mjs",
+    "bootstrap": "node ecosystem/scripts/run.mjs install",
+    "build": "node ecosystem/scripts/run.mjs build",
+    "start": "node ecosystem/scripts/run.mjs start",
+    "sync": "git submodule update --init --recursive --remote",
+    "pull": "git pull --recurse-submodules && git submodule update --init --recursive"
+  }
+}

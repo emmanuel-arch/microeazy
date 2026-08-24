@@ -1,0 +1,134 @@
+{
+  "name": "Micro Eazy",
+  "description": "A two-sided credit ecosystem: licensed lenders on one side, Kenyan borrowers on the other, and a consent-gated exchange between them.",
+  "owner": "emmanuel-arch",
+  "metaRepo": "https://github.com/emmanuel-arch/microeazy",
+
+  "$comment": [
+    "THIS FILE IS THE SINGLE SOURCE OF TRUTH FOR THE ECOSYSTEM.",
+    "",
+    "Every orchestration script reads it and nothing hard-codes a path, a port or a",
+    "command anywhere else. That is the whole design: adding a seventh system is one",
+    "entry here plus one `git submodule add`, and it appears in `npm run dev`,",
+    "`npm run build`, `npm run doctor` and the README map without another edit.",
+    "",
+    "PORTS ARE ASSIGNED HERE, ONCE. Two systems that both default to 3000 is the",
+    "single most common way a local ecosystem stops booting, and the fix has to live",
+    "somewhere that both the orchestrator and the app's own dev script agree on.",
+    "",
+    "`repo` is what .gitmodules pins. A system whose repo is owned by someone else",
+    "is marked `\"upstream\": true` — it is tracked read-only and never pushed to."
+  ],
+
+  "systems": [
+    {
+      "id": "connected-suite",
+      "name": "The Connected Suite",
+      "short": "Suite",
+      "purpose": "The lender realm. Lending console, customer portal, analytics studio, PeopleHub, Ledgerly and ConnectDesk — six front doors, one BirgenAI ID.",
+      "path": "connected-suite",
+      "repo": "https://github.com/emmanuel-arch/BirgenAI_LMS",
+      "branch": "main",
+      "stack": "next",
+      "port": 3000,
+      "install": "npm install",
+      "dev": "npm run dev",
+      "build": "npm run build",
+      "start": "npm run start",
+      "readyPath": "/login",
+      "signIn": [
+        { "label": "Platform admin (BirgenAI)", "path": "/platform/login" },
+        { "label": "Lender staff", "path": "/login" },
+        { "label": "Borrower portal", "path": "/" }
+      ],
+      "env": { "file": ".env", "example": ".env.example" },
+      "database": "Supabase Postgres (shared with production) — DATABASE_URL",
+      "deploy": {
+        "platform": "vercel",
+        "live": true,
+        "note": "Deployed from the BirgenAI_LMS repo with its environment already mapped. The LOCAL FOLDER was renamed to connected-suite; the remote, the Vercel project and every env var are untouched, because Vercel builds from the repo and has never seen this folder name."
+      }
+    },
+
+    {
+      "id": "interchange",
+      "name": "The Interchange",
+      "short": "Interchange",
+      "purpose": "A federated data exchange for Kenyan lenders. Members query each other in real time through a consent-gated broker; nothing is pooled, and identity is destroyed at the edge before anything crosses a boundary.",
+      "path": "interchange",
+      "workdir": "apps/interchange-console",
+      "repo": "https://github.com/emmanuel-arch/Interchange.git",
+      "branch": "main",
+      "stack": "next",
+      "port": 3341,
+      "install": "npm install",
+      "preDev": [
+        { "cmd": "npx prisma dev -d -n interchange", "why": "Starts the local PGlite Postgres the console connects to. Detached, and a no-op when it is already up." }
+      ],
+      "dev": "npm run dev",
+      "build": "npm run build",
+      "start": "npm run start",
+      "readyPath": "/",
+      "signIn": [
+        { "label": "Operator access code", "path": "/", "note": "Gate → Access Code → your four-digit code. Super admin code is set with `npm run operator -- create`." },
+        { "label": "Member certificate", "path": "/", "note": "Ed25519, signed by the member's node. The production door." }
+      ],
+      "env": { "file": "apps/interchange-console/.env", "example": "apps/interchange-console/.env.example" },
+      "database": "Local PGlite via `prisma dev` on :51214 — DATABASE_URL",
+      "deploy": { "platform": "vercel", "live": false, "note": "Not yet deployed. Root Directory would be apps/interchange-console." }
+    },
+
+    {
+      "id": "pwa",
+      "name": "Micro Eazy",
+      "short": "PWA",
+      "purpose": "The borrower realm. One installable app: verify once, apply, track and repay — routed by the Exchange to a licensed lender who funds you.",
+      "path": "pwa",
+      "repo": "https://github.com/emmanuel-arch/micro-eazy-pwa",
+      "branch": "main",
+      "stack": "vite",
+      "port": 5173,
+      "install": "npm install",
+      "dev": "npm run dev",
+      "build": "npm run build",
+      "start": "npm run preview",
+      "readyPath": "/",
+      "signIn": [{ "label": "Borrower", "path": "/" }],
+      "env": { "file": ".env", "example": null },
+      "database": "none — talks to ServiceSuite / the Suite over HTTP",
+      "deploy": { "platform": "vercel", "live": false, "note": "vercel.json rewrites everything to / for client-side routing." },
+      "provenance": "Copied from TallamTitus/micromart-client-pwa. Re-homed under this account as its own repo so it can be deployed and evolved independently."
+    },
+
+    {
+      "id": "pbx-auth",
+      "name": "PBX Authentication",
+      "short": "PBX",
+      "purpose": "Call-centre telephony authentication worker. Backs ConnectDesk's softphone against the PBX.",
+      "path": "pbx-auth",
+      "repo": "https://github.com/skegode/PBXAuthentication",
+      "branch": "master",
+      "upstream": true,
+      "stack": "dotnet-worker",
+      "port": null,
+      "install": "dotnet restore",
+      "dev": "dotnet run --project PBXAuthentication/PBXAuthentication.csproj",
+      "build": "dotnet build -c Release",
+      "start": "dotnet run -c Release --project PBXAuthentication/PBXAuthentication.csproj",
+      "readyPath": null,
+      "signIn": [],
+      "env": { "file": "PBXAuthentication/appsettings.Development.json", "example": "PBXAuthentication/appsettings.json" },
+      "database": "SQL Server via App.config connection string",
+      "deploy": { "platform": "self-hosted", "live": true, "note": "A background Worker Service, not a web app — it has no port and no browser surface." },
+      "provenance": "Third-party repo (skegode). Pinned read-only as a submodule: fork it before you need to push."
+    }
+  ],
+
+  "portMap": {
+    "$comment": "Reserved so a new system does not collide. Claim the next free one here BEFORE you write the entry above.",
+    "3000": "connected-suite",
+    "3341": "interchange console",
+    "5173": "pwa",
+    "51214": "interchange PGlite (prisma dev)"
+  }
+}

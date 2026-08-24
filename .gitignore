@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# The meta-repo tracks almost nothing: four submodule POINTERS, the ecosystem
+# registry, the orchestration scripts and the docs. Everything else belongs to a
+# submodule and is ignored by that submodule's own .gitignore.
+#
+# Nothing here ignores the submodule directories themselves — git tracks those
+# as gitlink entries, and an ignore rule on one would silently stop the pointer
+# being recorded, which is the failure that makes a fresh clone come up empty.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Never a secret in the meta-repo. Per-system env files live inside each
+# submodule, ignored there.
+.env
+.env.*
+!.env.example
+
+# Node — the meta-repo has no dependencies, but a stray install should not be
+# committed if someone adds one.
+node_modules/
+npm-debug.log*
+*.tsbuildinfo
+
+# Local scratch
+*.local
+/tmp/
+/scratch/
