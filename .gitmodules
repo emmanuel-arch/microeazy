@@ -1,0 +1,16 @@
+[submodule "connected-suite"]
+	path = connected-suite
+	url = https://github.com/emmanuel-arch/BirgenAI_LMS
+	branch = main
+[submodule "interchange"]
+	path = interchange
+	url = https://github.com/emmanuel-arch/Interchange.git
+	branch = main
+[submodule "pwa"]
+	path = pwa
+	url = https://github.com/emmanuel-arch/micro-eazy-pwa
+	branch = main
+[submodule "pbx-auth"]
+	path = pbx-auth
+	url = https://github.com/skegode/PBXAuthentication
+	branch = master
