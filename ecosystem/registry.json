@@ -46,7 +46,18 @@
       "deploy": {
         "platform": "vercel",
         "live": true,
-        "note": "Deployed from the BirgenAI_LMS repo with its environment already mapped. The LOCAL FOLDER was renamed to connected-suite; the remote, the Vercel project and every env var are untouched, because Vercel builds from the repo and has never seen this folder name."
+        "rootDirectory": ".",
+        "buildCommand": "npm run build",
+        "domains": [
+          "microeazy.servicesuitecloud.com  — CANONICAL. / is the borrower app (installed PWA start_url); /login is the lender staff door.",
+          "connectedsuite.servicesuitecloud.com — alias onto the same deployment",
+          "lms.servicesuitecloud.com         — / rewrites to /suite/lms/login",
+          "analytics.servicesuitecloud.com   — / rewrites to /suite/analytics/login",
+          "peoplehub.servicesuitecloud.com   — / rewrites to /suite/hr/login",
+          "ledgerly.servicesuitecloud.com    — / rewrites to /suite/accounting/login",
+          "connectdesk.servicesuitecloud.com — / rewrites to /suite/callcenter/login"
+        ],
+        "note": "Deployed from the BirgenAI_LMS repo with its environment already mapped. The LOCAL FOLDER was renamed to connected-suite; the remote, the Vercel project and every env var are untouched, because Vercel builds from the repo and has never seen this folder name. Every subdomain above is the SAME deployment — src/proxy.ts rewrites the bare host to that system's branded door. SUITE_COOKIE_DOMAIN=.servicesuitecloud.com is what makes one sign-in carry across all of them."
       }
     },
 
@@ -74,8 +85,14 @@
         { "label": "Member certificate", "path": "/", "note": "Ed25519, signed by the member's node. The production door." }
       ],
       "env": { "file": "apps/interchange-console/.env", "example": "apps/interchange-console/.env.example" },
-      "database": "Local PGlite via `prisma dev` on :51214 — DATABASE_URL",
-      "deploy": { "platform": "vercel", "live": false, "note": "Not yet deployed. Root Directory would be apps/interchange-console." }
+      "database": "Local PGlite via `prisma dev` on :51214 — DATABASE_URL. PRODUCTION: its own Supabase project, NEVER the Suite's. The Registry is a separate trust domain — it holds consent records and the audit trail for competing lenders, and the whole architectural claim is that the broker cannot be read from a member's own systems. Sharing a database would make a Suite credential a Registry credential. Set DATABASE_URL to the pooled string (:6543, ?pgbouncer=true) and DIRECT_URL to the direct one (:5432) for migrations.",
+      "deploy": {
+        "platform": "vercel",
+        "live": false,
+        "rootDirectory": "apps/interchange-console",
+        "domains": ["interchange.servicesuitecloud.com"],
+        "note": "THE 404 IS THIS FIELD. The repo has no package.json at its root — the Next app is at apps/interchange-console — so a Vercel project left on the default Root Directory finds nothing to build and serves a 404 with no build error to explain it. Set Root Directory to apps/interchange-console in Project Settings → General. Needs its OWN database, never the Suite's: see the database field."
+      }
     },
 
     {
@@ -96,7 +113,13 @@
       "signIn": [{ "label": "Borrower", "path": "/" }],
       "env": { "file": ".env", "example": null },
       "database": "none — talks to ServiceSuite / the Suite over HTTP",
-      "deploy": { "platform": "vercel", "live": false, "note": "vercel.json rewrites everything to / for client-side routing." },
+      "deploy": {
+        "platform": "vercel",
+        "live": false,
+        "rootDirectory": ".",
+        "domains": ["app.servicesuitecloud.com"],
+        "note": "A flat Vite project — Root Directory is the repo root. vercel.json rewrites everything to / for client-side routing. NOTE the domain: microeazy.servicesuitecloud.com belongs to the CONNECTED SUITE deployment (its /microeazy route is what the installed app launches into), so this project needs a different label or it will fight the Suite for the same host."
+      },
       "provenance": "Copied from TallamTitus/micromart-client-pwa. Re-homed under this account as its own repo so it can be deployed and evolved independently."
     },
 

@@ -1,0 +1,1339 @@
+<title>Micro Eazy Operations Playbook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   MICRO EAZY — OPERATIONS PLAYBOOK
+   A4 print. Three typographic registers, one superfamily:
+     IBM Plex Sans   — headings, labels, table heads   (the system speaking about itself)
+     IBM Plex Serif  — running prose                    (the manual speaking to you)
+     IBM Plex Mono   — commands, paths, hosts, env vars (the machine speaking)
+   The seven system accents are the codebase's own. They are used as DATA —
+   a colour chip means "this instruction belongs to that system" — never decoration.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@page { size: A4; margin: 14mm 13mm 15mm; }
+
+:root {
+  --paper:      #fbfbfa;
+  --ink:        #17161c;
+  --ink-body:   #2c2a34;
+  --ink-muted:  #6a6874;
+  --ink-faint:  #9d9ba6;
+  --rule:       #e4e3e8;
+  --rule-soft:  #efeef2;
+  --alert:      #a8321c;
+  --alert-bg:   #fdf4f1;
+  --good:       #1d6b4f;
+  --code-bg:    #f4f3f6;
+
+  --lms:        #2a78d6;
+  --portal:     #0e7490;
+  --analytics:  #7c3aed;
+  --hr:         #6d28d9;
+  --accounting: #0f766e;
+  --desk:       #be123c;
+  --exchange:   #0891b2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink-body);
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-size: 9.6pt;
+  line-height: 1.58;
+  margin: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ── Structure ───────────────────────────────────────────────────────────── */
+
+.part { break-before: page; }
+.part:first-of-type { break-before: auto; }
+
+.row {
+  display: grid;
+  grid-template-columns: 17mm 1fr;
+  gap: 0 5mm;
+  align-items: start;
+}
+.rail { padding-top: 1.5mm; }
+.body-col { min-width: 0; }
+
+/* ── Type ────────────────────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, .label, .eyebrow, th, .chip, .badge, .num {
+  font-family: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+h1 {
+  font-size: 25pt;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 3mm;
+  text-wrap: balance;
+}
+h2 {
+  font-size: 14.5pt;
+  font-weight: 600;
+  line-height: 1.16;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: 0 0 2mm;
+  text-wrap: balance;
+}
+h3 {
+  font-size: 10.6pt;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 6mm 0 1.5mm;
+  text-wrap: balance;
+}
+h4 {
+  font-size: 9.4pt;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 4.5mm 0 1mm;
+}
+p { margin: 0 0 2.6mm; max-width: 68ch; }
+p.wide { max-width: none; }
+
+.eyebrow {
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 1.5mm;
+}
+.num {
+  font-size: 8pt;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.lede {
+  font-size: 10.8pt;
+  line-height: 1.55;
+  color: var(--ink-body);
+  max-width: 62ch;
+}
+.lede em { font-style: italic; color: var(--ink); }
+
+strong { font-weight: 600; color: var(--ink); }
+em { font-style: italic; }
+a { color: inherit; }
+
+code, kbd, .mono {
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.885em;
+}
+p code, td code, li code {
+  background: var(--code-bg);
+  padding: 0.5pt 2.2pt;
+  border-radius: 2pt;
+  color: var(--ink);
+}
+
+/* ── Command blocks — the machine's voice ────────────────────────────────── */
+
+pre {
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 8.1pt;
+  line-height: 1.62;
+  background: #1a1922;
+  color: #e6e4ee;
+  padding: 3mm 4mm;
+  border-radius: 2.5pt;
+  margin: 2.5mm 0 3mm;
+  overflow-x: auto;
+  break-inside: avoid-page;
+  white-space: pre;
+}
+pre .c { color: #8e8ba0; }          /* comment */
+pre .k { color: #79b8ff; }          /* command word */
+pre .s { color: #9fe6a0; }          /* string / value */
+pre .w { color: #ffca7a; }          /* warning inline */
+
+/* ── Tables ──────────────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.3pt;
+  margin: 2mm 0 3.5mm;
+  break-inside: avoid-page;
+  font-variant-numeric: tabular-nums;
+}
+thead th {
+  font-size: 6.9pt;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-align: left;
+  padding: 0 3mm 1.2mm 0;
+  border-bottom: 0.9pt solid var(--ink);
+  vertical-align: bottom;
+}
+tbody td {
+  padding: 1.5mm 3mm 1.5mm 0;
+  border-bottom: 0.5pt solid var(--rule);
+  vertical-align: top;
+  line-height: 1.45;
+}
+tbody tr:last-child td { border-bottom: 0.9pt solid var(--rule); }
+td.mono, th.mono { font-family: "IBM Plex Mono", monospace; font-size: 7.8pt; }
+td:last-child, th:last-child { padding-right: 0; }
+.t-tight td { padding-top: 1.1mm; padding-bottom: 1.1mm; }
+
+/* ── Chips: the colour code, used as data ────────────────────────────────── */
+
+.chip {
+  display: inline-block;
+  font-size: 6.6pt;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+  padding: 0.7mm 1.6mm;
+  border-radius: 2pt;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+.dot {
+  display: inline-block;
+  width: 6pt; height: 6pt;
+  border-radius: 1.5pt;
+  vertical-align: -0.5pt;
+  margin-right: 1.5mm;
+}
+.c-lms   { background: var(--lms); }
+.c-portal{ background: var(--portal); }
+.c-anal  { background: var(--analytics); }
+.c-hr    { background: var(--hr); }
+.c-acct  { background: var(--accounting); }
+.c-desk  { background: var(--desk); }
+.c-xch   { background: var(--exchange); }
+.c-none  { background: var(--ink-faint); }
+
+.rail-chip {
+  display: block;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 6.4pt;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  padding: 1mm 1.4mm;
+  border-radius: 2pt;
+  text-align: center;
+  margin-bottom: 1.5mm;
+  line-height: 1.25;
+}
+
+/* ── Callouts ────────────────────────────────────────────────────────────── */
+
+.note {
+  border-left: 2.2pt solid var(--ink);
+  background: #f5f4f7;
+  padding: 2.6mm 3.5mm;
+  margin: 3mm 0;
+  break-inside: avoid-page;
+  border-radius: 0 2.5pt 2.5pt 0;
+}
+.note.alert { border-left-color: var(--alert); background: var(--alert-bg); }
+.note.good  { border-left-color: var(--good); background: #f2f8f5; }
+.note p:last-child { margin-bottom: 0; }
+.note .label {
+  display: block;
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 1mm;
+}
+.note.alert .label { color: var(--alert); }
+.note.good .label  { color: var(--good); }
+
+/* ── Lists ───────────────────────────────────────────────────────────────── */
+
+ul, ol { margin: 0 0 2.6mm; padding-left: 4.5mm; max-width: 68ch; }
+li { margin-bottom: 1.1mm; }
+ul.steps { list-style: none; padding-left: 0; counter-reset: s; max-width: none; }
+ul.steps > li {
+  counter-increment: s;
+  display: grid;
+  grid-template-columns: 6mm 1fr;
+  gap: 0 2mm;
+  margin-bottom: 3.2mm;
+  break-inside: avoid-page;
+}
+ul.steps > li::before {
+  content: counter(s);
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 8.6pt;
+  font-weight: 600;
+  color: var(--ink);
+  border-top: 1.4pt solid var(--ink);
+  padding-top: 1mm;
+  font-variant-numeric: tabular-nums;
+}
+/* The prose in a step obeys the same measure as body prose — a step that runs
+   the full page width is harder to read than the paragraphs around it, and
+   these are the instructions somebody follows one line at a time. The command
+   blocks inside deliberately break out of it. */
+ul.steps > li > div { padding-top: 0.6mm; max-width: 76ch; }
+ul.steps > li > div pre { max-width: none; }
+
+/* ── Cover ───────────────────────────────────────────────────────────────── */
+
+.cover { padding-top: 6mm; }
+.cover-rule { height: 2.4pt; background: var(--ink); margin: 0 0 4mm; }
+.spectrum { display: flex; height: 3.4pt; margin: 5mm 0 6mm; border-radius: 1pt; overflow: hidden; }
+.spectrum span { flex: 1; }
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4mm;
+  border-top: 0.5pt solid var(--rule);
+  padding-top: 3mm;
+  margin-top: 5mm;
+}
+.meta div { font-size: 8.2pt; }
+.meta .label {
+  display: block;
+  font-size: 6.5pt; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.8mm;
+}
+
+.toc { margin-top: 6mm; }
+.toc-item {
+  display: grid;
+  grid-template-columns: 8mm 1fr;
+  gap: 0 3mm;
+  padding: 1.6mm 0;
+  border-bottom: 0.5pt solid var(--rule-soft);
+  font-size: 8.6pt;
+  break-inside: avoid;
+}
+.toc-item .num { color: var(--ink); }
+.toc-item strong { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; }
+.toc-item span.d { color: var(--ink-muted); font-size: 8.1pt; }
+
+.sig {
+  margin-top: 6mm;
+  border-top: 0.9pt solid var(--ink);
+  padding-top: 2.5mm;
+  font-size: 7.6pt;
+  color: var(--ink-muted);
+}
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 6mm; }
+.two > div { min-width: 0; }
+.avoid { break-inside: avoid-page; }
+.tight { margin-bottom: 1.2mm; }
+.hr { height: 0.5pt; background: var(--rule); margin: 5mm 0; border: 0; }
+</style>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- COVER                                                                  -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="cover">
+  <div class="cover-rule"></div>
+  <p class="eyebrow">Operations playbook &middot; servicesuitecloud.com</p>
+  <h1>Running the Micro&nbsp;Eazy ecosystem</h1>
+  <p class="lede">
+    Four repositories. Seven systems. One identity. This is the manual for the gap
+    between those three numbers &mdash; every command that starts something, every
+    setting that puts it on the internet, and the handful of places where getting it
+    wrong is expensive rather than merely annoying.
+  </p>
+
+  <div class="spectrum">
+    <span style="background:var(--lms)"></span>
+    <span style="background:var(--portal)"></span>
+    <span style="background:var(--analytics)"></span>
+    <span style="background:var(--hr)"></span>
+    <span style="background:var(--accounting)"></span>
+    <span style="background:var(--desk)"></span>
+    <span style="background:var(--exchange)"></span>
+  </div>
+
+  <div class="meta">
+    <div><span class="label">Compiled</span>24 August 2026</div>
+    <div><span class="label">Meta-repo</span><span class="mono">emmanuel-arch/microeazy</span></div>
+    <div><span class="label">Source of truth</span><span class="mono">ecosystem/registry.json</span></div>
+  </div>
+
+  <div class="toc">
+    <p class="eyebrow">Contents</p>
+    <div class="toc-item"><span class="num">01</span><span><strong>Four repositories, seven systems</strong> &nbsp; <span class="d">Why those numbers differ, and what it means for every command below</span></span></div>
+    <div class="toc-item"><span class="num">02</span><span><strong>Starting the estate locally</strong> &nbsp; <span class="d">Doctor, bootstrap, dev &mdash; and what to do when a port is taken</span></span></div>
+    <div class="toc-item"><span class="num">03</span><span><strong>The command reference</strong> &nbsp; <span class="d">Every npm script worth knowing, grouped by what you are trying to do</span></span></div>
+    <div class="toc-item"><span class="num">04</span><span><strong>What changed today</strong> &nbsp; <span class="d">The system switch, the seven doors &mdash; and the one migration that must run first</span></span></div>
+    <div class="toc-item"><span class="num">05</span><span><strong>Vercel: four projects</strong> &nbsp; <span class="d">Root directories, build commands, and the reason the Interchange 404s</span></span></div>
+    <div class="toc-item"><span class="num">06</span><span><strong>Databases</strong> &nbsp; <span class="d">Why the Interchange gets its own Supabase project and not a schema</span></span></div>
+    <div class="toc-item"><span class="num">07</span><span><strong>DNS</strong> &nbsp; <span class="d">Every record, in the order they should be added</span></span></div>
+    <div class="toc-item"><span class="num">08</span><span><strong>Go-live, in order</strong> &nbsp; <span class="d">The sequence, with the check that proves each step landed</span></span></div>
+    <div class="toc-item"><span class="num">09</span><span><strong>Still open</strong> &nbsp; <span class="d">What is not done, stated plainly</span></span></div>
+  </div>
+
+  <div class="sig">
+    Every orchestration script reads <span class="mono">ecosystem/registry.json</span> and nothing
+    hard-codes a path, a port or a command anywhere else. Where this document and that
+    file disagree, the file is right &mdash; and this document is out of date.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 01 — THE MAP                                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">01</span></div>
+  <div class="body-col">
+    <p class="eyebrow">The map</p>
+    <h2>Four repositories, seven systems</h2>
+    <p class="lede">
+      This is the single most confusing thing about the estate, and almost every
+      mistake made against it traces back here. <em>Seven systems</em> is what a
+      lender buys. <em>Four repositories</em> is what you deploy. Six of the seven
+      systems live inside one repository.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:5mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<h3>The seven systems &mdash; what a lender sees</h3>
+<table>
+  <thead><tr><th style="width:5mm"></th><th>System</th><th>What it is for</th><th>Route</th><th>Lives in</th></tr></thead>
+  <tbody>
+    <tr><td><span class="dot c-lms"></span></td><td><strong>Lending Console</strong></td><td>Originate, score, disburse, collect</td><td class="mono">/console</td><td class="mono">connected-suite</td></tr>
+    <tr><td><span class="dot c-portal"></span></td><td><strong>Customer Portal</strong></td><td>The borrower's own door</td><td class="mono">/microeazy</td><td class="mono">connected-suite</td></tr>
+    <tr><td><span class="dot c-anal"></span></td><td><strong>Analytics Studio</strong></td><td>The whole book, drawn</td><td class="mono">/analytics</td><td class="mono">connected-suite</td></tr>
+    <tr><td><span class="dot c-hr"></span></td><td><strong>PeopleHub HR</strong></td><td>The roster behind the book</td><td class="mono">/people</td><td class="mono">connected-suite</td></tr>
+    <tr><td><span class="dot c-acct"></span></td><td><strong>Ledgerly</strong></td><td>The journal, read live</td><td class="mono">/books</td><td class="mono">connected-suite</td></tr>
+    <tr><td><span class="dot c-desk"></span></td><td><strong>ConnectDesk</strong></td><td>The collections floor</td><td class="mono">/desk</td><td class="mono">connected-suite</td></tr>
+    <tr><td><span class="dot c-xch"></span></td><td><strong>The Interchange</strong></td><td>Consent-gated exposure exchange</td><td class="mono">(own origin)</td><td class="mono">interchange</td></tr>
+  </tbody>
+</table>
+
+<h3>The four repositories &mdash; what you deploy</h3>
+<table>
+  <thead><tr><th>Folder</th><th>Repository</th><th>Stack</th><th>Port</th><th>Deploys as</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">connected-suite</td><td class="mono">emmanuel-arch/BirgenAI_LMS</td><td>Next 16</td><td class="mono">3000</td><td>1 Vercel project, 6 systems</td></tr>
+    <tr><td class="mono">interchange</td><td class="mono">emmanuel-arch/Interchange</td><td>Next 16</td><td class="mono">3341</td><td>1 Vercel project</td></tr>
+    <tr><td class="mono">pwa</td><td class="mono">emmanuel-arch/micro-eazy-pwa</td><td>Vite + React</td><td class="mono">5173</td><td>1 Vercel project</td></tr>
+    <tr><td class="mono">pbx-auth</td><td class="mono">skegode/PBXAuthentication</td><td>.NET Worker</td><td class="mono">&mdash;</td><td>Self-hosted, no browser surface</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <span class="label">The folder name is not the repository name</span>
+  <p>
+    The local folder <span class="mono">connected-suite</span> pushes to a repository still called
+    <span class="mono">BirgenAI_LMS</span>, and its Vercel project has never seen the folder name &mdash; Vercel
+    builds from the repository. Renaming the folder was safe for exactly that reason. Do not
+    rename the <em>repository</em> to match: that would re-point a live project and re-map every
+    environment variable by hand, for no product benefit.
+  </p>
+</div>
+
+<h3>Why one deployment serves six systems</h3>
+<p>
+  Because they share the two surfaces where a multi-tenant bug becomes a cross-lender data
+  leak: <strong>auth and tenancy</strong>. Six separate deployments would mean six copies of
+  session handling, the daily OTP, tenant resolution, the vault and RBAC &mdash; and five
+  chances for one of them to drift. A subdomain here is a <em>rewrite</em>
+  (<span class="mono">src/proxy.ts</span>), not a second application.
+</p>
+<p>
+  The Interchange is the exception, and deliberately so. It is a separate <em>trust domain</em>,
+  not merely a separate product: it brokers between competing lenders, and the architectural
+  claim is that no member can read the Registry from their own systems. That claim is worth
+  a second deployment and a second database. See <span class="num">06</span>.
+</p>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 02 — LOCAL                                                             -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">02</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Local</p>
+    <h2>Starting the estate</h2>
+    <p class="lede">
+      Everything runs from the meta-repo root, <span class="mono">C:\GIT\MICRO EAZY</span>.
+      Four commands cover the normal day.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<pre><span class="c"># From C:\GIT\MICRO EAZY — the meta-repo root</span>
+
+<span class="k">npm run doctor</span>       <span class="c"># is this machine ready? checks submodules, deps,</span>
+                     <span class="c"># env files, free ports, required variables</span>
+
+<span class="k">npm run bootstrap</span>    <span class="c"># npm install in every system, in sequence</span>
+
+<span class="k">npm run dev</span>          <span class="c"># start every system at once, colour-tagged output</span>
+<span class="k">npm run dev</span> <span class="s">interchange</span>   <span class="c"># …or just one</span>
+
+<span class="k">npm run build</span>        <span class="c"># production build of every system, sequentially</span>
+<span class="k">npm run start</span>        <span class="c"># run those production builds</span></pre>
+
+<h3>Keeping the pins in step</h3>
+<p>
+  The meta-repo does not contain the systems; it <em>pins</em> them at a commit. That pin is
+  the record of which combination constitutes a working estate &mdash; which was previously
+  written down nowhere, and is precisely why a fresh machine could not reproduce one.
+</p>
+
+<pre><span class="k">npm run pull</span>         <span class="c"># pull the meta-repo and check out the pinned commits</span>
+<span class="k">npm run sync</span>         <span class="c"># pull each submodule to the TIP of its branch instead</span>
+
+<span class="c"># After sync, the pins have moved. Record the new combination:</span>
+<span class="k">git</span> add connected-suite interchange pwa
+<span class="k">git</span> commit -m <span class="s">"Bump the pointers"</span></pre>
+
+<div class="note alert">
+  <span class="label">A change spanning two systems is two pull requests and a pointer bump</span>
+  <p>
+    That is the cost of independent deployability, and it is worth naming rather than
+    discovering. Push the system repository first, then bump the pin in the meta-repo.
+    A pin bumped to a commit that was never pushed will check out on your machine and
+    on nobody else's.
+  </p>
+</div>
+
+<h3>Ports, and what to do when one is taken</h3>
+<table class="t-tight">
+  <thead><tr><th>Port</th><th>System</th><th>Claimed in</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">3000</td><td>Connected Suite</td><td class="mono">registry.json &rarr; portMap</td></tr>
+    <tr><td class="mono">3341</td><td>Interchange console</td><td class="mono">registry.json &rarr; portMap</td></tr>
+    <tr><td class="mono">5173</td><td>Micro Eazy PWA</td><td class="mono">registry.json &rarr; portMap</td></tr>
+    <tr><td class="mono">51214</td><td>Interchange PGlite (<span class="mono">prisma dev</span>)</td><td class="mono">registry.json &rarr; portMap</td></tr>
+  </tbody>
+</table>
+<p>
+  <span class="mono">npm run doctor</span> reports a busy port before <span class="mono">npm run dev</span> fails on it.
+  Two systems both defaulting to 3000 is the single most common way a local ecosystem stops
+  booting &mdash; claim the next free port in <span class="mono">portMap</span> <em>before</em> writing a new
+  registry entry, not after.
+</p>
+
+<h3>The Interchange needs its database started first</h3>
+<p>
+  It is the only system with a <span class="mono">preDev</span> step. <span class="mono">npm run dev</span> runs it
+  automatically; if you are starting the console on its own, run it yourself.
+</p>
+<pre><span class="c"># cd interchange/apps/interchange-console</span>
+<span class="k">npx</span> prisma dev -d -n interchange   <span class="c"># detached; a no-op when already up</span>
+<span class="k">npm run</span> dev                        <span class="c"># :3341</span></pre>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 03 — COMMANDS                                                          -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">03</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Reference</p>
+    <h2>The command reference</h2>
+    <p class="lede">
+      The Connected Suite alone carries eighty-six npm scripts. These are the ones worth
+      knowing, grouped by what you are actually trying to do. Run
+      <span class="mono">npm run</span> with no argument in any system to see the rest.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"><span class="rail-chip" style="background:var(--lms)">Suite</span><span class="rail-chip" style="background:var(--portal)">Portal</span><span class="rail-chip" style="background:var(--analytics)">Analytics</span><span class="rail-chip" style="background:var(--hr)">People</span><span class="rail-chip" style="background:var(--accounting)">Ledgerly</span><span class="rail-chip" style="background:var(--desk)">Desk</span></div>
+  <div class="body-col">
+
+<h3>Connected Suite &mdash; <span class="mono" style="font-weight:400;font-size:9pt">cd connected-suite</span></h3>
+
+<h4>Running it</h4>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run dev</td><td>Dev server on :3000</td></tr>
+    <tr><td class="mono">npm run build</td><td><span class="mono">prisma generate</span> then <span class="mono">next build</span> &mdash; exactly what Vercel runs</td></tr>
+    <tr><td class="mono">npm run start</td><td>Serve the production build</td></tr>
+    <tr><td class="mono">npm run lint</td><td>ESLint</td></tr>
+  </tbody>
+</table>
+
+<h4>Database</h4>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run db:push</td><td>Push the Prisma schema to <span class="mono">DATABASE_URL</span>. <strong>Required before this release deploys</strong> &mdash; see <span class="num">04</span></td></tr>
+    <tr><td class="mono">npm run db:studio</td><td>Prisma Studio, a browser over the data</td></tr>
+    <tr><td class="mono">npm run db:seed</td><td>Base seed</td></tr>
+    <tr><td class="mono">npm run db:seed:demo</td><td>The guided showcase org and its lifecycle</td></tr>
+    <tr><td class="mono">npm run db:rls</td><td>Apply row-level security policies</td></tr>
+    <tr><td class="mono">npm run db:rls:verify</td><td>Prove the policies actually bite</td></tr>
+    <tr><td class="mono">npm run db:app-role</td><td>Create the restricted application role</td></tr>
+    <tr><td class="mono">npm run db:index-advisor</td><td>Report indexes worth adding</td></tr>
+  </tbody>
+</table>
+
+<h4>Setting up a lender</h4>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run platform:admin</td><td>Create the BirgenAI platform administrator &mdash; the account that opens <span class="mono">/platform</span></td></tr>
+    <tr><td class="mono">npm run setup:launch</td><td>Create the launch organisations</td></tr>
+    <tr><td class="mono">npm run org:activate</td><td>Flip an org to ACTIVE from the terminal</td></tr>
+    <tr><td class="mono">npm run storage:init</td><td>Create the storage buckets</td></tr>
+    <tr><td class="mono">npm run vault:seed-micromart</td><td>Seed Micromart's integration vault</td></tr>
+  </tbody>
+</table>
+
+<h4>Artwork</h4>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run art:prompts</td><td>Print each login plate's generation prompt and target path</td></tr>
+    <tr><td class="mono">npm run art:optimize</td><td>Report the PNG&rarr;WebP encode; writes nothing</td></tr>
+    <tr><td class="mono">npm run art:optimize -- --write</td><td>Actually encode. 8.02&nbsp;MB &rarr; 230&nbsp;kB</td></tr>
+    <tr><td class="mono">npm run art:check</td><td><strong>New.</strong> Score each plate: left-third darkness, chroma, hue against its accent. Non-zero exit on a failure</td></tr>
+  </tbody>
+</table>
+
+<h4>Verification &mdash; the ones to run before a release</h4>
+<p class="tight">
+  There are fifty of these. They are real assertions against the real database, not unit
+  tests. These six cover the surfaces that break silently:
+</p>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>Proves</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run test:access</td><td>The access catalogue and per-person module denial</td></tr>
+    <tr><td class="mono">npm run test:rbac</td><td>Rights gate what they claim to gate</td></tr>
+    <tr><td class="mono">npm run test:scope</td><td>Tenant scoping &mdash; the cross-lender boundary</td></tr>
+    <tr><td class="mono">npm run test:platform-admin</td><td>The platform session cannot be forged</td></tr>
+    <tr><td class="mono">npm run test:federation</td><td>Cross-system session carry</td></tr>
+    <tr><td class="mono">npm run test:live</td><td>The live data reads behind the launcher tiles</td></tr>
+  </tbody>
+</table>
+
+  </div>
+</div>
+
+<div class="row" style="margin-top:5mm">
+  <div class="rail"><span class="rail-chip" style="background:var(--exchange)">Exchange</span></div>
+  <div class="body-col">
+
+<h3>The Interchange &mdash; <span class="mono" style="font-weight:400;font-size:9pt">cd interchange/apps/interchange-console</span></h3>
+
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run db:dev</td><td>Start the local PGlite Postgres on :51214. Run this first</td></tr>
+    <tr><td class="mono">npm run dev</td><td>Console on :3341</td></tr>
+    <tr><td class="mono">npm run build</td><td>Production build</td></tr>
+    <tr><td class="mono">npm run db:push</td><td>Push the Registry schema</td></tr>
+    <tr><td class="mono">npm run db:seed</td><td>Seed members and reference data</td></tr>
+    <tr><td class="mono">npm run keys:dev</td><td>Generate the OPRF and member keys for local work</td></tr>
+    <tr><td class="mono">npm run keys:session</td><td>Generate <span class="mono">INTERCHANGE_SESSION_SECRET</span></td></tr>
+    <tr><td class="mono">npm run operator -- create</td><td>Create an operator and their four-digit access code</td></tr>
+    <tr><td class="mono">npm run operator:list</td><td>List operators</td></tr>
+    <tr><td class="mono">npm run verify:operator</td><td>Prove a hand-written session cookie is refused</td></tr>
+    <tr><td class="mono">npm run verify:exchange</td><td>Prove the consent gate holds</td></tr>
+    <tr><td class="mono">npm run verify:tamper</td><td>Prove a tampered payload is rejected</td></tr>
+    <tr><td class="mono">npm run verify:exposure</td><td>Exposure aggregation</td></tr>
+    <tr><td class="mono">npm run verify:scoring</td><td>The Interchange Score</td></tr>
+    <tr><td class="mono">npm run verify:onboarding</td><td>Self-service member onboarding</td></tr>
+    <tr><td class="mono">npm run filters:build</td><td>Rebuild the membership filters</td></tr>
+    <tr><td class="mono">npm run train</td><td>Retrain the scoring models</td></tr>
+  </tbody>
+</table>
+
+<h3>Micro Eazy PWA &mdash; <span class="mono" style="font-weight:400;font-size:9pt">cd pwa</span></h3>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">npm run dev</td><td>Vite dev server on :5173</td></tr>
+    <tr><td class="mono">npm run build</td><td>Production build to <span class="mono">dist/</span></td></tr>
+    <tr><td class="mono">npm run preview</td><td>Serve <span class="mono">dist/</span></td></tr>
+    <tr><td class="mono">npm run lint</td><td>ESLint</td></tr>
+  </tbody>
+</table>
+
+<h3>PBX Authentication &mdash; <span class="mono" style="font-weight:400;font-size:9pt">cd pbx-auth</span></h3>
+<p class="tight">
+  A .NET background worker. No port, no browser surface, and a <strong>third-party
+  repository</strong> &mdash; tracked read-only. Fork it before you need to push.
+</p>
+<pre><span class="k">dotnet</span> restore
+<span class="k">dotnet</span> run --project PBXAuthentication/PBXAuthentication.csproj
+<span class="k">dotnet</span> build -c Release</pre>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 04 — WHAT CHANGED                                                      -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">04</span></div>
+  <div class="body-col">
+    <p class="eyebrow">This release</p>
+    <h2>What changed today</h2>
+    <p class="lede">
+      Three things, and one of them will take the product down if it deploys in the
+      wrong order.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<div class="note alert">
+  <span class="label">Run this before the deploy, not after</span>
+  <p>
+    A new column, <span class="mono">Org.systems</span>, backs the per-lender system switch.
+    The deployed code selects it on the first screen every staff member sees. If the
+    code ships before the column exists, <span class="mono">/suite</span> throws for everybody.
+  </p>
+  <pre style="margin-bottom:0"><span class="c"># against the PRODUCTION DATABASE_URL, before pushing to main</span>
+<span class="k">cd</span> connected-suite
+<span class="k">npx</span> prisma generate
+<span class="k">npm run</span> db:push</pre>
+</div>
+
+<h3>1 &mdash; Lenders now hold systems, not the whole suite</h3>
+<p>
+  There are now <strong>three gates</strong> in front of a system, and they compose by AND.
+  Conflating any two of them is what makes access control impossible to explain to the
+  person on the receiving end.
+</p>
+<table>
+  <thead><tr><th style="width:26mm">Gate</th><th>Question</th><th>Set by</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Entitled</strong></td><td>Did this <em>organisation</em> buy it?</td><td>Platform admin</td><td class="mono">/platform</td></tr>
+    <tr><td><strong>Visible</strong></td><td>Is it part of <em>this person's</em> job?</td><td>Their administrator</td><td class="mono">StaffUser.access</td></tr>
+    <tr><td><strong>Entered</strong></td><td>Do they hold the right that opens it?</td><td>Their role</td><td class="mono">Role.rights</td></tr>
+  </tbody>
+</table>
+<p>
+  <span class="mono">/platform</span> now carries a colour-coded toggle row per lender. The
+  change is staged rather than instant &mdash; ticking three boxes is one decision, not
+  three &mdash; and the Save button names what is about to be <em>removed</em> before you
+  press it, because removals are the half that hurts.
+</p>
+<p>
+  <strong>Null means every system.</strong> An organisation that existed before this column
+  is unrestricted and inherits systems added later. An empty array is a different, real
+  value meaning <em>no systems</em>, and the launcher says so plainly rather than rendering
+  a blank page.
+</p>
+<p>
+  Hiding a tile is a courtesy; the control is the refusal. Every satellite layout now
+  checks entitlement server-side, so a lender whose Ledgerly was switched off cannot
+  reach it by typing <span class="mono">/books</span>.
+</p>
+
+<h3>2 &mdash; Seven front doors</h3>
+<p>
+  Each system's bare host now serves <em>that system's own sign-in page</em> rather than
+  dropping straight into the console. The page holds both audiences at once: somebody
+  already carrying a BirgenAI ID gets one button with their own first name on it, and
+  somebody who only has the link gets the real email-and-password form &mdash; on that
+  system's artwork, in that system's colour.
+</p>
+<table class="t-tight">
+  <thead><tr><th style="width:5mm"></th><th>Host</th><th>Serves</th></tr></thead>
+  <tbody>
+    <tr><td><span class="dot c-lms"></span></td><td class="mono">lms.servicesuitecloud.com</td><td class="mono">/suite/lms/login</td></tr>
+    <tr><td><span class="dot c-anal"></span></td><td class="mono">analytics.servicesuitecloud.com</td><td class="mono">/suite/analytics/login</td></tr>
+    <tr><td><span class="dot c-hr"></span></td><td class="mono">peoplehub.servicesuitecloud.com</td><td class="mono">/suite/hr/login</td></tr>
+    <tr><td><span class="dot c-acct"></span></td><td class="mono">ledgerly.servicesuitecloud.com</td><td class="mono">/suite/accounting/login</td></tr>
+    <tr><td><span class="dot c-desk"></span></td><td class="mono">connectdesk.servicesuitecloud.com</td><td class="mono">/suite/callcenter/login</td></tr>
+    <tr><td><span class="dot c-portal"></span></td><td class="mono">microeazy.servicesuitecloud.com</td><td><span class="mono">/microeazy</span> &mdash; the borrower app; <span class="mono">/login</span> is the staff door</td></tr>
+    <tr><td><span class="dot c-xch"></span></td><td class="mono">interchange.servicesuitecloud.com</td><td>Its own member gate, separate deployment</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <span class="label">Two hosts deliberately have no staff door</span>
+  <p>
+    <span class="mono">microeazy.…</span> keeps serving the borrower app at <span class="mono">/</span> because
+    the installed PWA's <span class="mono">start_url</span> is that host &mdash; every home-screen icon
+    already on a customer's phone opens there, and an installed base cannot be un-pointed.
+    The lender staff door on that host is <span class="mono">/login</span>, which works today.
+    The Interchange has no BirgenAI ID session to carry: it authenticates members by
+    Ed25519 node certificate, so a "Continue as&hellip;" button would be a promise it
+    cannot keep.
+  </p>
+</div>
+
+<h3>3 &mdash; The five satellites got a floor</h3>
+<p>
+  The lending console has always sat on artwork while PeopleHub, Ledgerly, ConnectDesk
+  and the Analytics Studio sat on flat grey &mdash; which is exactly why one of them looked
+  like a product and the others looked like admin panels. They now share the console's
+  canvas with a wash in their own accent, driven by the accent each system already
+  declares. One shared image, seven distinct rooms, nothing new to keep in sync.
+</p>
+<p>
+  Separately: the lucide <span class="mono">Sparkles</span> icon has been removed from every
+  live surface and the rule recorded, so it does not come back.
+</p>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 05 — VERCEL                                                            -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">05</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Deployment</p>
+    <h2>Vercel: four projects</h2>
+    <p class="lede">
+      Three of them serve browsers. The fourth is a .NET worker and does not belong on
+      Vercel at all.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<table>
+  <thead><tr><th>Project</th><th>Repository</th><th>Root Directory</th><th>Framework</th><th>Build</th></tr></thead>
+  <tbody>
+    <tr><td><strong>connected-suite</strong></td><td class="mono">BirgenAI_LMS</td><td class="mono">. <span style="color:var(--ink-faint)">(repo root)</span></td><td>Next.js</td><td class="mono">npm run build</td></tr>
+    <tr><td><strong>interchange</strong></td><td class="mono">Interchange</td><td class="mono">apps/interchange-console</td><td>Next.js</td><td class="mono">npm run build</td></tr>
+    <tr><td><strong>micro-eazy-pwa</strong></td><td class="mono">micro-eazy-pwa</td><td class="mono">. <span style="color:var(--ink-faint)">(repo root)</span></td><td>Vite</td><td class="mono">npm run build</td></tr>
+    <tr><td><strong>pbx-auth</strong></td><td class="mono">PBXAuthentication</td><td colspan="3">Not a web app. Self-hosted Windows service &mdash; no Vercel project</td></tr>
+  </tbody>
+</table>
+
+<div class="note alert">
+  <span class="label">Why the Interchange returns 404</span>
+  <p>
+    The Interchange repository has <strong>no <span class="mono">package.json</span> at its root</strong>. The Next
+    application is at <span class="mono">apps/interchange-console</span>. A Vercel project left on the
+    default Root Directory therefore finds nothing to build, produces no error worth
+    reading, and serves a 404.
+  </p>
+  <p style="margin-top:1.5mm">
+    <strong>The fix:</strong> Project Settings &rarr; General &rarr; Root Directory &rarr;
+    <span class="mono">apps/interchange-console</span> &rarr; Save. Then redeploy.
+  </p>
+</div>
+
+<div class="note alert">
+  <span class="label">And then it fails to type-check &mdash; the second Interchange blocker</span>
+  <p>
+    With the Root Directory fixed, the build gets far enough to fail differently:
+    <span class="mono">Module '@prisma/client' has no exported member 'PrismaClient'</span>, followed by
+    two dozen implicit-<span class="mono">any</span> errors that are all downstream of it.
+  </p>
+  <p style="margin-top:1.5mm">
+    <span class="mono">@prisma/client/index.d.ts</span> contains one line &mdash;
+    <span class="mono">export * from '.prisma/client/default'</span> &mdash; a re-export of a directory that
+    <strong><span class="mono">prisma generate</span> writes and <span class="mono">npm install</span> does not.</strong> It
+    exists on your machine and is gitignored, so Vercel installs from the lockfile and gets
+    the empty stub. Nothing exports <span class="mono">PrismaClient</span>, every Prisma call loses its
+    return type, and every <span class="mono">.map(h =&gt; …)</span> becomes an implicit any under
+    <span class="mono">strict</span>. One root cause, twenty errors.
+  </p>
+  <p style="margin-top:1.5mm">
+    The Connected Suite has always carried the generate step; the Interchange never did.
+    Both now read:
+  </p>
+  <pre style="margin-bottom:0"><span class="s">"postinstall"</span>: <span class="s">"prisma generate"</span>,
+<span class="s">"build"</span>:       <span class="s">"prisma generate &amp;&amp; next build"</span></pre>
+</div>
+
+<p>
+  Both, not either. <span class="mono">postinstall</span> alone is skipped when Vercel restores a cached
+  <span class="mono">node_modules</span> without re-running the install; <span class="mono">build</span> alone
+  re-generates on every local build for no reason. Together they cover both paths, which is
+  why this is the shape the Suite already used.
+</p>
+
+<div class="note alert">
+  <span class="label">And then it fails a third time &mdash; at &ldquo;Collecting page data&rdquo;</span>
+  <p>
+    <span class="mono">Failed to collect configuration for /api/authorise &mdash; [prisma] DATABASE_URL is
+    not set.</span>
+  </p>
+  <p style="margin-top:1.5mm">
+    That step <em>imports every route module</em> to read its configuration exports
+    (<span class="mono">runtime</span>, <span class="mono">dynamic</span>, <span class="mono">revalidate</span>). Importing a
+    route imported <span class="mono">lib/prisma.ts</span>, which built the client at module load and
+    threw when the URL was absent. The client is now constructed lazily behind a Proxy, so
+    importing the module costs nothing and the error fires at the first real query &mdash; where
+    it is actually useful.
+  </p>
+  <p style="margin-top:1.5mm">
+    The general rule this is an instance of: <strong>a build must not depend on a secret being
+    in scope.</strong> Build-time and run-time are different environments, and a build that only
+    passes when production credentials happen to be present is one that fails on a laptop,
+    in CI, and in every preview deployment.
+  </p>
+</div>
+
+<div class="note">
+  <span class="label">Redeploy rebuilds the same commit</span>
+  <p>
+    All three of the above were fixed in successive commits, and each one appeared to
+    &ldquo;come back&rdquo; because <em>Redeploy re-runs the commit that deployment was built
+    from</em>, not the tip of the branch. If a fix looks like it did not take, check the
+    commit SHA at the top of the build log against <span class="mono">git rev-parse --short
+    origin/main</span> before debugging anything else. A fresh deploy comes from a push &mdash;
+    <span class="mono">git commit --allow-empty -m "rebuild" &amp;&amp; git push</span> if there is nothing
+    to change.
+  </p>
+</div>
+
+<h3>Environment variables</h3>
+
+<h4><span class="dot c-lms"></span>connected-suite &mdash; the ones that make it a suite</h4>
+<table class="t-tight">
+  <thead><tr><th style="width:62mm">Variable</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">SUITE_COOKIE_DOMAIN</td><td class="mono">.servicesuitecloud.com</td></tr>
+    <tr><td class="mono">SUITE_INTERCHANGE_ORIGIN</td><td class="mono">https://interchange.servicesuitecloud.com</td></tr>
+    <tr><td class="mono">PUBLIC_BASE_URL</td><td class="mono">https://microeazy.servicesuitecloud.com</td></tr>
+    <tr><td class="mono">NEXTAUTH_URL</td><td class="mono">https://microeazy.servicesuitecloud.com</td></tr>
+    <tr><td class="mono">DATABASE_URL</td><td>Supabase pooled &mdash; port <span class="mono">6543</span>, <span class="mono">?pgbouncer=true</span></td></tr>
+    <tr><td class="mono">DIRECT_URL</td><td>Supabase direct &mdash; port <span class="mono">5432</span> (migrations)</td></tr>
+    <tr><td class="mono">NEXTAUTH_SECRET</td><td>Already set</td></tr>
+    <tr><td class="mono">VAULT_MASTER_KEY</td><td>Already set &mdash; <strong>rotating it orphans every stored credential</strong></td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <span class="label">SUITE_COOKIE_DOMAIN is what makes the suite a suite</span>
+  <p>
+    A session cookie set on <span class="mono">lms.servicesuitecloud.com</span> with no explicit
+    <span class="mono">domain</span> is <em>host-only</em> &mdash; the browser will simply not send it to
+    <span class="mono">peoplehub.servicesuitecloud.com</span>. Single sign-on works in development purely
+    because every system is the same host. Miss this one variable and the symptom is not an
+    error: it is being asked to sign in again on every subdomain, which reads as six
+    products rather than one.
+  </p>
+  <p style="margin-top:1.5mm">
+    Leave it <em>unset</em> on preview deployments. A cookie scoped to
+    <span class="mono">.vercel.app</span> would be shared with every other tenant of that domain.
+  </p>
+</div>
+
+<p>
+  Leave the six <span class="mono">SUITE_*_ORIGIN</span> variables for the in-repo systems
+  (<span class="mono">SUITE_LMS_ORIGIN</span>, <span class="mono">SUITE_HR_ORIGIN</span>, and so on) <strong>unset</strong>.
+  They exist to split a system onto its own deployment later; setting one now would point
+  the launcher at an origin that does not exist yet. <span class="mono">SUITE_INTERCHANGE_ORIGIN</span>
+  is the exception, because that system genuinely is elsewhere.
+</p>
+
+<h4><span class="dot c-xch"></span>interchange</h4>
+<table class="t-tight">
+  <thead><tr><th style="width:62mm">Variable</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">DATABASE_URL</td><td><strong>Its own</strong> Supabase project, pooled (:6543)</td></tr>
+    <tr><td class="mono">DIRECT_URL</td><td>Same project, direct (:5432)</td></tr>
+    <tr><td class="mono">INTERCHANGE_SESSION_SECRET</td><td><span class="mono">npm run keys:session</span> &mdash; 32+ chars</td></tr>
+    <tr><td class="mono">INTERCHANGE_OPRF_KEY</td><td>Generate once. <strong>Rotating it re-tokenises every borrower in the ecosystem</strong></td></tr>
+    <tr><td class="mono">CONSENT_WORDING_VERSION</td><td class="mono">2026-08-1.0</td></tr>
+    <tr><td class="mono">INTERCHANGE_ALLOW_CODE_LOGIN</td><td class="mono">0</td></tr>
+    <tr><td class="mono">INTERCHANGE_DEV_OPEN_CONSOLE</td><td class="mono">0</td></tr>
+  </tbody>
+</table>
+<p>
+  The last two matter. Four-digit operator codes are refused outright when
+  <span class="mono">NODE_ENV=production</span> unless the first is explicitly <span class="mono">1</span> &mdash; the
+  production door is the member certificate. Ten thousand combinations means the hash is
+  not the control; lockout is.
+</p>
+
+<h4><span class="dot c-portal"></span>micro-eazy-pwa</h4>
+<p class="tight">
+  Whatever API base URL the client needs, and nothing else &mdash; it holds no lender data and
+  no bureau data. <span class="mono">vercel.json</span> already rewrites every path to
+  <span class="mono">/</span> for client-side routing.
+</p>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 06 — DATABASES                                                         -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">06</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Data</p>
+    <h2>Databases</h2>
+    <p class="lede">
+      You asked whether the Interchange should get a new Supabase database in production.
+      It should &mdash; and not as a preference. It is the architecture's central claim.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<table>
+  <thead><tr><th>System</th><th>Database</th><th>Holds</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Connected Suite</strong></td><td>Supabase project A <em>(existing)</em></td><td>Lenders, borrowers, loans, staff, the vault</td></tr>
+    <tr><td><strong>Interchange</strong></td><td><strong>Supabase project B</strong> <em>(new)</em></td><td>Members, consent records, the audit trail. <strong>No borrower record, no raw identifier</strong></td></tr>
+    <tr><td><strong>PWA</strong></td><td>None</td><td>Talks to the Suite over HTTP</td></tr>
+    <tr><td><strong>PBX Auth</strong></td><td>SQL Server</td><td>Telephony authentication</td></tr>
+  </tbody>
+</table>
+
+<h3>Why not one database with two schemas</h3>
+<p>
+  Because the Registry is a separate <em>trust domain</em>, not merely a separate concern.
+  It brokers between lenders who are competitors, and the thing being sold is that no
+  member can read the exchange from their own systems. Share a database and a Suite
+  credential becomes a Registry credential &mdash; the audit trail, the consent records and
+  every member's query history all sit one connection string away from the application
+  those members are being asked to trust.
+</p>
+<p>
+  There is a mundane failure too: <span class="mono">prisma db push</span> from either repository
+  would see the other's tables, and Prisma's opinion about tables it does not know about is
+  not one you want to discover in production.
+</p>
+
+<h3>Creating it</h3>
+<ul class="steps">
+  <li><div>New Supabase project. Region <strong>eu-central-1</strong> or <strong>eu-west-2</strong> &mdash; whichever the Suite already uses, so a call between them does not cross an ocean.</div></li>
+  <li><div>Copy both connection strings from Project Settings &rarr; Database. The <em>Transaction</em> pooler (port <span class="mono">6543</span>) is <span class="mono">DATABASE_URL</span>; append <span class="mono">?pgbouncer=true</span>. The <em>Session</em> / direct string (port <span class="mono">5432</span>) is <span class="mono">DIRECT_URL</span>.</div></li>
+  <li><div>Push the schema and seed:
+    <pre style="margin-top:1.5mm"><span class="k">cd</span> interchange/apps/interchange-console
+<span class="c"># with the production URLs in the environment</span>
+<span class="k">npm run</span> db:push
+<span class="k">npm run</span> db:seed
+<span class="k">npm run</span> operator -- create   <span class="c"># the first super-admin</span></pre>
+  </div></li>
+  <li><div>Set both URLs in the Vercel project, redeploy, then run <span class="mono">npm run verify:operator</span> against it &mdash; it asserts that a hand-written session cookie is refused.</div></li>
+</ul>
+
+<div class="note alert">
+  <span class="label">Two keys with very different blast radii</span>
+  <p>
+    <span class="mono">INTERCHANGE_SESSION_SECRET</span> can be rotated freely: it signs everyone out
+    and nothing more. <span class="mono">INTERCHANGE_OPRF_KEY</span> cannot &mdash; rotating it
+    re-tokenises every borrower in the ecosystem, which invalidates every consent
+    reference and every exposure record that points at one. Generate it once, store it
+    where you store the vault master key, and treat losing it as data loss.
+  </p>
+</div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 07 — DNS                                                               -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">07</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Networking</p>
+    <h2>DNS</h2>
+    <p class="lede">
+      Nine records at the registrar for <span class="mono">servicesuitecloud.com</span>. Seven of
+      them point at the same Vercel project, which is the whole trick.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<h3>Step one &mdash; add the domains in Vercel first</h3>
+<p>
+  Add every hostname under Project &rarr; Settings &rarr; Domains <em>before</em> touching the
+  registrar. Vercel then shows you the exact target and issues the certificate the moment
+  the record resolves. Adding the DNS first just means waiting through a propagation cycle
+  for a certificate that had not been requested yet.
+</p>
+
+<h3>Step two &mdash; the records</h3>
+<table class="t-tight">
+  <thead><tr><th style="width:5mm"></th><th>Type</th><th>Name</th><th>Value</th><th>Project</th></tr></thead>
+  <tbody>
+    <tr><td><span class="dot c-portal"></span></td><td class="mono">CNAME</td><td class="mono">microeazy</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-none"></span></td><td class="mono">CNAME</td><td class="mono">connectedsuite</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-lms"></span></td><td class="mono">CNAME</td><td class="mono">lms</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-anal"></span></td><td class="mono">CNAME</td><td class="mono">analytics</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-hr"></span></td><td class="mono">CNAME</td><td class="mono">peoplehub</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-acct"></span></td><td class="mono">CNAME</td><td class="mono">ledgerly</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-desk"></span></td><td class="mono">CNAME</td><td class="mono">connectdesk</td><td class="mono">cname.vercel-dns.com</td><td>connected-suite</td></tr>
+    <tr><td><span class="dot c-xch"></span></td><td class="mono">CNAME</td><td class="mono">interchange</td><td class="mono">cname.vercel-dns.com</td><td><strong>interchange</strong></td></tr>
+    <tr><td><span class="dot c-none"></span></td><td class="mono">CNAME</td><td class="mono">app</td><td class="mono">cname.vercel-dns.com</td><td><strong>micro-eazy-pwa</strong></td></tr>
+  </tbody>
+</table>
+<p>
+  If you want the apex <span class="mono">servicesuitecloud.com</span> itself to resolve, add an
+  <span class="mono">A</span> record for <span class="mono">@</span> pointing at <span class="mono">76.76.21.21</span>. Vercel
+  will confirm the current value when you add the domain &mdash; use what it tells you rather
+  than what is written here, because that address is the one thing on this page that can
+  change without anybody telling us.
+</p>
+
+<div class="note">
+  <span class="label">Set microeazy as the Production Domain</span>
+  <p>
+    In the connected-suite project, mark <span class="mono">microeazy.servicesuitecloud.com</span> as the
+    production domain. Every other host on that project should be added as a plain domain,
+    <em>not</em> a redirect &mdash; a redirect would collapse all seven front doors into one and
+    undo the entire point of <span class="mono">src/proxy.ts</span>.
+  </p>
+</div>
+
+<h3>Step three &mdash; prove it</h3>
+<pre><span class="c"># each of these should return 200 and land on a different door</span>
+<span class="k">curl</span> -sI https://lms.servicesuitecloud.com         | head -1
+<span class="k">curl</span> -sI https://connectdesk.servicesuitecloud.com  | head -1
+<span class="k">curl</span> -sI https://interchange.servicesuitecloud.com  | head -1
+
+<span class="c"># the staff door on the canonical host</span>
+<span class="k">curl</span> -sI https://microeazy.servicesuitecloud.com/login | head -1
+
+<span class="c"># the cookie must carry the parent domain, or SSO does not cross</span>
+<span class="k">curl</span> -sI https://microeazy.servicesuitecloud.com/api/auth/login <span class="w">\</span>
+  | grep -i set-cookie   <span class="c"># expect: Domain=.servicesuitecloud.com</span></pre>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 08 — GO LIVE                                                           -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">08</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Sequence</p>
+    <h2>Go-live, in order</h2>
+    <p class="lede">
+      The order matters in exactly two places: the migration must precede the deploy, and
+      the Vercel domains must precede the DNS. Everything else is independent.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<ul class="steps">
+  <li><div>
+    <strong>Migrate the Suite database.</strong> The new <span class="mono">Org.systems</span> column, against
+    production, before any code that reads it exists.
+    <pre style="margin-top:1.5mm"><span class="k">cd</span> connected-suite &amp;&amp; <span class="k">npm run</span> db:push</pre>
+  </div></li>
+
+  <li><div>
+    <strong>Push the Suite.</strong> Vercel builds on push to <span class="mono">main</span>. This is the deploy
+    that lights up <span class="mono">connectedsuite.servicesuitecloud.com</span> and the six doors.
+    <pre style="margin-top:1.5mm"><span class="k">cd</span> connected-suite
+<span class="k">git</span> add -A &amp;&amp; <span class="k">git</span> commit -m <span class="s">"Seven doors, per-lender systems"</span>
+<span class="k">git</span> push origin main</pre>
+  </div></li>
+
+  <li><div>
+    <strong>Create the Interchange database</strong> and push its schema &mdash; see <span class="num">06</span>.
+  </div></li>
+
+  <li><div>
+    <strong>Fix the Interchange project's Root Directory</strong> to
+    <span class="mono">apps/interchange-console</span>, set its environment variables, and redeploy.
+    The 404 goes away on that redeploy and not before.
+  </div></li>
+
+  <li><div>
+    <strong>Push the Interchange and the PWA.</strong>
+    <pre style="margin-top:1.5mm"><span class="k">cd</span> interchange &amp;&amp; <span class="k">git</span> push origin main
+<span class="k">cd</span> ../pwa &amp;&amp; <span class="k">git</span> push origin main</pre>
+  </div></li>
+
+  <li><div>
+    <strong>Add all nine domains in Vercel</strong>, then the nine DNS records at the registrar.
+    Wait for the certificates to issue &mdash; usually minutes.
+  </div></li>
+
+  <li><div>
+    <strong>Set <span class="mono">SUITE_COOKIE_DOMAIN</span></strong> to <span class="mono">.servicesuitecloud.com</span> and
+    <span class="mono">SUITE_INTERCHANGE_ORIGIN</span> to the live Interchange, then redeploy the Suite.
+    Do this <em>after</em> the domains resolve: a cookie scoped to a domain that does not
+    serve the app yet signs everybody out.
+  </div></li>
+
+  <li><div>
+    <strong>Bump the pins.</strong> Record which combination of commits is now live.
+    <pre style="margin-top:1.5mm"><span class="k">cd</span> <span class="s">"C:\GIT\MICRO EAZY"</span>
+<span class="k">git</span> add connected-suite interchange pwa
+<span class="k">git</span> commit -m <span class="s">"Live on servicesuitecloud.com"</span> &amp;&amp; <span class="k">git</span> push</pre>
+  </div></li>
+
+  <li><div>
+    <strong>Walk it.</strong> Sign in at <span class="mono">microeazy.servicesuitecloud.com/login</span>, land on
+    the launcher, open each system through its own door, and switch between two of them
+    using the top-right menu without being asked for a password. Then switch a system off
+    at <span class="mono">/platform</span> and reload the launcher &mdash; the tile should be gone, and
+    typing its route directly should bounce you back.
+  </div></li>
+</ul>
+
+<div class="note good">
+  <span class="label">Verified today</span>
+  <p>
+    <span class="mono">npx tsc --noEmit</span> clean and <span class="mono">npm run build</span> exit 0 on the
+    Connected Suite with all of the above in place; <span class="mono">tsc</span> clean on the Interchange
+    console. <span class="mono">npm run art:check</span> runs and reports 4 plates passing, 2 failing.
+    Nothing here has been run against production.
+  </p>
+</div>
+
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+<!-- 09 — OPEN                                                              -->
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="part">
+<div class="row">
+  <div class="rail"><span class="num">09</span></div>
+  <div class="body-col">
+    <p class="eyebrow">Honest list</p>
+    <h2>Still open</h2>
+    <p class="lede">
+      What is not done. None of it blocks the deploy; all of it is visible to somebody.
+    </p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:4mm">
+  <div class="rail"></div>
+  <div class="body-col">
+
+<h3>Two login plates are wrong, and one of them measurably so</h3>
+<p>
+  <span class="mono">npm run art:check</span> scores every plate on three things the eye cannot
+  judge while looking at the plate itself: whether the left third is dark enough for the
+  sign-in card, whether there is any chroma at all, and whether the hue matches the
+  system's accent.
+</p>
+<table class="t-tight">
+  <thead><tr><th style="width:5mm"></th><th>Plate</th><th>Pixels</th><th>Chroma</th><th>Hue error</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><span class="dot c-lms"></span></td><td class="mono">login-lending</td><td class="mono">1586&times;992</td><td class="mono">28.0%</td><td class="mono">2&deg;</td><td>ok</td></tr>
+    <tr><td><span class="dot c-portal"></span></td><td class="mono">login-portal</td><td class="mono">1536&times;944</td><td class="mono">17.3%</td><td class="mono">8&deg;</td><td>ok</td></tr>
+    <tr><td><span class="dot c-anal"></span></td><td class="mono">login-analytics</td><td class="mono">1586&times;992</td><td class="mono">26.2%</td><td class="mono">7&deg;</td><td>ok</td></tr>
+    <tr><td><span class="dot c-desk"></span></td><td class="mono">login-desk</td><td class="mono">1536&times;944</td><td class="mono">7.1%</td><td class="mono">20&deg;</td><td>thin &mdash; redo next</td></tr>
+    <tr><td><span class="dot c-hr"></span></td><td class="mono">login-people</td><td class="mono">1344&times;768</td><td class="mono" style="color:var(--alert)">1.1%</td><td class="mono">12&deg;</td><td style="color:var(--alert)"><strong>regenerate</strong></td></tr>
+    <tr><td><span class="dot c-acct"></span></td><td class="mono">login-books</td><td class="mono">1536&times;944</td><td class="mono">2.8%</td><td class="mono" style="color:var(--alert)">140&deg;</td><td style="color:var(--alert)"><strong>regenerate</strong></td></tr>
+  </tbody>
+</table>
+<p>
+  <strong>PeopleHub</strong> is a black rectangle with four flat violet bars &mdash; the generator
+  took <em>"most dark, some glowing"</em> literally &mdash; and it is the lowest-resolution file in
+  the set. <strong>Ledgerly</strong> is a beautiful photograph of the wrong colour: 35&deg; gold
+  against its 175&deg; green-teal, because <em>"antique brass"</em> is a colour instruction that
+  outweighs a rim-light qualifier eleven words later. Both prompts in
+  <span class="mono">src/lib/suite/artwork.ts</span> have been rewritten for those specific failures.
+</p>
+
+<h3>Four assets worth buying, none of them login plates</h3>
+<table class="t-tight">
+  <thead><tr><th style="width:52mm">File</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">images/white-background.png</td><td><strong>Highest value.</strong> Currently 740&times;465 and used behind nine surfaces &mdash; now including all five satellites. It is upscaled 3.5&times; on a normal monitor. Regenerate at 2560&times;1600, same filename, no code change</td></tr>
+    <tr><td class="mono">images/dark-background.png</td><td>The launcher builds its dark field from seven CSS blur circles. One plate is cheaper and richer</td></tr>
+    <tr><td class="mono">interchange &rarr; public/</td><td>Still holds the Next.js starter SVGs. Needs an <span class="mono">og.png</span> (1200&times;630), <span class="mono">icon-512.png</span>, <span class="mono">apple-touch-icon.png</span></td></tr>
+    <tr><td class="mono">public/og/*.png</td><td>Every WhatsApp and Slack link to any of these systems previews as blank. 1200&times;630 per system, croppable from the login masters</td></tr>
+  </tbody>
+</table>
+<p class="tight">
+  Prompts and target paths for all of it are in
+  <span class="mono">connected-suite/public/images/suite/README.md</span>.
+</p>
+
+<h3>Not built</h3>
+<ul>
+  <li><strong>System selection at organisation creation.</strong> The toggles exist at <span class="mono">/platform</span> for an org that already exists. The self-service onboarding flow at <span class="mono">/onboard</span> does not yet ask, so a new lender starts unrestricted and is narrowed afterwards.</li>
+  <li><strong>Package and systems are independent.</strong> Deliberately &mdash; a plan change should never silently take a system away &mdash; but it does mean the two can disagree and nothing flags it.</li>
+  <li><strong>The Interchange is not in the switcher's session.</strong> Its tile links out and opens its own gate. Federating a BirgenAI ID into an Ed25519 member session is a real piece of work, not a configuration change.</li>
+  <li><strong>PBX Authentication is a third-party repository</strong> (<span class="mono">skegode</span>), tracked read-only. Fork it before you need to push.</li>
+</ul>
+
+<div class="hr"></div>
+<p style="font-size:8pt;color:var(--ink-muted);max-width:none">
+  <strong>Where to look when this document is wrong.</strong>
+  <span class="mono">ecosystem/registry.json</span> declares every system, port, command and deployment
+  target, and every orchestration script reads it. <span class="mono">ecosystem/ARCHITECTURE.md</span>
+  holds the boundaries that are load-bearing. <span class="mono">src/lib/suite/</span> holds the seven
+  systems, their hosts, their artwork and their entitlements &mdash; one list each, no second
+  place. Adding an eighth system is one registry entry, one <span class="mono">SUITE_APPS</span> entry
+  and one <span class="mono">git submodule add</span>.
+</p>
+
+  </div>
+</div>
+</div>
