@@ -1,0 +1,592 @@
+<meta charset="utf-8">
+<title>Two Books, One Exchange</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<style>
+  @page { size: A4; margin: 14mm 13mm 15mm; }
+
+  :root {
+    --paper: #FCFCFD;
+    --ink:   #0F1115;
+    --ink-2: #454B57;
+    --ink-3: #7B8290;
+    --rule:  #DFE2E8;
+    --panel: #F2F4F7;
+    --done:  #1d7a09;
+    --block: #A8620C;
+    --next:  #1F4FD8;
+    --stop:  #B3261E;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 9.7pt;
+    line-height: 1.6;
+  }
+  h1, h2, h3, .ui { font-family: "Sora", system-ui, sans-serif; }
+
+  .cover { padding-bottom: 6mm; border-bottom: 2pt solid var(--ink); margin-bottom: 7mm; }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 7.2pt; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-3); margin: 0 0 3mm;
+  }
+  h1 {
+    font-size: 25pt; font-weight: 700; line-height: 1.06;
+    letter-spacing: -0.021em; margin: 0 0 3.5mm; text-wrap: balance;
+  }
+  .standfirst { font-size: 10.6pt; line-height: 1.62; color: var(--ink-2); max-width: 63ch; margin: 0; }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  section { margin-top: 8.5mm; }
+  h2 {
+    font-size: 14pt; font-weight: 600; letter-spacing: -0.012em;
+    margin: 0 0 1mm; padding-bottom: 1.8mm; border-bottom: 0.5pt solid var(--rule);
+  }
+  .lede { color: var(--ink-2); margin: 3mm 0 4.5mm; max-width: 66ch; }
+  h3 { font-size: 10pt; font-weight: 600; margin: 5mm 0 1.5mm; letter-spacing: -0.005em; }
+  p { max-width: 66ch; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  th, td { text-align: left; padding: 2.1mm 3mm 2.1mm 0; border-bottom: 0.4pt solid var(--rule); vertical-align: top; }
+  th {
+    font-family: "Sora", sans-serif; font-weight: 600;
+    font-size: 7.3pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
+  }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.anchor td { font-weight: 600; }
+
+  code, .mono {
+    font-family: "JetBrains Mono", monospace; font-size: 8.1pt;
+    background: var(--panel); padding: 0.3mm 1.1mm; border-radius: 2px;
+  }
+  pre {
+    font-family: "JetBrains Mono", monospace; font-size: 7.6pt; line-height: 1.5;
+    background: var(--panel); border-left: 2pt solid var(--ink-3);
+    padding: 3.5mm 4mm; margin: 3mm 0; overflow-x: auto;
+    break-inside: avoid-page; white-space: pre-wrap; word-break: break-word;
+  }
+  pre .c { color: var(--ink-3); }
+
+  .tag {
+    display: inline-block;
+    font-family: "Sora", sans-serif; font-size: 6.8pt; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 0.7mm 2mm; border-radius: 2.5px; color: #fff; white-space: nowrap;
+  }
+  .t-done  { background: var(--done); }
+  .t-block { background: var(--block); }
+  .t-next  { background: var(--next); }
+  .t-stop  { background: var(--stop); }
+
+  .callout {
+    break-inside: avoid-page;
+    background: var(--panel);
+    border-left: 2.5pt solid var(--ink);
+    padding: 4mm 5mm; margin: 5mm 0;
+  }
+  .callout p { margin: 0; max-width: 64ch; }
+  .callout p + p { margin-top: 2.5mm; }
+  .callout .h {
+    font-family: "JetBrains Mono", monospace; font-size: 6.9pt;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 2mm;
+  }
+  .callout.stop { border-left-color: var(--stop); }
+  .callout.stop .h { color: var(--stop); }
+
+  /* Numbered because the server work genuinely is a sequence — each step
+     depends on the one before it. */
+  ol.steps { counter-reset: step; list-style: none; margin: 0; padding: 0; }
+  ol.steps > li {
+    counter-increment: step; position: relative;
+    padding-left: 11mm; margin-bottom: 4.5mm; break-inside: avoid-page;
+  }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0.2mm;
+    width: 7.5mm; height: 7.5mm;
+    display: grid; place-items: center;
+    border: 0.6pt solid var(--ink); border-radius: 50%;
+    font-family: "JetBrains Mono", monospace; font-size: 8pt; font-weight: 500;
+  }
+  ol.steps b { font-family: "Sora", sans-serif; font-weight: 600; font-size: 9.6pt; }
+  ol.steps p { margin: 0.8mm 0 0; color: var(--ink-2); max-width: 62ch; }
+
+  ul.plain { list-style: none; margin: 2mm 0 0; padding: 0; }
+  ul.plain li { position: relative; padding-left: 5mm; margin-bottom: 2mm; max-width: 64ch; }
+  ul.plain li::before {
+    content: "—"; position: absolute; left: 0; color: var(--ink-3);
+    font-family: "JetBrains Mono", monospace; font-size: 7.5pt; top: 0.2mm;
+  }
+
+  .decide { break-inside: avoid-page; margin-bottom: 4mm; padding-left: 4mm; border-left: 1.5pt solid var(--next); }
+  .decide h3 { margin: 0 0 1mm; }
+  .decide p { margin: 0; color: var(--ink-2); }
+  .decide .rec { margin-top: 1.5mm; color: var(--ink); }
+  .decide .rec b { font-family: "Sora", sans-serif; font-size: 8.6pt; }
+
+  .pagebreak { break-before: page; }
+
+  footer {
+    margin-top: 8mm; padding-top: 3mm; border-top: 0.5pt solid var(--rule);
+    font-family: "JetBrains Mono", monospace; font-size: 7.2pt; color: var(--ink-3);
+    display: flex; justify-content: space-between;
+  }
+</style>
+
+<div class="cover">
+  <p class="eyebrow">Micro Eazy · The Interchange · Sprint 3</p>
+  <h1>Two books, one exchange</h1>
+  <p class="standfirst">
+    Axe is connected and measured. Their live book is <strong>fourteen thousand open
+    loans against Micromart Fintech's seventy-nine</strong> — which makes Axe the
+    anchor contributor, not the guest. What remains before a query between them is
+    real is a short list of changes on your servers, and it is shorter than it
+    looks: the Interchange needs <strong>no inbound port on either lender's
+    machine</strong>.
+  </p>
+</div>
+
+<section>
+  <h2>What is true this morning</h2>
+  <p class="lede">
+    Both ServiceSuite servers were read over Tailscale while writing this. Figures
+    are rounded; the shape is what matters.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Entity</th><th>Server</th>
+        <th class="n">Borrowers</th><th class="n">Open loans</th><th class="n">Outstanding</th>
+        <th>Last disbursement</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="anchor">
+        <td>3003 · Axe — Boresha</td><td class="mono">axemicro</td>
+        <td class="n">43,000</td><td class="n">14,000</td><td class="n">KES 122.8M</td>
+        <td>25 Aug 2026</td>
+      </tr>
+      <tr>
+        <td>3004 · Axe — Stawi</td><td class="mono">axemicro</td>
+        <td class="n">417</td><td class="n">115</td><td class="n">KES 8.5M</td>
+        <td>24 Jul 2026</td>
+      </tr>
+      <tr class="anchor">
+        <td>3002 · Micromart Africa</td><td class="mono">services</td>
+        <td class="n">142,000</td><td class="n">59,000</td><td class="n">KES 347.5M</td>
+        <td>25 Aug 2026</td>
+      </tr>
+      <tr>
+        <td>3003 · Micromart Check off</td><td class="mono">services</td>
+        <td class="n">2,000</td><td class="n">4,000</td><td class="n">KES 499.4M</td>
+        <td>25 Aug 2026</td>
+      </tr>
+      <tr>
+        <td>3005 · Micromart Fintech</td><td class="mono">services</td>
+        <td class="n">17,000</td><td class="n">79</td><td class="n">KES 818k</td>
+        <td>25 Aug 2026</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout stop">
+    <p class="h">Read this row twice</p>
+    <p>
+      <strong>Entity 3003 is “Micromart Check off” on one server and “Axe — Boresha”
+      on the other.</strong> EntityIds are unique within a ServiceSuite instance and
+      nowhere else, and the Registry’s existing member codes are built from them —
+      <code>KE/LENDER/3002</code>, <code>KE/LENDER/3005</code>. A bare
+      <code>KE/LENDER/3003</code> would therefore name two different lenders, and
+      whichever registered first would silently own the other’s exposure.
+    </p>
+    <p>
+      Axe is registered today as <code>KE/LENDER/AXE-3003</code> and
+      <code>KE/LENDER/AXE-3004</code> to step around it. That is a patch, not a fix —
+      see the decisions at the end.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>Where Sprint 3 actually stands</h2>
+  <p class="lede">
+    Two sprint ladders have been running under the same number, which is worth
+    separating before anything is called done. Blueprint v2 Table 7 numbers the
+    <em>Interchange</em> sprints; the customer-app build plan numbers the
+    <em>PWA</em> sprints. They are not the same list, and only one of them has a
+    measurable acceptance test.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Blueprint v2 · Table 7</th><th>Done when</th><th>State</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>2</b> · Registry, OPRF, policy engine, metering, hash-chained log</td>
+        <td>Two members exchange a signed, consented, logged call</td>
+        <td><span class="tag t-done">Met</span></td>
+      </tr>
+      <tr>
+        <td><b>3</b> · Exposure engine — fan-out, Bloom filters, aggregation. CRB 2.0 types 1, 2, 20</td>
+        <td><strong>p95 under 400 ms on the real Micromart book</strong></td>
+        <td><span class="tag t-block">Engine yes, book no</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="margin-top:4mm">
+    Every component of Sprint 3 exists and is tested: the broker fans out in
+    parallel with per-member timeouts, the Bloom screening has a no-false-negative
+    check, the CRB 2.0 envelopes are built, and <code>verify:exposure</code>
+    measures p95 over thirty samples. What none of it had was a book. The Registry
+    holds fifteen members, all with keys — and <strong>zero holdings and zero
+    published filters</strong>. The 400 ms was measured against four hundred
+    invented borrowers.
+  </p>
+
+  <div class="callout">
+    <p class="h">The honest reading</p>
+    <p>
+      Sprint 3’s done-when says <em>“on the real Micromart book”</em>, and that
+      clause is the whole sprint. Everything else was finished weeks ago. The gap
+      was never the algorithm — it was that nothing had ever pointed the engine at
+      Serviceconnect.
+    </p>
+    <p>
+      The customer app’s own Sprint 3.0 (“Connect the Interchange”) is downstream
+      of exactly the same gap, which is why the credit-file screen still says
+      <em>not switched on</em>. One piece of work closes both.
+    </p>
+  </div>
+
+  <h3>What was built today to close it</h3>
+  <ul class="plain">
+    <li>
+      <b>A node ingest</b> that reads one entity’s live book, derives a
+      <code>subject_token</code> per borrower through the blinded OPRF exchange,
+      drops the identifiers, and publishes tokens plus four aggregates. It runs in
+      the suite deployment — which already holds the credentials and the tailnet
+      reach — so no lender’s SQL password is copied into the Registry repo.
+    </li>
+    <li>
+      <b>Generational publication.</b> A fourteen-thousand-row book takes several
+      requests. The obvious implementation, delete-then-insert, opens a window in
+      which the member truthfully answers <em>no exposure</em> for every borrower
+      they hold. Chunks are written under a new generation and become visible in one
+      statement at the end.
+    </li>
+    <li>
+      <b>Batch tokenisation</b>, metered per element rather than per request, with a
+      separate <code>INGEST</code> allowance from the <code>SERVING</code> one — a
+      member walking their own book and a member walking the national ID space look
+      identical to the Registry, so the two budgets are granted, not inferred.
+    </li>
+    <li>
+      <b>“Not published” is no longer “owes nothing.”</b> A member who has never run
+      an ingest now answers <code>BOOK_NOT_PUBLISHED</code>, and the broker counts
+      that as a non-response that marks the result <code>partial</code>. Silently
+      clearing a borrower because a node was never ingested is the most dangerous
+      answer this service can give.
+    </li>
+  </ul>
+</section>
+
+<section class="pagebreak">
+  <h2>What has to change on your servers</h2>
+  <p class="lede">
+    Less than you are expecting. Take the network question first, because it is the
+    one you asked and the answer removes most of the work.
+  </p>
+
+  <h3>No, do not open a port or build a security group for the Interchange</h3>
+  <p>
+    RDP on 3389 needs a firewall rule and a security group because somebody outside
+    is dialling in. The Interchange is the opposite shape: <strong>nothing ever
+    dials in to Axe’s or Micromart’s server.</strong> The node runs on your
+    hardware — blueprint v2 §1, <em>“members get an endpoint, not a server”</em> —
+    and it dials <em>out</em> to SQL over Tailscale, then pushes to the Registry
+    over HTTPS. Both connections are outbound from machines you already control.
+  </p>
+  <p>
+    Tailscale is not a hole in the firewall. It is an authenticated overlay: the
+    listener is bound to the tailnet interface, every peer is a device you admitted,
+    and the SQL port stays closed to the internet. That is already how Micromart
+    works, and it is how Axe now works.
+  </p>
+
+  <div class="callout">
+    <p class="h">Measured while writing this</p>
+    <p>
+      <code>100.103.154.73:4420</code> — Axe, over the tailnet — <strong>open, 870 ms,
+      answers a query.</strong><br>
+      <code>213.148.17.54:4420</code> — Axe, the public address in the portal
+      config — <strong>no answer.</strong>
+    </p>
+    <p>
+      That is the correct posture and it should stay that way. The one thing worth
+      confirming with whoever runs that box: if the public 4420 is open to any
+      source at all, close it. A SQL Server exposed to the internet with a shared
+      application login is a larger risk than anything on this page.
+    </p>
+  </div>
+
+  <h3>What does need doing: a login that can only read what the node reads</h3>
+  <p>
+    Today the suite connects as <code>SystemUser1</code> on Axe and
+    <code>service_suite_user</code> on Micromart. Those are the application’s own
+    logins — they can write, and they can read every entity on the server. The node
+    needs neither. Ten unrelated companies share the <code>.198</code> book
+    separated by nothing but <code>EntityId</code>, so scope is a security boundary,
+    not a filter.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <b>Create one read-only login per server</b>
+      <p>
+        Separate from the application login, so revoking Interchange access never
+        takes the LMS down with it, and so the audit can tell the two apart.
+      </p>
+<pre><span class="c">-- On each ServiceSuite server, once.</span>
+CREATE LOGIN interchange_node
+  WITH PASSWORD = '&lt;generated, 32+ chars&gt;', CHECK_POLICY = ON;
+
+USE Serviceconnect;
+CREATE USER interchange_node FOR LOGIN interchange_node;</pre>
+    </li>
+
+    <li>
+      <b>Give it a view per entity, with the scope baked in</b>
+      <p>
+        The <code>EntityId</code> lives inside the view, not in a parameter the
+        caller supplies. A node key that leaked could then still only ever see the
+        one book it was issued for — the scope is not something a request can widen.
+      </p>
+<pre>CREATE SCHEMA interchange AUTHORIZATION dbo;
+GO
+
+<span class="c">-- One per member entity: 3003 and 3004 on Axe; 3002 and 3005 on Micromart.</span>
+CREATE VIEW interchange.BookExposure_3003 AS
+SELECT b.NationalID                                       AS NationalID,
+       COUNT(l.ID)                                        AS ActiveLoans,
+       SUM(CAST(l.LoanBalance AS BIGINT))                 AS OutstandingKes,
+       MAX(l.BorrowDate)                                  AS NewestDisbursedAt,
+       MAX(DATEDIFF(day, l.ExpectedClearDate, GETDATE())) AS WorstDpd
+  FROM Loans l
+  JOIN Borrowers b ON b.ID = l.BorrowerId AND b.EntityId = l.EntityId
+ WHERE l.EntityId = 3003          <span class="c">-- the scope, fixed here</span>
+   AND l.isApproved = 1 AND l.LoanCleared = 0 AND l.LoanBalance &gt; 0
+ GROUP BY b.NationalID;</pre>
+    </li>
+
+    <li>
+      <b>Grant the schema, deny everything else</b>
+      <p>
+        <code>DENY</code> beats a forgotten <code>GRANT</code> later — it is the
+        rule that survives someone adding this user to a role in six months.
+      </p>
+<pre>GRANT SELECT ON SCHEMA::interchange TO interchange_node;
+DENY  SELECT, INSERT, UPDATE, DELETE ON SCHEMA::dbo TO interchange_node;</pre>
+    </li>
+
+    <li>
+      <b>Hand over the connection string, not the password</b>
+      <p>
+        It goes into the suite deployment’s secret store as
+        <code>SERVICESUITE_CONN_AXE</code>, pointed at the <em>tailnet</em> address.
+        The current entry uses the application login and should be swapped for
+        <code>interchange_node</code> once the view exists; the ingest reads the
+        base tables today and moves to the view in the same change.
+      </p>
+    </li>
+  </ol>
+
+  <div class="callout">
+    <p class="h">One thing the node genuinely needs, and why</p>
+    <p>
+      The view returns <code>NationalID</code>. It has to: the OPRF has to blind a
+      real identifier, and that can only happen inside the perimeter. It exists in
+      memory for the length of one ingest and is never written, never logged and
+      never sent — what leaves is a 128-character token that cannot be reversed,
+      even by us, without the ecosystem key.
+    </p>
+    <p>
+      That is the sentence to say to a member, and it is the one the blueprint
+      warns you to say precisely: not “your data never leaves you”, which stopped
+      being true when you took on hosting the nodes, but “identity is destroyed
+      before it reaches anything we store.”
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>The six systems, and the message you want gone</h2>
+  <p class="lede">
+    <em>“Micromart’s server is not reachable right now.”</em> It is not an outage
+    and never was — it is topology, and it has one cause.
+  </p>
+  <p>
+    The launcher shows that banner when <code>isOrgConfigured()</code> is false,
+    which is true when a deployment has <strong>neither</strong> a connection string
+    it can route with <strong>nor</strong> a relay. Micromart’s SQL Server lives on
+    a Tailscale CGNAT address with no internet route at all, so on Vercel the
+    connection string can be set perfectly and still connect to nothing. The relay
+    exists precisely for this, and <code>npm run test:relay</code> reports
+    <code>SERVICESUITE_RELAY_URL</code> and <code>SERVICESUITE_RELAY_SECRET</code>
+    unset — so the relay path is not merely down, it has never been switched on.
+  </p>
+
+  <ul class="plain">
+    <li>
+      <b>Install Node on a tailnet host and run the relay there.</b>
+      <code>servicesuite-in</code> (100.115.241.36) is online and is the intended
+      home; this workstation, <code>arch-bishop</code>, already has Funnel enabled
+      and can prove the path in ten minutes if you want it working before the
+      install.
+    </li>
+    <li>
+      <b>Expose it with Funnel, not a firewall rule.</b>
+      <code>npm run relay</code>, then <code>tailscale funnel 8787</code>. That
+      publishes one HTTPS endpoint that only answers HMAC-signed queries inside a
+      two-minute window and refuses writes unless separately armed.
+    </li>
+    <li>
+      <b>Set the two variables on Vercel and nowhere else.</b> With a relay
+      configured, <code>SERVICESUITE_CONN_MICROMART</code> is not needed in the
+      cloud at all — Micromart’s database password never leaves the tailnet, and a
+      compromise of the hosting account yields a secret that can ask a read-only
+      relay for numbers already on a screen.
+    </li>
+    <li>
+      <b>Then run <code>npm run test:relay</code> and <code>npm run test:live</code></b>
+      — the second is an outside-in check that separates <em>live</em> from
+      <em>degraded</em> from <em>broken</em> on every subdomain, which is the actual
+      round trip of the six systems.
+    </li>
+  </ul>
+</section>
+
+<section class="pagebreak">
+  <h2>Decisions that are yours</h2>
+  <p class="lede">
+    Four, and the first one gets harder to change every week it waits.
+  </p>
+
+  <div class="decide">
+    <h3>1 · What a member code is made of</h3>
+    <p>
+      Entity IDs are not globally unique and two of them already collide across your
+      two servers. Codes built from them will keep colliding as the cohort grows,
+      and a code is the thing consent, audit and the message log are all keyed to —
+      it is the hardest field in the system to change later.
+    </p>
+    <p class="rec">
+      <b>Recommendation:</b> key member codes on the KRA PIN already sitting in
+      <code>BsEntity.EntityTaxRef</code> — <code>KE/LENDER/A0KAO70K0</code> for Axe
+      Boresha. It is globally unique, it is what an X-Road member identifier is meant
+      to be, and it is legible to a regulator. Migrate the fifteen existing members
+      in one pass now, while the message log is short.
+    </p>
+  </div>
+
+  <div class="decide">
+    <h3>2 · How big an ingest allowance each member gets</h3>
+    <p>
+      The Registry cannot tell a member tokenising their own book from a member
+      enumerating the national ID space, because by construction it never sees the
+      identifiers. So the allowance is granted rather than inferred. It currently
+      defaults to 250,000 elements a day per member, spent visibly under
+      <code>kind=INGEST</code>.
+    </p>
+    <p class="rec">
+      <b>Recommendation:</b> set it per member at roughly twice their declared open
+      book — Axe Boresha at 30,000, Micromart Africa at 120,000 — so a run that
+      suddenly wants five times the book shows up in the audit as exactly that.
+    </p>
+  </div>
+
+  <div class="decide">
+    <h3>3 · How often a book is republished</h3>
+    <p>
+      Exposure is a real-time product built on a periodic ingest, so staleness is a
+      property the answer carries: every node response now returns <code>as_of</code>.
+      The blueprint’s filter cadence is fifteen minutes.
+    </p>
+    <p class="rec">
+      <b>Recommendation:</b> fifteen minutes for Axe Boresha and Micromart Africa,
+      which disburse daily; hourly for Stawi and Fintech. Whatever you pick, put
+      <code>as_of</code> on the customer-facing screen — a lender making a credit
+      decision is entitled to know how old the answer is.
+    </p>
+  </div>
+
+  <div class="decide">
+    <h3>4 · Whether Axe queries on day one</h3>
+    <p>
+      A new member registers as <code>SHADOW</code>: contributing, not yet querying.
+      That is the reciprocity rule enforced in the policy engine rather than in a
+      contract, and it exists so nobody reads the ecosystem having published nothing.
+    </p>
+    <p class="rec">
+      <b>Recommendation:</b> leave both Axe entities in <code>SHADOW</code> until
+      their first successful ingest commits, then promote. It costs a day and it
+      makes the rule real rather than decorative — which matters more with the
+      largest contributor than with the smallest.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>Still open</h2>
+  <table>
+    <thead><tr><th>Item</th><th>State</th><th>Needs</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Registry schema migration — generational holdings, batch issuance</td>
+        <td><span class="tag t-stop">Blocked</span></td>
+        <td>Approval to run <code>prisma db push</code> against the hosted Postgres. The affected table is empty; the warning is about a replaced unique constraint, not data.</td>
+      </tr>
+      <tr>
+        <td>Node on <code>servicesuite-in</code></td>
+        <td><span class="tag t-block">Carried</span></td>
+        <td>Install, then the relay steps above. This is what removes the launcher banner.</td>
+      </tr>
+      <tr>
+        <td><code>PAYMENTS_ENTITY_ID = 7</code></td>
+        <td><span class="tag t-block">Carried</span></td>
+        <td>Confirmation from Micromart. Entity 7 404s on their config endpoint, so it is a different id space or it is wrong — and wrong means no STK prompt reaches the handset.</td>
+      </tr>
+      <tr>
+        <td>Black-on-black branding</td>
+        <td><span class="tag t-block">Carried</span></td>
+        <td>Two rows now, not one: entity 3005 on Micromart and entity 3004 on Axe both carry <code>#000000</code> for primary and secondary.</td>
+      </tr>
+      <tr>
+        <td><code>npm run demo:room</code> against the live org</td>
+        <td><span class="tag t-next">Next</span></td>
+        <td>A run, once the relay is up.</td>
+      </tr>
+      <tr>
+        <td>Directory services still marked <code>specified</code></td>
+        <td><span class="tag t-next">Next</span></td>
+        <td>All nine, including <code>exposure-v1</code>, are flagged not-live in the Registry. Flip <code>exposure-v1</code> when the first two books have committed.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <span>Micro Eazy · The Interchange · connection plan</span>
+  <span>26 August 2026</span>
+</footer>

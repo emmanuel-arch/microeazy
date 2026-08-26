@@ -1,0 +1,455 @@
+<title>Customer App Build Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  @page { size: A4; margin: 14mm 13mm 15mm; }
+
+  :root {
+    --paper:  #FCFCFD;
+    --ink:    #0F1115;
+    --ink-2:  #454B57;
+    --ink-3:  #7B8290;
+    --rule:   #DFE2E8;
+    --panel:  #F2F4F7;
+    --done:   #1d7a09;
+    --block:  #A8620C;
+    --next:   #1F4FD8;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 9.7pt;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, .ui { font-family: "Sora", system-ui, sans-serif; }
+
+  .cover { padding-bottom: 6mm; border-bottom: 2pt solid var(--ink); margin-bottom: 7mm; }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 7.2pt; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-3); margin: 0 0 3mm;
+  }
+  h1 {
+    font-size: 25pt; font-weight: 700; line-height: 1.06;
+    letter-spacing: -0.021em; margin: 0 0 3.5mm; text-wrap: balance;
+  }
+  .standfirst { font-size: 10.6pt; line-height: 1.62; color: var(--ink-2); max-width: 63ch; margin: 0; }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  section { margin-top: 8.5mm; }
+  h2 {
+    font-size: 14pt; font-weight: 600; letter-spacing: -0.012em;
+    margin: 0 0 1mm; padding-bottom: 1.8mm; border-bottom: 0.5pt solid var(--rule);
+  }
+  .lede { color: var(--ink-2); margin: 3mm 0 4.5mm; max-width: 66ch; }
+
+  h3 {
+    font-size: 10pt; font-weight: 600; margin: 5mm 0 1.5mm;
+    letter-spacing: -0.005em;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  th, td { text-align: left; padding: 2.1mm 3mm 2.1mm 0; border-bottom: 0.4pt solid var(--rule); vertical-align: top; }
+  th {
+    font-family: "Sora", sans-serif; font-weight: 600;
+    font-size: 7.3pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
+  }
+  td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  code, .mono {
+    font-family: "JetBrains Mono", monospace; font-size: 8.1pt;
+    background: var(--panel); padding: 0.3mm 1.1mm; border-radius: 2px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: "Sora", sans-serif; font-size: 6.8pt; font-weight: 600;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 0.7mm 2mm; border-radius: 2.5px; color: #fff; white-space: nowrap;
+  }
+  .t-done  { background: var(--done); }
+  .t-block { background: var(--block); }
+  .t-next  { background: var(--next); }
+
+  /* The loop: numbered because it genuinely is a sequence — each step depends
+     on the one before it. */
+  ol.loop { counter-reset: step; list-style: none; margin: 0; padding: 0; }
+  ol.loop > li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 11mm;
+    margin-bottom: 4mm;
+    break-inside: avoid-page;
+  }
+  ol.loop > li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0.2mm;
+    width: 7.5mm; height: 7.5mm;
+    display: grid; place-items: center;
+    border: 0.6pt solid var(--ink); border-radius: 50%;
+    font-family: "JetBrains Mono", monospace; font-size: 8pt; font-weight: 500;
+  }
+  ol.loop b { font-family: "Sora", sans-serif; font-weight: 600; font-size: 9.6pt; }
+  ol.loop p { margin: 0.8mm 0 0; color: var(--ink-2); max-width: 62ch; }
+
+  ul.check { list-style: none; margin: 0; padding: 0; }
+  ul.check li {
+    position: relative; padding-left: 6mm; margin-bottom: 1.6mm;
+    break-inside: avoid-page;
+  }
+  ul.check li::before {
+    content: "";
+    position: absolute; left: 0; top: 1.6mm;
+    width: 3mm; height: 3mm;
+    border: 0.6pt solid var(--ink-3); border-radius: 1.5px;
+  }
+
+  .callout {
+    break-inside: avoid-page;
+    background: var(--panel);
+    border-left: 2.5pt solid var(--ink);
+    padding: 4mm 5mm; margin: 5mm 0;
+  }
+  .callout p { margin: 0; max-width: 64ch; }
+  .callout p + p { margin-top: 2.5mm; }
+  .callout .h {
+    font-family: "JetBrains Mono", monospace; font-size: 6.9pt;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 2mm;
+  }
+
+  .sprint { break-inside: avoid-page; margin-bottom: 5mm; }
+  .sprint-head { display: flex; align-items: baseline; gap: 3mm; margin-bottom: 1mm; }
+  .sprint-head h3 { margin: 0; }
+  .sprint-meta { font-family: "JetBrains Mono", monospace; font-size: 7.4pt; color: var(--ink-3); margin-left: auto; }
+
+  footer {
+    margin-top: 8mm; padding-top: 3mm; border-top: 0.5pt solid var(--rule);
+    font-family: "JetBrains Mono", monospace; font-size: 7.2pt; color: var(--ink-3);
+    display: flex; justify-content: space-between;
+  }
+</style>
+
+<div class="cover">
+  <p class="eyebrow">Micro Eazy · Customer app</p>
+  <h1>Seven screens, and the loop that keeps them good</h1>
+  <p class="standfirst">
+    All seven ecosystem screens are built, wired and reachable, on two new server routes
+    written for them. More important than the number: there is now a <strong>way of
+    working</strong> that catches design and logic faults before a customer meets them —
+    and it has already caught five.
+  </p>
+</div>
+
+<section>
+  <h2>Where the seven stand</h2>
+  <p class="lede">
+    These are the surfaces Micromart's core banking does not provide. Everything else in
+    the app — balances, ledger, statements, applications — is theirs and unchanged.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Screen</th><th>Route</th><th>Reads</th><th>State</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Statement crunch</strong><br><span style="color:var(--ink-3)">incl. the Safaricom theatre</span></td>
+        <td><code>/crunch</code></td>
+        <td><code>/api/portal/recrunch</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+      <tr>
+        <td><strong>Pay by M-PESA</strong></td>
+        <td><code>/pay</code></td>
+        <td><code>/api/portal/pay</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+      <tr>
+        <td><strong>Auto-repay (Ratiba)</strong></td>
+        <td><code>/auto-repay</code></td>
+        <td><code>/api/portal/standing-order</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+      <tr>
+        <td><strong>Why this decision</strong></td>
+        <td><code>/why</code></td>
+        <td><code>/api/portal/decision</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+      <tr>
+        <td><strong>Your limit</strong> (the ladder)</td>
+        <td><code>/limit</code></td>
+        <td><code>/api/portal/ladder</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+      <tr>
+        <td><strong>Exposure report</strong><br><span style="color:var(--ink-3)">CRB + Interchange</span></td>
+        <td><code>/credit-file</code></td>
+        <td><code>/api/portal/exposure</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+      <tr>
+        <td><strong>Consent</strong></td>
+        <td><code>/permissions</code></td>
+        <td><code>/api/portal/consent</code></td>
+        <td><span class="tag t-done">Built</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="h">Two decisions inside the exposure route worth knowing</div>
+    <p>
+      <strong>It never spends the lender's money.</strong> A live Metropol pull is billed
+      per call and the tariff scales with scrutiny — an endpoint a customer can refresh
+      at will is a way to hand a lender a surprise invoice, and at scale a
+      denial-of-wallet. The route reads the last stored report from
+      <code>KycCheck kind=CRB</code> and never calls <code>runCrbCheck()</code>. The
+      spend decision stays with the lender, in their own console.
+    </p>
+    <p>
+      <strong>Consent is checked, not assumed.</strong> <code>crbCheck</code> must be
+      granted on the borrower's latest record before a stored file is read back. Serving
+      a report the customer has since withdrawn permission for is exactly what the
+      withdrawal was meant to stop, and "we already had it" is not a defence.
+    </p>
+    <p>
+      <strong>The Interchange half is reported as not connected, deliberately.</strong>
+      A federated query is not a fetch: the subject must be tokenised through the OPRF so
+      no raw national ID crosses a boundary, a consent_ref issued against that token, and
+      only then can the broker fan out over Ed25519-signed requests returning bands and
+      counts — never a name, never an amount. That plumbing is Sprint 3. Saying so in one
+      line beats an empty section that reads like the customer owes nothing anywhere.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>The loop</h2>
+  <p class="lede">
+    Every one of these screens sits behind an SMS code, a national ID and — for the
+    crunch — a real M-PESA payment. Left alone, the only way to look at one is to pay
+    for it, on a real handset, with a real statement. Nobody runs that loop twenty times
+    while getting the spacing right, so screens do not get looked at. This is the
+    replacement.
+  </p>
+
+  <ol class="loop">
+    <li>
+      <b>Write the fixture first, and make it unflattering</b>
+      <p>
+        Shaped exactly like the server's response, in <code>src/pages/eco/Preview.jsx</code>.
+        Round numbers and three short factors make every layout look fine. The crunch
+        fixture carries a betting factor, a 46-character merchant string, two negative
+        reasons and a six-item list — because those are the shapes that break a design.
+      </p>
+    </li>
+    <li>
+      <b>Build against the harness, not the live API</b>
+      <p>
+        <code>/preview</code> for the component gallery, <code>/preview/screen?s=pay</code>
+        for a real screen, <code>/preview/crunch?stage=factors</code> to jump straight
+        into any stage of the theatre. No session, no network, no payment. Mounted only
+        when <code>DEV</code> or <code>VITE_PREVIEW=1</code>; a production build removes
+        the routes entirely.
+      </p>
+    </li>
+    <li>
+      <b>Review on the device wall before calling it done</b>
+      <p>
+        <code>tools/devicewall.html</code> renders the same route in four real browsing
+        contexts — 360, 414, 768, 1024 — side by side. Use it instead of headless
+        <code>--window-size</code>, which lays out at a default width and crops the
+        screenshot to the size you asked for. That discrepancy makes a sound layout look
+        broken and a broken one look sound.
+      </p>
+    </li>
+    <li>
+      <b>Wire the real route, then walk the degraded states</b>
+      <p>
+        Session expired, lender not configured, service unreachable, nothing on file.
+        All four are reachable in the live app and all four have their own words. A
+        single "something went wrong" across all of them is what makes a working product
+        feel broken when it is merely unconfigured.
+      </p>
+    </li>
+  </ol>
+
+  <div class="callout">
+    <div class="h">The loop has already paid for itself</div>
+    <p>
+      Four faults caught in the harness, none of which would have surfaced in normal use
+      until a customer hit them:
+    </p>
+    <p>
+      <strong>The credit dial rendered “−11 out of 850”.</strong> A rAF timestamp can
+      predate the <code>performance.now()</code> captured immediately before it, so the
+      eased progress went negative and the arc drew backwards.
+    </p>
+    <p>
+      <strong>The same dial could silently show 0.</strong> If rAF is throttled — a
+      backgrounded tab, a phone that locked while the customer read the SMS — the counter
+      never left its initial value and a customer would be shown a zero credit score.
+      There is no worse failure on that screen. It now settles on a timer regardless.
+    </p>
+    <p>
+      <strong>The login panel's background was an HTML file.</strong>
+      <code>background-image-8.jpg</code> is 111KB of <code>&lt;!doctype html&gt;</code>,
+      and Vercel's SPA rewrite answered it <code>200 image/jpeg</code>, so it looked fine
+      in a network tab while rendering as a flat brown rectangle.
+    </p>
+    <p>
+      <strong>An invalid enum in the exposure route.</strong> The open-loan count filtered
+      on <code>ARREARS</code> and <code>DEFAULTED</code>. Neither is a member of
+      <code>LoanStatus</code> — Prisma validates enums at query time, so the whole screen
+      would have thrown on first load. Caught by reading the schema rather than assuming
+      it; the typechecker cannot see inside a string literal in a <code>where</code>.
+    </p>
+    <p>
+      <strong>And one false alarm worth recording:</strong> a reported mobile overflow at
+      360px turned out to be the screenshot harness cropping a 500px layout. The device
+      wall exists because of that hour.
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>Definition of done</h2>
+  <p class="lede">
+    A screen is not done when it renders. It is done when every one of these is true.
+    This list is the review, and it is short enough to actually run.
+  </p>
+
+  <h3>States</h3>
+  <ul class="check">
+    <li>Loading, empty, error, lender-not-configured and session-expired all render, each with its own wording</li>
+    <li>Every failure path offers the customer a next action, not just a description</li>
+    <li>Nothing shows a spinner that cannot end</li>
+  </ul>
+
+  <h3>Truthfulness</h3>
+  <ul class="check">
+    <li>No figure on screen that the server did not send — placeholders are visibly placeholders and never survive the response</li>
+    <li>Money always carries two decimals and its currency</li>
+    <li>Nothing promises an outcome the system cannot grant</li>
+  </ul>
+
+  <h3>Responsive</h3>
+  <ul class="check">
+    <li>Reviewed on the device wall at all four widths</li>
+    <li>No horizontal scroll at 360; wide content scrolls inside its own container</li>
+    <li>Flex rows that can overflow carry <code>min-width: 0</code></li>
+  </ul>
+
+  <h3>Interaction</h3>
+  <ul class="check">
+    <li>Every control has a visible keyboard focus state</li>
+    <li>Tap targets at least 44px</li>
+    <li><code>prefers-reduced-motion</code> honoured — animation is enhancement, never the only path to a value</li>
+  </ul>
+
+  <h3>Copy</h3>
+  <ul class="check">
+    <li>No “unfortunately”, no apologies, no blame</li>
+    <li>Errors say what happened and what to do next</li>
+    <li>A control names exactly what it will do</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Sprints</h2>
+
+  <div class="sprint">
+    <div class="sprint-head">
+      <h3>Sprint 1 — Foundation and the five</h3>
+      <span class="tag t-done">Done</span>
+      <span class="sprint-meta">this session</span>
+    </div>
+    <p style="margin:0 0 2mm; color:var(--ink-2)">
+      The design layer (<code>eco.css</code>, <code>Surface.jsx</code>), the shared
+      identity gate, the Safaricom crunch theatre, five screens wired into the sidebar,
+      the preview harness and the device wall.
+    </p>
+  </div>
+
+  <div class="sprint">
+    <div class="sprint-head">
+      <h3>Sprint 2 — The last two screens</h3>
+      <span class="tag t-done">Done</span>
+      <span class="sprint-meta">this session</span>
+    </div>
+    <table>
+      <tbody>
+        <tr><td class="n"><code>2.1</code></td><td><code>/api/portal/exposure</code> — reads the stored bureau file under the borrower's own consent. Never triggers a paid pull.</td></tr>
+        <tr><td class="n"><code>2.2</code></td><td><code>/api/portal/consent</code> — GET the catalogue, grants and full history; POST to change one. Append-only, so a withdrawal never destroys the evidence of what was agreed on the day a check ran.</td></tr>
+        <tr><td class="n"><code>2.3</code></td><td><code>/credit-file</code> — score, bureau detail, negative listings, and an honest line for each of the three ways a section can be empty.</td></tr>
+        <tr><td class="n"><code>2.4</code></td><td><code>/permissions</code> — a toggle per grant, withdrawal as easy as granting, the consequence stated before the toggle rather than after, and the customer's own copy of the audit trail.</td></tr>
+        <tr><td class="n"><code>2.5</code></td><td>Fixture layer — <code>fixtures.js</code> swaps <code>window.fetch</code> so screens run their real loading, error and success paths against canned responses. Zero references survive a production build.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sprint">
+    <div class="sprint-head">
+      <h3>Sprint 3 — Federation, and the flows already served</h3>
+      <span class="tag t-next">Next</span>
+      <span class="sprint-meta">endpoints mostly exist</span>
+    </div>
+    <table>
+      <tbody>
+        <tr><td class="n"><code>3.0</code></td><td><strong>Connect the Interchange.</strong> OPRF tokenisation of the subject, a consent_ref issued on the <code>PWA</code> channel — which the exchange already recognises — then the brokered query. Turns the one honest "not switched on" line on the credit-file screen into a real band. The largest item here.</td></tr>
+        <tr><td class="n"><code>3.1</code></td><td>KYC wizard — <code>/api/portal/kyc</code>, five steps, confidence gates. Reuse Micromart's live <code>vision/ocr/id</code> rather than adding a vendor.</td></tr>
+        <tr><td class="n"><code>3.2</code></td><td>Guarantor — <code>/api/portal/guarantee/[id]</code>. Consent and decline both first-class.</td></tr>
+        <tr><td class="n"><code>3.3</code></td><td>Offer acceptance — <code>/api/portal/offer/[id]</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sprint">
+    <div class="sprint-head">
+      <h3>Sprint 4 — Make it fast and make it correct</h3>
+      <span class="sprint-meta">before go-live</span>
+    </div>
+    <table>
+      <tbody>
+        <tr><td class="n"><code>4.1</code></td><td><strong>Bundle.</strong> 754kB / 200kB gzipped today, on a phone, in Kenya, on mobile data. Route-split the eco screens and the theatre.</td></tr>
+        <tr><td class="n"><code>4.2</code></td><td><strong>Assets.</strong> <code>safaricom-25.gif</code> is 890kB and renders at 80px wide; <code>mpesa-logo.png</code> is 583kB. Both want re-encoding.</td></tr>
+        <tr><td class="n"><code>4.3</code></td><td>Accessibility pass — focus order, labels, contrast on the tenant accent for every lender, not only Micromart.</td></tr>
+        <tr><td class="n"><code>4.4</code></td><td>Confirm <code>PAYMENTS_ENTITY_ID</code> with Micromart. It is <code>7</code>; entity <code>7</code> 404s on their config endpoint, so it is a different id space or it is wrong. A wrong value means no STK prompt reaches the handset.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>What is in the box</h2>
+  <table>
+    <thead><tr><th>Path</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td><code>components/eco/eco.css</code></td><td>Tokens, the white-wave ground, cards, rows, chips, buttons, states, motion</td></tr>
+      <tr><td><code>components/eco/Surface.jsx</code></td><td>Screen, Card, Hero, Row, Chip, Button, State, Loading, Icon, money, when</td></tr>
+      <tr><td><code>components/eco/Identity.jsx</code></td><td>The shared gate — SMS code, then national ID. One verification, seven screens</td></tr>
+      <tr><td><code>components/eco/CrunchTheatre.jsx</code></td><td>The Safaricom sequence, ported off framer-motion to keyframes</td></tr>
+      <tr><td><code>lib/ecosystem.js</code></td><td>Same-origin client for <code>/api/portal/*</code> — every ecosystem call</td></tr>
+      <tr><td><code>lib/micromart.js</code></td><td>Micromart's own rails: bearer + <code>X-New-Token</code> refresh, SMS, STK, OCR, FCM</td></tr>
+      <tr><td><code>lib/tenant.js</code></td><td>Lender resolution and theming — one entity id, one palette, every lender</td></tr>
+      <tr><td><code>pages/eco/Preview.jsx</code></td><td>The harness — gallery, screen mode, theatre stage-jumping</td></tr>
+      <tr><td><code>pages/eco/fixtures.js</code></td><td>The fetch shim and its deliberately unflattering fixtures</td></tr>
+      <tr><td><code>api/portal/exposure/route.ts</code></td><td>Stored bureau file, consent-gated, never a paid pull</td></tr>
+      <tr><td><code>api/portal/consent/route.ts</code></td><td>Grants, history and change — append-only</td></tr>
+      <tr><td><code>tools/devicewall.html</code></td><td>Four real viewports, side by side</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  <span>Micro Eazy · Customer app build plan</span>
+  <span>26 August 2026</span>
+</footer>

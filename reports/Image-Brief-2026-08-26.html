@@ -1,0 +1,393 @@
+<title>Ecosystem Image Brief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  @page { size: A4; margin: 14mm 13mm 15mm; }
+
+  :root {
+    --paper:    #FBFAF8;
+    --ink:      #16171A;
+    --muted:    #6E6A63;
+    --rule:     #E2DED6;
+    --panel:    #F3F0EA;
+    --panel-2:  #EDE9E1;
+    --eazy:     #1d7a09;
+    --warn:     #A8420C;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 9.6pt;
+    line-height: 1.55;
+  }
+
+  /* ── Cover ─────────────────────────────────────────────────────────── */
+  .cover { padding-bottom: 7mm; border-bottom: 1.5pt solid var(--ink); margin-bottom: 7mm; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 7.4pt; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 3mm;
+  }
+
+  h1 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400; font-size: 30pt; line-height: 1.04;
+    letter-spacing: -0.012em; margin: 0 0 3mm; text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 10.4pt; line-height: 1.6; color: var(--muted);
+    max-width: 62ch; margin: 0;
+  }
+  .standfirst strong { color: var(--ink); font-weight: 500; }
+
+  .meta {
+    display: flex; gap: 8mm; flex-wrap: wrap;
+    margin-top: 5mm; padding-top: 4mm; border-top: 0.5pt solid var(--rule);
+    font-family: "IBM Plex Mono", monospace; font-size: 7.6pt; color: var(--muted);
+  }
+  .meta b { display: block; color: var(--ink); font-weight: 500; letter-spacing: 0.02em; }
+
+  /* ── Section headers ───────────────────────────────────────────────── */
+  section { margin-top: 9mm; }
+  section:first-of-type { margin-top: 0; }
+
+  .sec-head { display: flex; align-items: baseline; gap: 4mm; margin-bottom: 1.5mm; }
+
+  h2 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-weight: 400; font-size: 18pt; letter-spacing: -0.01em; margin: 0;
+  }
+  .count {
+    font-family: "IBM Plex Mono", monospace; font-size: 7.6pt;
+    color: var(--muted); letter-spacing: 0.06em;
+  }
+  .sec-note { color: var(--muted); max-width: 64ch; margin: 0 0 5mm; font-size: 9.2pt; }
+
+  /* ── Plate card ────────────────────────────────────────────────────── */
+  .plate {
+    break-inside: avoid-page;
+    border: 0.5pt solid var(--rule);
+    border-left: 2.5pt solid var(--hue, var(--ink));
+    background: #fff;
+    padding: 4.5mm 5mm;
+    margin-bottom: 4mm;
+  }
+
+  .plate-head {
+    display: flex; align-items: baseline; gap: 3mm; flex-wrap: wrap;
+    margin-bottom: 1mm;
+  }
+  .plate-name { font-weight: 600; font-size: 11pt; letter-spacing: -0.005em; }
+  .file {
+    font-family: "IBM Plex Mono", monospace; font-size: 7.6pt;
+    color: var(--muted); margin-left: auto;
+  }
+
+  .chip {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 6.8pt; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.7mm 2mm; border-radius: 2px; font-weight: 500;
+  }
+  .chip.new  { background: var(--eazy); color: #fff; }
+  .chip.regen{ background: var(--warn); color: #fff; }
+
+  .swatch {
+    display: inline-block; width: 3mm; height: 3mm; border-radius: 50%;
+    background: var(--hue); vertical-align: middle;
+    box-shadow: 0 0 0 0.4pt rgba(0,0,0,0.18);
+  }
+  .hex {
+    font-family: "IBM Plex Mono", monospace; font-size: 7.4pt; color: var(--muted);
+  }
+
+  .why {
+    margin: 2mm 0 3mm; font-size: 9.2pt; color: var(--ink);
+    max-width: 68ch;
+  }
+  .why em { color: var(--warn); font-style: normal; font-weight: 500; }
+
+  .prompt-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 6.8pt; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.2mm;
+  }
+  .prompt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 7.7pt; line-height: 1.5;
+    background: var(--panel); border: 0.4pt solid var(--rule);
+    padding: 3mm 3.5mm; margin: 0;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ── Specs ─────────────────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  th, td { text-align: left; padding: 2mm 3mm 2mm 0; border-bottom: 0.4pt solid var(--rule); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", monospace; font-weight: 500;
+    font-size: 7.2pt; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  td code, .why code, li code {
+    font-family: "IBM Plex Mono", monospace; font-size: 8.2pt;
+    background: var(--panel-2); padding: 0.3mm 1mm; border-radius: 2px;
+  }
+
+  .callout {
+    break-inside: avoid-page;
+    background: var(--panel); border-left: 2.5pt solid var(--ink);
+    padding: 4mm 5mm; margin: 5mm 0;
+  }
+  .callout p { margin: 0; max-width: 66ch; }
+  .callout p + p { margin-top: 2.5mm; }
+  .callout .prompt-label { margin-bottom: 2mm; }
+
+  ol, ul { margin: 0; padding-left: 5mm; }
+  li { margin-bottom: 1.5mm; }
+
+  .pipeline {
+    font-family: "IBM Plex Mono", monospace; font-size: 7.8pt;
+    background: var(--ink); color: #F3F0EA;
+    padding: 3.5mm 4mm; white-space: pre-wrap; margin: 3mm 0 0;
+  }
+
+  footer {
+    margin-top: 8mm; padding-top: 3mm; border-top: 0.5pt solid var(--rule);
+    font-family: "IBM Plex Mono", monospace; font-size: 7.2pt; color: var(--muted);
+    display: flex; justify-content: space-between;
+  }
+</style>
+
+<div class="cover">
+  <p class="eyebrow">Micro Eazy · Commissioning brief</p>
+  <h1>Seven plates between here and gorgeous</h1>
+  <p class="standfirst">
+    Two products, two visual registers, one specification. The apex needs <strong>four new
+    photographs of Kenyan working life</strong>; the staff suite needs <strong>three of its six
+    plates regenerated</strong> to remove a watermark that will otherwise be projected in front of
+    Micromart's management. Every prompt below is paste-ready.
+  </p>
+  <div class="meta">
+    <div><b>26 August 2026</b>Issued</div>
+    <div><b>4 new · 3 regenerate</b>Scope</div>
+    <div><b>WebP, q80</b>Delivery format</div>
+    <div><b>Before the demo</b>Deadline</div>
+  </div>
+</div>
+
+<section>
+  <div class="sec-head">
+    <h2>The apex</h2>
+    <span class="count">4 NEW · microeazy.servicesuitecloud.com</span>
+  </div>
+  <p class="sec-note">
+    The right half of the customer sign-in screen. Warm, human, documentary — the opposite register
+    to the suite, deliberately. These are the people who actually borrow here, and the panel is
+    currently a flat gradient waiting for them.
+  </p>
+
+  <div class="callout">
+    <div class="prompt-label">The composition rule, and why it differs from the suite's</div>
+    <p>
+      On the staff doors the sign-in card sits <em>on</em> the artwork, so those plates keep their
+      left third empty. Here the card has its own column and the photograph owns a full half — but
+      the slider's headline is centred over it.
+    </p>
+    <p>
+      <strong>So: keep the centre calm.</strong> Subject to one side, or far enough back that a
+      two-line heading can cross the middle without landing on a face. Every prompt below already
+      says this; do not drop it.
+    </p>
+    <p>
+      One more, and it is the one that matters most: <strong>dark skin must be rendered with real
+      warmth and detail in the shadows.</strong> Image models routinely grey it out or crush it.
+      Reject any frame where it reads ashy.
+    </p>
+  </div>
+
+  <div class="plate" style="--hue:#1d7a09">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">Mama mboga</span>
+      <span class="chip new">New</span>
+      <span class="file">/images/login/ke-mama-mboga.webp</span>
+    </div>
+    <p class="why">Slide 1 — <em>“Your business does not wait. Neither should your loan.”</em></p>
+    <div class="prompt-label">Prompt</div>
+    <p class="prompt">Editorial photograph, early morning golden light. A confident Kenyan woman in her forties — a mama mboga — arranging tomatoes and sukuma wiki at her roadside vegetable stall in Nairobi. Deep, rich dark skin rendered with true warmth and detail, never washed out or greyed. She is mid-task and unposed, glancing off-camera, quietly capable. Subject sits in the RIGHT third of the frame; the LEFT and CENTRE fall away into softly blurred market depth so a heading can sit across the middle without touching her face. Natural documentary colour, shallow depth of field, 35mm. No text, no logos, no watermark, no badge of any kind.</p>
+  </div>
+
+  <div class="plate" style="--hue:#1d7a09">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">Fundi</span>
+      <span class="chip new">New</span>
+      <span class="file">/images/login/ke-fundi.webp</span>
+    </div>
+    <p class="why">Slide 2 — <em>“Tools, stock, rent — funded the same day.”</em></p>
+    <div class="prompt-label">Prompt</div>
+    <p class="prompt">Editorial photograph, warm workshop light through a doorway. A Kenyan fundi — a skilled carpenter in his thirties — measuring a length of timber in his open-air workshop, sawdust suspended in a shaft of light. Deep dark skin lit with warmth and clear detail in the shadows. Focused on the work, not the camera. Subject occupies the RIGHT of the frame; the LEFT and CENTRE recede into soft workshop depth. Honest documentary colour, no orange grade, shallow depth of field, 50mm. No text, no logos, no watermark, no badge of any kind.</p>
+  </div>
+
+  <div class="plate" style="--hue:#1d7a09">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">Duka owner</span>
+      <span class="chip new">New</span>
+      <span class="file">/images/login/ke-duka.webp</span>
+    </div>
+    <p class="why">Slide 3 — <em>“Every decision explained. Never a silent no.”</em></p>
+    <div class="prompt-label">Prompt</div>
+    <p class="prompt">Editorial photograph, soft interior daylight. A Kenyan woman in her thirties behind the counter of her duka — a small neighbourhood shop — checking something on her phone, shelves of stock softly out of focus behind her. Deep dark skin rendered warmly with genuine detail and catchlight in the eyes. Calm, self-possessed, mid-thought. She sits to the RIGHT; the CENTRE of the frame is quiet shop interior. Natural colour, shallow depth of field, 35mm. No text, no logos, no watermark, no badge of any kind.</p>
+  </div>
+
+  <div class="plate" style="--hue:#1d7a09">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">Boda rider</span>
+      <span class="chip new">New</span>
+      <span class="file">/images/login/ke-boda.webp</span>
+    </div>
+    <p class="why">Slide 4 — <em>“Repay from your phone, wherever the day takes you.”</em></p>
+    <div class="prompt-label">Prompt</div>
+    <p class="prompt">Editorial photograph, late afternoon light. A young Kenyan boda boda rider standing beside his motorcycle at the edge of a busy Nairobi street, helmet under one arm, taking a moment. Deep dark skin with warm, true-to-life rendering and detail retained in the shadows. Dignified and unhurried, not a stock smile. Subject to the RIGHT of frame; the LEFT and CENTRE are softly blurred street depth and warm bokeh. Documentary colour, shallow depth of field, 50mm. No text, no logos, no watermark, no badge of any kind.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>The suite</h2>
+    <span class="count">3 REGENERATE · six staff doors</span>
+  </div>
+  <p class="sec-note">
+    All six plates exist and are compositionally right. Three of them came back from the tool with a
+    <strong>“Made with AI” badge burned into the top-right corner</strong> — which is exactly where
+    the eye lands after the sign-in card, on a projector, in front of senior management. Three came
+    back clean from the same tool, so regenerating is a two-minute job, not a redesign.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Plate</th><th>System</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>login-lending</code></td><td>Lending Console</td><td>Clean — leave it</td></tr>
+      <tr><td><code>login-analytics</code></td><td>Analytics Studio</td><td>Clean — leave it</td></tr>
+      <tr><td><code>login-people</code></td><td>PeopleHub</td><td>Clean — leave it</td></tr>
+      <tr><td><code>login-portal</code></td><td>Customer Portal</td><td><strong>Badge — regenerate</strong></td></tr>
+      <tr><td><code>login-desk</code></td><td>ConnectDesk</td><td><strong>Badge — regenerate</strong></td></tr>
+      <tr><td><code>login-books</code></td><td>Ledgerly</td><td><strong>Badge + wrong hue — regenerate</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="prompt-label">House style — prepend this to all three</div>
+    <p class="prompt" style="background:#fff">Abstract architectural photography, shot on a full-frame camera with a 35mm lens at f/8. Deep near-black background (#0b0a10) occupying at least 60% of the frame. A single soft directional light source from the upper left. Fine film grain. No text, no letters, no numbers, no logos, no watermarks, no people, no faces, no hands. No UI, no screens, no charts, no dashboards. Composition weighted to the RIGHT THIRD so the left third stays near-empty and dark for a sign-in card to sit on. Muted, desaturated, cinematic. Photorealistic, not illustrative. 2560x1600, landscape.</p>
+  </div>
+
+  <div class="plate" style="--hue:#0e7490">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">Customer Portal</span>
+      <span class="chip regen">Regenerate</span>
+      <span class="hex">#0e7490</span>
+      <span class="file">login-portal.webp</span>
+    </div>
+    <p class="why">Open, welcoming, human-scale. The front door a customer sees. <em>Current file carries the badge.</em></p>
+    <div class="prompt-label">Prompt — after the house style</div>
+    <p class="prompt">Subject: a single doorway standing open in a dark wall, teal-cyan daylight (#0e7490) spilling through it across a polished floor, the reflection stretching toward the viewer. Everything outside the doorway is unresolved and dark. The feeling is invitation and arrival — one way in, and it is open. Teal as the only chroma. Nobody in the frame.</p>
+  </div>
+
+  <div class="plate" style="--hue:#be123c">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">ConnectDesk</span>
+      <span class="chip regen">Regenerate</span>
+      <span class="hex">#be123c</span>
+      <span class="file">login-desk.webp</span>
+    </div>
+    <p class="why">Warm, alive, connected. Voices moving through the dark. <em>Current file carries the badge — and this is the system being sold hardest.</em></p>
+    <div class="prompt-label">Prompt — after the house style</div>
+    <p class="prompt">Subject: dense bundles of fibre-optic cable curving through darkness, each strand ending in a pinpoint of crimson-rose light (#be123c), the bundles braiding together toward the right of the frame. Shallow depth of field so the near strands are sharp and the far ones dissolve. The feeling is many separate conversations travelling the same path. Crimson as the only chroma.</p>
+  </div>
+
+  <div class="plate" style="--hue:#0f766e">
+    <div class="plate-head">
+      <span class="swatch"></span>
+      <span class="plate-name">Ledgerly</span>
+      <span class="chip regen">Regenerate</span>
+      <span class="hex">#0f766e</span>
+      <span class="file">login-books.webp</span>
+    </div>
+    <p class="why">
+      Exact, balanced, quiet. The truth about the money. <em>Badge, plus the only plate that misses
+      its hue</em> — the delivered image reads brass and gold at roughly 35°, against Ledgerly's
+      green-teal at 175°. The accent is a colour code shared with the sidebar and the tiles, so this
+      one is worth getting right rather than accepting.
+    </p>
+    <div class="prompt-label">Prompt — after the house style</div>
+    <p class="prompt">Subject: a balance scale of dark blackened steel standing in near-darkness, both pans empty and perfectly level. Deep green-teal light (#0f766e) rims the beam, the chains and the upper edge of both pans, and a soft teal pool of the same colour spreads on the surface beneath it. The metal is MATTE DARK GREY-BLACK, not brass, not gold, not bronze, not copper — there must be no warm yellow or amber anywhere in the frame. Background falls away entirely to black. Macro-sharp on the pivot, soft everywhere else. The feeling is exactness and equilibrium — two sides that agree. Green-teal as the only chroma in the image. The scale sits in the right third.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>Delivery</h2>
+    <span class="count">Specs &amp; pipeline</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>&nbsp;</th><th>Apex — login panel</th><th>Suite — staff doors</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Dimensions</strong></td><td>1600 × 1800 (portrait-ish crop)</td><td>2560 × 1600 (landscape)</td></tr>
+      <tr><td><strong>Format</strong></td><td>WebP, quality 80</td><td>WebP, quality 80</td></tr>
+      <tr><td><strong>Weight budget</strong></td><td>120–180 kB each</td><td>~40 kB each</td></tr>
+      <tr><td><strong>Destination</strong></td><td><code>pwa/public/images/login/</code></td><td><code>connected-suite/public/images/suite/</code></td></tr>
+      <tr><td><strong>Register</strong></td><td>Warm documentary, people</td><td>Cold abstract, no people</td></tr>
+      <tr><td><strong>Empty state</strong></td><td>Tenant gradient — already correct</td><td>Accent gradient — already correct</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <div class="prompt-label">Why the encode step is not optional</div>
+    <p>
+      The suite plates arrived as ~1.5 MB PNGs and the set totalled <strong>8.02 MB</strong>. PNG is
+      the wrong container for a photograph, and these load before anything else on a sign-in page.
+      Re-encoded to WebP the same set is <strong>230 kB — 97% smaller</strong>, with nothing visible
+      lost through the scrim the card sits on. Keep the PNGs on disk as masters; the code reads the
+      <code>.webp</code>.
+    </p>
+    <p class="pipeline">npm run art:prompts               # print the suite prompts, paste-ready
+npm run art:optimize              # dry run — report what the encode would do
+npm run art:optimize -- --write   # encode</p>
+  </div>
+
+  <div class="callout">
+    <div class="prompt-label">One thing to fix on Micromart's side, not ours</div>
+    <p>
+      Entity <strong>3005 (MICROMART FINTECH)</strong> — the entity both the app and the staff suite
+      now read — has an empty branding row: <code>primaryColor</code> and <code>secondaryColor</code>
+      both return <code>#000000</code>, and <code>ggDriveFolder</code> returns the string
+      <code>"Failed"</code>. Those are values rather than absences, so a naive fallback paints a
+      black-on-black interface.
+    </p>
+    <p>
+      The app guards against it and falls back to Micro Eazy navy, which is why the sign-in screen
+      looks right today. But it is <em>not</em> Micromart's brand. Ask them to fill that row in and
+      the real colours apply everywhere with no code change — the guard stops matching on its own.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <span>Micro Eazy · Image brief</span>
+  <span>26 August 2026</span>
+</footer>
