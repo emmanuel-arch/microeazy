@@ -87,10 +87,24 @@ and this table without another edit. See [`ecosystem/ADDING-A-SYSTEM.md`](ecosys
 | `npm run bootstrap` | Installs dependencies for every system, sequentially. |
 | `npm run dev` | Runs every system with prefixed, interleaved output. Ctrl-C stops the tree. |
 | `npm run build` | Production build of every system. Exits non-zero if any fails. |
+| `npm run serve` | Runs every system from its **built output** instead of a dev server. No hot reload. |
 | `npm run sync` | Pulls each submodule to its remote tip. |
 | `npm run pull` | Pulls the meta-repo and re-points every submodule at its pinned commit. |
 
-All four accept system ids: `npm run dev interchange pwa`.
+All of these accept system ids: `npm run dev interchange pwa`.
+
+### On a machine with 8 GB
+
+`npm run dev` does not fit. A Turbopack dev server settles near 1.9 GB and there are
+two of them, so the full set wants about 5.6 GB on top of an editor — and Windows does
+not report that as a shortage, it pages until the desktop stops repainting. Both `dev`
+and `doctor` now price the run against free memory before anything is spawned, and
+refuse rather than let you find out.
+
+`npm run serve` is the way through: the same systems, served from `npm run build`
+output, at about 0.3 GB each. Demo from `serve`; develop with `npm run dev interchange`,
+one system at a time. The per-stack numbers live in `ecosystem/registry.json` under
+`memory`, so `dev` and `doctor` cannot disagree about what a system costs.
 
 ---
 

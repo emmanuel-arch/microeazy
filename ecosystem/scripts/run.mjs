@@ -17,7 +17,22 @@ import { loadRegistry, select, c, heading } from "./lib/registry.mjs";
 
 const [, , key, ...rest] = process.argv;
 if (!key) {
-  console.error("usage: run.mjs <install|build|start> [system…]");
+  console.error("usage: run.mjs <install|build> [system…]");
+  process.exit(1);
+}
+
+// `start` used to be routed here, and could never have worked. This runner is
+// sequential and blocking by design — correct for install and build, wrong for
+// anything long-lived: it would launch the first server, block on it forever and
+// never reach the second. Servers go through the supervisor in dev.mjs, which
+// spawns them in parallel and kills the tree on Ctrl-C.
+if (key === "start") {
+  console.error(
+    "\n  `start` does not run here — this runner blocks on each system in turn,\n" +
+      "  so it would launch the first server and never reach the second.\n\n" +
+      "    npm run serve                 every system, from its built output\n" +
+      "    npm run serve -- interchange  just one\n",
+  );
   process.exit(1);
 }
 

@@ -22,7 +22,8 @@
     "doctor": "node ecosystem/scripts/doctor.mjs",
     "bootstrap": "node ecosystem/scripts/run.mjs install",
     "build": "node ecosystem/scripts/run.mjs build",
-    "start": "node ecosystem/scripts/run.mjs start",
+    "serve": "node ecosystem/scripts/dev.mjs --built",
+    "start": "node ecosystem/scripts/dev.mjs --built",
     "sync": "git submodule update --init --recursive --remote",
     "pull": "git pull --recurse-submodules && git submodule update --init --recursive"
   }

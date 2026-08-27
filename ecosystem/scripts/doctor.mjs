@@ -15,8 +15,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createServer } from "node:net";
 import { execSync } from "node:child_process";
-import { totalmem, freemem } from "node:os";
 import { loadRegistry, select, c, heading, ROOT } from "./lib/registry.mjs";
+import { budget, buildState, ago, reclaimable } from "./lib/memory.mjs";
 
 let problems = 0;
 const ok = (label, detail) => console.log("  " + c.green("✓") + " " + label + (detail ? c.dim("  " + detail) : ""));
@@ -80,19 +80,36 @@ for (const [tool, cmd, needed] of [
 // process fork inside git-bash, and fails a Turbopack write with
 // ERROR_NO_SYSTEM_RESOURCES (os error 1450) — three symptoms that each look like
 // a permissions or corruption problem and are all the same shortage.
-const totalGb = totalmem() / 1024 ** 3;
-const freeGb = freemem() / 1024 ** 3;
-const webSystems = systems.filter((s) => s.port).length;
-const needGb = 1.5 + webSystems * 1.6;
+// The numbers come from registry.json so this and dev.mjs cannot drift.
+heading("  Memory");
+const dev = budget(registry, systems, "dev");
+const serve = budget(registry, systems, "start");
 
-if (freeGb >= needGb) {
-  ok("memory", freeGb.toFixed(1) + " GB free of " + totalGb.toFixed(1) + " GB");
-} else {
+const spread = dev.freeGb.toFixed(1) + " GB free of " + dev.totalGb.toFixed(1) + " GB";
+if (dev.fits()) {
+  ok("memory", spread + c.dim("  ·  npm run dev needs " + dev.needGb.toFixed(1) + " GB"));
+} else if (serve.fits()) {
   warn(
-    "only " + freeGb.toFixed(1) + " GB free of " + totalGb.toFixed(1) + " GB",
-    "Running " + webSystems + " dev servers together wants about " + needGb.toFixed(1) + " GB.\n" +
-      "      Run one at a time (npm run dev interchange), or use the built output\n" +
-      "      (npm run build && npm run start), which costs a fraction of Turbopack dev.",
+    spread + " — not enough for `npm run dev`",
+    "npm run dev across " + systems.length + " systems wants " + dev.needGb.toFixed(1) + " GB; you have " +
+      dev.freeGb.toFixed(1) + " GB.\n" +
+      "      `npm run serve` runs the same systems from their built output for " +
+      serve.needGb.toFixed(1) + " GB and fits.\n" +
+      "      Develop with `npm run dev -- <system>`, one at a time.",
+  );
+} else {
+  // Neither mode fits, which is the state that ends in a hung desktop rather
+  // than an error. Name what is holding the memory; do not touch it.
+  const canFree = reclaimable();
+  warn(
+    spread + " — not enough for `npm run dev` or `npm run serve`",
+    "dev wants " + dev.needGb.toFixed(1) + " GB, serve wants " + serve.needGb.toFixed(1) + " GB.\n" +
+      (canFree.length
+        ? "      Closing these would return about " +
+          Math.round(canFree.reduce((n, p) => n + p.mb, 0) / 1024 * 10) / 10 + " GB:\n" +
+          canFree.slice(0, 6).map((p) => "        " + String(p.mb).padStart(5) + " MB  " + p.name + "  " + p.why).join("\n") + "\n"
+        : "") +
+      "      Or serve a single system: npm run serve -- " + (systems.find((s) => s.port)?.id ?? "connected-suite"),
   );
 }
 
@@ -135,6 +152,28 @@ for (const s of systems) {
         : required.length && ok("required variables set", required.join(", "));
     } else {
       bad("no " + s.env.file, s.env.example ? "cp " + s.env.example + " " + s.env.file : "Create it — see the README.");
+    }
+  }
+
+  // Is there anything for `npm run serve` to serve, and is it current? On a
+  // machine that cannot afford `next dev`, this is the whole demo. Stale is the
+  // worse of the two failures: an absent build 404s and you notice inside a
+  // second, a stale one answers confidently with last week's code.
+  if (s.buildOutput) {
+    const b = buildState(s);
+    if (!b.built) {
+      warn("nothing built to serve", "npm run build -- " + s.id);
+    } else if (b.stale) {
+      warn(
+        "built output is stale",
+        [
+          "Built " + ago(b.builtAt) + " ago; source changed " + ago(b.sourceAt) + " ago.",
+          "      `npm run serve` would serve the older code — rebuild before you demo:",
+          "      npm run build -- " + s.id,
+        ].join("\n"),
+      );
+    } else {
+      ok("built output current", s.buildOutput + c.dim(" · built " + ago(b.builtAt) + " ago"));
     }
   }
 
