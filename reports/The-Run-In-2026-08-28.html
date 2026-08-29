@@ -1,0 +1,923 @@
+<title>The Run In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#f8f8f6; --card:#ffffff; --ink:#15171c; --ink-2:#3b4049; --muted:#5a606d;
+  --rule:#e2e1dc; --rule-soft:#eeede9;
+  --accent:#1b4d8f; --accent-soft:#eaf0f8;
+  --live:#00875e; --modelled:#c07c00; --blocked:#93233f;
+  --live-bg:#e6f4ee; --modelled-bg:#fbf1de; --blocked-bg:#f9e9ed;
+  --display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --body:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'Consolas',monospace;
+}
+
+@page{ size:A4; margin:14mm 13mm 15mm; }
+
+*{ box-sizing:border-box; }
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:10.2pt; line-height:1.52;
+  margin:0; padding:0 0 8mm; -webkit-font-smoothing:antialiased;
+}
+.page{ max-width:186mm; margin:0 auto; }
+
+/* type scale */
+h1,h2,h3,h4{ font-family:var(--display); text-wrap:balance; margin:0; font-weight:600; }
+h1{ font-size:31pt; line-height:1.02; letter-spacing:-.022em; font-weight:700; }
+h2{ font-size:15pt; line-height:1.15; letter-spacing:-.014em; }
+h3{ font-size:11.4pt; line-height:1.24; letter-spacing:-.008em; }
+h4{ font-size:9.6pt; line-height:1.3; letter-spacing:.002em; }
+p{ margin:0 0 .62em; max-width:70ch; }
+p:last-child{ margin-bottom:0; }
+strong{ font-weight:600; color:var(--ink); }
+em{ font-style:italic; }
+a{ color:var(--accent); text-decoration:none; }
+code,.m{ font-family:var(--mono); font-size:.88em; letter-spacing:-.012em; }
+code{ background:var(--rule-soft); padding:.06em .3em; border-radius:2px; color:var(--ink-2); }
+
+.eyebrow{
+  font-family:var(--display); font-size:7.4pt; font-weight:600;
+  text-transform:uppercase; letter-spacing:.15em; color:var(--muted);
+}
+.lede{ font-size:11.6pt; line-height:1.46; color:var(--ink-2); max-width:64ch; }
+
+/* cover */
+.cover{ padding:2mm 0 7mm; border-bottom:2.5px solid var(--ink); margin-bottom:7mm; }
+.cover .eyebrow{ display:block; margin-bottom:5mm; }
+.cover h1{ margin-bottom:4mm; }
+.cover .sub{
+  font-family:var(--display); font-size:13pt; font-weight:500;
+  color:var(--accent); letter-spacing:-.01em; margin-bottom:5mm;
+}
+.meta{
+  display:flex; flex-wrap:wrap; gap:0 9mm; padding-top:4mm;
+  border-top:1px solid var(--rule); font-family:var(--mono);
+  font-size:8pt; color:var(--muted);
+}
+.meta b{ color:var(--ink); font-weight:500; }
+
+/* sections */
+section{ break-inside:avoid-page; margin-bottom:8mm; }
+.sec-head{
+  display:flex; align-items:baseline; gap:4mm;
+  border-bottom:1px solid var(--ink); padding-bottom:2mm; margin-bottom:4.5mm;
+}
+.sec-num{
+  font-family:var(--mono); font-size:8.4pt; font-weight:600;
+  color:var(--accent); flex:none; padding-top:.5mm;
+}
+.sec-head h2{ flex:1; }
+.sec-head .note{ font-family:var(--mono); font-size:7.6pt; color:var(--muted); flex:none; }
+
+/* tables */
+.tw{ overflow-x:auto; }
+table{ width:100%; border-collapse:collapse; font-size:8.9pt; }
+th{
+  font-family:var(--display); font-size:7.4pt; font-weight:600;
+  text-transform:uppercase; letter-spacing:.09em; color:var(--muted);
+  text-align:left; padding:0 6px 2mm 0; border-bottom:1px solid var(--ink);
+  vertical-align:bottom;
+}
+td{
+  padding:2.1mm 6px 2.1mm 0; border-bottom:1px solid var(--rule-soft);
+  vertical-align:top; line-height:1.38;
+}
+tr:last-child td{ border-bottom:none; }
+th.n,td.n{ text-align:right; padding-right:0; font-variant-numeric:tabular-nums; font-family:var(--mono); font-size:8.3pt; }
+td.sys{ font-weight:600; white-space:nowrap; }
+.dim{ color:var(--muted); }
+tbody.tot td{ border-top:1.5px solid var(--ink); border-bottom:none; font-weight:600; padding-top:2.4mm; }
+
+/* status chips */
+.chip{
+  display:inline-flex; align-items:center; gap:3.5px;
+  font-family:var(--display); font-size:7.2pt; font-weight:600;
+  text-transform:uppercase; letter-spacing:.07em;
+  padding:1.1px 5.5px 1.6px; border-radius:2.5px; white-space:nowrap;
+}
+.chip::before{ content:''; width:5px; height:5px; border-radius:50%; background:currentColor; flex:none; }
+.chip.live{ color:var(--live); background:var(--live-bg); }
+.chip.mod{ color:var(--modelled); background:var(--modelled-bg); }
+.chip.blk{ color:var(--blocked); background:var(--blocked-bg); }
+
+/* coverage meter */
+.meter{ display:flex; gap:2px; height:9px; width:100%; margin-top:1.1mm; }
+.meter i{ display:block; border-radius:1px; }
+.meter i:first-child{ border-radius:2.5px 1px 1px 2.5px; }
+.meter i:last-child{ border-radius:1px 2.5px 2.5px 1px; }
+.meter i:only-child{ border-radius:2.5px; }
+.seg-live{ background:var(--live); }
+.seg-mod{ background:var(--modelled); }
+.seg-blk{ background:var(--blocked); }
+.legend{
+  display:flex; gap:6mm; margin-top:3.5mm; padding-top:2.5mm;
+  border-top:1px solid var(--rule-soft); font-size:8.2pt; color:var(--muted);
+}
+.legend span{ display:inline-flex; align-items:center; gap:4px; }
+.legend i{ width:9px; height:9px; border-radius:2px; display:block; flex:none; }
+
+/* the coverage column: a fraction over its own bar */
+td.cov{ padding-right:7mm; }
+.cov .frac{
+  font-family:var(--mono); font-size:8.3pt; font-variant-numeric:tabular-nums;
+  color:var(--ink); white-space:nowrap;
+}
+.cov .frac b{ font-weight:600; color:var(--live); }
+.cov .frac span{ color:var(--muted); }
+
+/* the framing number */
+.frame{
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+  border:1.5px solid var(--ink); border-radius:3px; overflow:hidden;
+  margin:1mm 0 4mm;
+}
+.frame > div{ padding:5mm 6mm; }
+.frame > div:first-child{ border-right:1.5px solid var(--ink); background:var(--card); }
+.frame > div:last-child{ background:var(--modelled-bg); }
+.frame .k{
+  font-family:var(--display); font-size:7.4pt; font-weight:600;
+  text-transform:uppercase; letter-spacing:.13em; color:var(--muted); margin-bottom:2.5mm;
+}
+.frame .v{
+  font-family:var(--display); font-size:27pt; font-weight:700;
+  letter-spacing:-.028em; line-height:.98; font-variant-numeric:tabular-nums;
+}
+.frame > div:first-child .v{ color:var(--live); }
+.frame > div:last-child .v{ color:var(--modelled); }
+.frame .u{ font-size:9pt; color:var(--ink-2); margin-top:2.5mm; line-height:1.4; }
+
+/* findings */
+.finding{
+  display:grid; grid-template-columns:14mm 1fr; gap:0 4mm;
+  padding:3.4mm 0; border-bottom:1px solid var(--rule-soft); break-inside:avoid;
+}
+.finding:last-child{ border-bottom:none; }
+.finding .id{
+  font-family:var(--mono); font-size:8.6pt; font-weight:600; color:var(--accent);
+  padding-top:.3mm;
+}
+.finding h4{ margin-bottom:1.4mm; }
+.finding p{ font-size:9.2pt; color:var(--ink-2); margin-bottom:0; max-width:66ch; }
+.finding .ev{
+  font-family:var(--mono); font-size:7.9pt; color:var(--muted);
+  margin-top:1.6mm; padding-left:2.6mm; border-left:2px solid var(--rule);
+  line-height:1.45; max-width:none;
+}
+.fh{ display:flex; align-items:baseline; gap:3mm; flex-wrap:wrap; margin-bottom:1.4mm; }
+.fh h4{ margin:0; }
+
+.group-label{
+  font-family:var(--display); font-size:8pt; font-weight:600;
+  text-transform:uppercase; letter-spacing:.11em;
+  padding:2.5mm 0 1.5mm; color:var(--ink);
+  border-bottom:1px solid var(--rule); margin-bottom:.5mm;
+}
+
+/* day plan */
+.day{
+  border:1px solid var(--rule); border-left:3px solid var(--accent);
+  border-radius:2px; background:var(--card);
+  padding:4mm 5mm; margin-bottom:3.5mm; break-inside:avoid;
+}
+.day.crit{ border-left-color:var(--blocked); }
+.day-head{
+  display:flex; align-items:baseline; gap:3mm; flex-wrap:wrap;
+  margin-bottom:2.5mm; padding-bottom:2mm; border-bottom:1px solid var(--rule-soft);
+}
+.day-head .when{
+  font-family:var(--mono); font-size:8.2pt; font-weight:600; color:var(--accent);
+  text-transform:uppercase; letter-spacing:.04em;
+}
+.day.crit .day-head .when{ color:var(--blocked); }
+.day-head h3{ flex:1; }
+.day-head .cost{ font-family:var(--mono); font-size:8pt; color:var(--muted); }
+.task{
+  display:grid; grid-template-columns:11mm 1fr auto; gap:0 3.5mm;
+  padding:2mm 0; border-bottom:1px dotted var(--rule); font-size:9.1pt;
+  align-items:baseline;
+}
+.task:last-child{ border-bottom:none; padding-bottom:0; }
+.task .t-id{ font-family:var(--mono); font-size:8.2pt; font-weight:600; color:var(--muted); }
+.task .t-b{ color:var(--ink-2); max-width:60ch; }
+.task .t-b b{ color:var(--ink); font-weight:600; }
+.task .t-c{ font-family:var(--mono); font-size:8pt; color:var(--muted); white-space:nowrap; }
+
+/* run of show */
+.show th.clk,.show td.clk{ width:15mm; }
+.show td.clk{
+  font-family:var(--mono); font-weight:600; font-size:9pt;
+  color:var(--accent); font-variant-numeric:tabular-nums;
+}
+.show td.mins{ font-family:var(--mono); font-size:8.2pt; color:var(--muted); width:12mm; }
+.show td.act{ font-weight:600; width:38mm; }
+.show td.act .where{
+  display:block; font-family:var(--mono); font-size:7.7pt;
+  font-weight:400; color:var(--muted); margin-top:.7mm; letter-spacing:-.01em;
+}
+.show td.beat{ font-size:8.7pt; color:var(--ink-2); line-height:1.42; }
+.show td.beat .say{
+  display:block; margin-top:1.3mm; padding-left:2.6mm;
+  border-left:2px solid var(--accent); color:var(--ink);
+  font-style:italic; font-size:8.5pt; line-height:1.4;
+}
+
+/* callouts */
+.call{
+  border:1px solid var(--rule); border-radius:2px; background:var(--card);
+  padding:4mm 5mm; margin:3mm 0; break-inside:avoid;
+}
+.call.warn{ background:var(--modelled-bg); border-color:#e6cf9f; }
+.call.stop{ background:var(--blocked-bg); border-color:#e8c2cc; }
+.call .k{
+  font-family:var(--display); font-size:7.4pt; font-weight:600;
+  text-transform:uppercase; letter-spacing:.13em; margin-bottom:2mm; color:var(--muted);
+}
+.call.warn .k{ color:var(--modelled); }
+.call.stop .k{ color:var(--blocked); }
+.call p{ font-size:9.3pt; }
+
+pre{
+  font-family:var(--mono); font-size:8.1pt; line-height:1.5;
+  background:var(--card); border:1px solid var(--rule); border-radius:2px;
+  padding:3.2mm 4mm; overflow-x:auto; margin:2.5mm 0; color:var(--ink-2);
+}
+pre b{ color:var(--ink); font-weight:600; }
+
+ul.plain{ margin:.5em 0 .6em; padding-left:4.6mm; max-width:68ch; }
+ul.plain li{ margin-bottom:1.4mm; padding-left:1mm; }
+ul.plain li::marker{ color:var(--muted); }
+
+.pb{ break-before:page; }
+.cols2{ column-count:2; column-gap:9mm; }
+.cols2 > *{ break-inside:avoid; }
+footer{
+  margin-top:9mm; padding-top:3mm; border-top:1px solid var(--rule);
+  font-family:var(--mono); font-size:7.6pt; color:var(--muted);
+  display:flex; justify-content:space-between; gap:6mm;
+}
+</style>
+
+<div class="page">
+
+<!-- COVER -->
+<div class="cover">
+  <span class="eyebrow">Micro Eazy &middot; execution plan</span>
+  <h1>The Run In</h1>
+  <div class="sub">Six days to the Micromart demonstration &mdash; Wednesday 2 September 2026</div>
+  <p class="lede">Three repositories, six systems and two relays already stand up. This is the
+  audit of what each screen actually reads, the twelve things between here and a two-hour
+  demonstration that never once shows a modelled number, and the day-by-day plan to close them.</p>
+  <div class="meta">
+    <span>Written <b>Friday 28 August 2026</b></span>
+    <span>Demonstration <b>Wed 2 Sept</b></span>
+    <span>Working days remaining <b>4</b></span>
+    <span>Evidence <b>verified on live systems</b></span>
+  </div>
+</div>
+
+<!-- 1 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Where we stand, according to the machine</h2>
+    <span class="note">run 28 Aug 2026</span>
+  </div>
+
+  <p>Nothing below is recalled from a document. Every row was produced by running the check
+  this afternoon against the deployed estate and Micromart's production server.</p>
+
+  <div class="tw"><table>
+    <thead><tr>
+      <th style="width:34mm">Check</th><th style="width:26mm">Verdict</th><th>What it proves</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="sys"><code>test:relay</code></td>
+        <td><span class="chip live">Passed</span></td>
+        <td>95,409 tracked loans read through the relay. SQL 703&thinsp;ms, round trip 1,411&thinsp;ms.
+        <code>DATETIME</code> survived the wire as a <code>Date</code>. Writes refused at the socket.</td>
+      </tr>
+      <tr>
+        <td class="sys"><code>test:crb:prod</code></td>
+        <td><span class="chip live">8 / 8</span></td>
+        <td>Every Metropol service entitled against production <span class="m">:22225</span>,
+        egressing from the whitelisted address. The <span class="m">E003</span> blocker is gone.</td>
+      </tr>
+      <tr>
+        <td class="sys"><code>test:live</code></td>
+        <td><span class="chip live">14 live &middot; 0 degraded</span></td>
+        <td>All six subdomains answer 200. One sign-in carries across every origin on the
+        <span class="m">.servicesuitecloud.com</span> cookie. No screen fell back to a degraded state.</td>
+      </tr>
+      <tr>
+        <td class="sys"><code>test:desk</code></td>
+        <td><span class="chip live">Passed</span></td>
+        <td>Eleven checks on the collections floor, including a shadow write composed, stored
+        and <em>not</em> executed. Pipeline and mirror both armed <span class="m">false</span>.</td>
+      </tr>
+      <tr>
+        <td class="sys">Group book read</td>
+        <td><span class="chip live">673&thinsp;ms</span></td>
+        <td>Micromart's four entities aggregated in one round trip through the relay &mdash;
+        161,862 borrowers, 327,709 loans, KES 562.9m outstanding.</td>
+      </tr>
+      <tr>
+        <td class="sys">Interchange filters</td>
+        <td><span class="chip mod">2 of 4 members</span></td>
+        <td>Bloom filters published for Micromart Fintech (79 tokens) and Axe Boresha
+        (14,149). Micromart Africa and Axe Stawi are declared but absent.</td>
+      </tr>
+      <tr>
+        <td class="sys">Fintech book read</td>
+        <td><span class="chip blk">HTTP 503</span></td>
+        <td><span class="m">"The relay host has no connection string for Micromart Fintech."</span>
+        One missing variable on <span class="m">salesmaster</span>, described in F1.</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <div class="call">
+    <div class="k">The headline</div>
+    <p>The hard problems are behind us. A serverless deployment now reads a database that has
+    no internet route, a bureau answers from a registered address, and one sign-in opens six
+    front doors. What remains is not infrastructure &mdash; it is that <strong>three of the six
+    systems are still reading the wrong database.</strong></p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>The six systems, by what they actually read</h2>
+    <span class="note">source-traced, not assumed</span>
+  </div>
+
+  <p>Every screen in the suite resolves to one of two data paths: <strong>live</strong> &mdash;
+  <code>runReadOnlyQuery()</code> through the relay into Micromart's SQL Server &mdash; or
+  <strong>our own Postgres</strong>, which for a bridged lender holds almost nothing. The
+  split below was traced from each page's imports to its query, not read off a roadmap.</p>
+
+  <div class="tw"><table>
+    <thead><tr>
+      <th style="width:32mm">System</th>
+      <th style="width:34mm">Screens reading live</th>
+      <th>Where the numbers come from</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="sys">ConnectDesk</td>
+        <td class="cov"><span class="frac"><b>12</b> <span>/ 12</span></span>
+          <div class="meter"><i class="seg-live" style="width:100%"></i></div></td>
+        <td>CollectBox joined to Serviceconnect in one query plan. The floor, the queues, the
+        case file, the timeline, the pipeline. <span class="dim">Shadow queue reads our own
+        records by design &mdash; that is what it is for.</span></td>
+      </tr>
+      <tr>
+        <td class="sys">PeopleHub</td>
+        <td class="cov"><span class="frac"><b>3</b> <span>/ 3</span></span>
+          <div class="meter"><i class="seg-live" style="width:100%"></i></div></td>
+        <td>The roster from <span class="m">UserMaster</span>, officers joined through
+        <span class="m">Borrowers.EntityAgent</span> to the floor and what it recovered.</td>
+      </tr>
+      <tr>
+        <td class="sys">Ledgerly</td>
+        <td class="cov"><span class="frac"><b>3</b> <span>/ 3</span></span>
+          <div class="meter"><i class="seg-live" style="width:100%"></i></div></td>
+        <td>The real journal, paged with an account filter; disbursement and collection read
+        from two databases nobody has reconciled.</td>
+      </tr>
+      <tr>
+        <td class="sys">Lending Console</td>
+        <td class="cov"><span class="frac"><b>3</b> <span>/ 27</span></span>
+          <div class="meter"><i class="seg-live" style="width:11%"></i><i class="seg-mod" style="width:89%"></i></div></td>
+        <td>Borrower list and field worklist read through live. The dashboard overlays live
+        KPIs but leaves <strong>four panels modelled</strong>. Everything else &mdash; applications,
+        loans, collections, repayments &mdash; is Postgres.</td>
+      </tr>
+      <tr>
+        <td class="sys">Analytics Studio</td>
+        <td class="cov"><span class="frac"><b>1</b> <span>/ 15</span></span>
+          <div class="meter"><i class="seg-live" style="width:7%"></i><i class="seg-mod" style="width:93%"></i></div></td>
+        <td>Only the group roll-up reads live. The other fourteen aggregate in Postgres via
+        <span class="m">lib/analytics/engine.ts</span> &mdash; <strong>a 199-loan book.</strong></td>
+      </tr>
+      <tr>
+        <td class="sys">Micro&nbsp;Eazy&nbsp;(PWA)</td>
+        <td class="cov"><span class="frac"><b>16</b> <span>/ 24</span></span>
+          <div class="meter"><i class="seg-live" style="width:67%"></i><i class="seg-mod" style="width:33%"></i></div></td>
+        <td>Core banking screens run on Micromart's own live API. The ecosystem screens go
+        through <span class="m">/api/portal/*</span> &mdash; and <strong>"My loan" refuses bridged
+        lenders outright.</strong></td>
+      </tr>
+    </tbody>
+    <tbody class="tot">
+      <tr>
+        <td class="sys">Estate</td>
+        <td class="cov"><span class="frac"><b>38</b> <span>/ 84</span></span>
+          <div class="meter"><i class="seg-live" style="width:45%"></i><i class="seg-mod" style="width:55%"></i></div></td>
+        <td>45% of the estate reads Micromart. The plan takes it to 88% by Tuesday.</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <div class="legend">
+    <span><i class="seg-live"></i> Live &mdash; read through the relay</span>
+    <span><i class="seg-mod"></i> Modelled or our own Postgres</span>
+  </div>
+</section>
+
+<!-- 3 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>The number that frames the week</h2>
+    <span class="note">Micromart, 28 Aug</span>
+  </div>
+
+  <p>The Analytics Studio is the screen the Data &amp; Analytics manager opens, and it is the
+  one that reads least. Both figures below are Micromart's loan book. They differ by a factor
+  of sixteen hundred.</p>
+
+  <div class="frame">
+    <div>
+      <div class="k">Live, through the relay</div>
+      <div class="v">327,709</div>
+      <div class="u">loans across four entities &middot; 161,862 borrowers &middot; KES 562.9m outstanding.
+      This is what ConnectDesk, PeopleHub and Ledgerly read today.</div>
+    </div>
+    <div>
+      <div class="k">In our Postgres</div>
+      <div class="v">199</div>
+      <div class="u">loans &middot; 162 borrowers &middot; 9 branches. This is what the Analytics Studio and
+      most of the Lending Console read today.</div>
+    </div>
+  </div>
+
+  <p>This is not a defect that crept in &mdash; it is the deliberate design working as specified.
+  A bridged lender's customers are <em>never</em> mirrored into our database, so the console
+  can never show a stale copy of somebody else's book. The borrower list honours that by
+  reading through. The studio was written before the bridge existed and still aggregates
+  locally, so it honours the same rule by finding almost nothing.</p>
+
+  <div class="tw"><table>
+    <thead><tr>
+      <th style="width:16mm">Entity</th><th style="width:44mm">Name</th>
+      <th class="n">Borrowers</th><th class="n">Loans</th><th class="n">Active</th>
+      <th class="n">OLB (KES)</th><th class="n">Arrears (KES)</th><th class="n">Last loan</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="m">3002</td><td>Micromart Africa Limited</td>
+        <td class="n">142,393</td><td class="n">264,178</td><td class="n">10,122</td>
+        <td class="n">91,084,484</td><td class="n">28,121,968</td><td class="n">28 Aug</td></tr>
+      <tr><td class="m">3003</td><td>Micromart Check off</td>
+        <td class="n">2,448</td><td class="n">3,664</td><td class="n">437</td>
+        <td class="n">470,890,580</td><td class="n">115,837,161</td><td class="n">28 Aug</td></tr>
+      <tr><td class="m">3005</td><td>Micromart Fintech <span class="dim">&mdash; the portal lender</span></td>
+        <td class="n">17,021</td><td class="n">59,867</td><td class="n">93</td>
+        <td class="n">915,261</td><td class="n">101,861</td><td class="n">27 Aug</td></tr>
+      <tr><td class="m">3004</td><td>Micromart IPF <span class="dim">&mdash; empty</span></td>
+        <td class="n">0</td><td class="n">0</td><td class="n">0</td>
+        <td class="n">0</td><td class="n">0</td><td class="n">&mdash;</td></tr>
+    </tbody>
+    <tbody class="tot">
+      <tr><td></td><td>Group</td>
+        <td class="n">161,862</td><td class="n">327,709</td><td class="n">10,652</td>
+        <td class="n">562,890,325</td><td class="n">144,060,990</td><td class="n"></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 4 -->
+<section class="pb">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Twelve findings, in the order they should be fixed</h2>
+    <span class="note">each reproduced today</span>
+  </div>
+
+  <div class="group-label">Blockers &mdash; one variable and one column stand between us and the exchange</div>
+
+  <div class="finding">
+    <div class="id">F1</div>
+    <div>
+      <div class="fh"><h4>The relay cannot read Micromart Fintech</h4><span class="chip blk">Blocker</span></div>
+      <p><code>relay-host/.env.example</code> never mentions <code>MICROMART_FINTECH</code>, and
+      <code>warmPools()</code> in <code>sql-relay.ts</code> warms only <span class="m">micromart</span>
+      and <span class="m">axe</span>. Both Interchange members on that server &mdash; 3005 <em>and</em>
+      3002 &mdash; resolve through the <span class="m">micromart-fintech</span> org, so a single
+      absent variable takes out half the exchange.</p>
+      <div class="ev">$ npm run interchange:members<br>
+      Micromart (services) <b>unreachable</b> &mdash; SQL relay returned 503.<br>
+      "The relay host has no connection string for Micromart Fintech."</div>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F2</div>
+    <div>
+      <div class="fh"><h4>Half the Interchange membership is unpublished</h4><span class="chip blk">Blocker</span></div>
+      <p><code>NODE_MEMBERS</code> declares four. The deployed registry serves two: Fintech
+      (79 tokens) and Axe Boresha (14,149), both built 26 August. Missing is
+      <span class="m">KE/LENDER/3002</span> &mdash; Micromart Africa, 142,393 borrowers, the anchor
+      member the whole exposure argument rests on. Consequence of F1; fixed by re-running the
+      publish once the variable is set.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F3</div>
+    <div>
+      <div class="fh"><h4>The group roll-up crashes on Axe's server</h4><span class="chip blk">Blocker</span></div>
+      <p><code>getGroupBook()</code> selects <span class="m">onboardingLatitude</span> /
+      <span class="m">onboardingLongitude</span>. Axe's Serviceconnect predates those columns,
+      so the one analytics surface that <em>does</em> read live throws on the second-largest
+      book in the ecosystem. Guard the two terms with <code>COL_LENGTH()</code>.</p>
+      <div class="ev">AXE &mdash; ERR <b>Invalid column name 'onboardingLongitude'.</b></div>
+    </div>
+  </div>
+
+  <div class="group-label">Live-data gaps &mdash; the reason this document exists</div>
+
+  <div class="finding">
+    <div class="id">F4</div>
+    <div>
+      <div class="fh"><h4>The Analytics Studio aggregates the wrong database</h4><span class="chip mod">Major</span></div>
+      <p>Fourteen of fifteen surfaces call <code>headline</code>, <code>timeSeries</code>,
+      <code>cube</code> or <code>cohorts</code> in <code>lib/analytics/engine.ts</code>, which
+      groups in Postgres through <code>orgTx</code>. For Micromart that is a 199-loan book, so
+      the board view will greet the room with <em>"There is no open book in this cut."</em>
+      The studio's entire data surface is those six functions &mdash; which is also why it is
+      tractable in a weekend.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F5</div>
+    <div>
+      <div class="fh"><h4>Four console dashboard panels stay modelled forever</h4><span class="chip mod">Major</span></div>
+      <p><code>MODELLED_PANELS = ["series","aging","productMix","branches"]</code>.
+      <code>applyLive()</code> overlays real KPIs and then sets
+      <code>simulated: false</code> &mdash; true of the headline figures, false of the time series,
+      the aging buckets, the product mix and the branch table, which are still produced by a
+      seeded PRNG. The screen labels each region honestly, which is the right behaviour and
+      still not a thing to project.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F6</div>
+    <div>
+      <div class="fh"><h4>The borrower's own loan screen refuses bridged lenders</h4><span class="chip mod">Major</span></div>
+      <p><code>/api/portal/my-loan</code> returns <span class="m">bridged: true</span> and the
+      message <em>"Your Micromart loan is managed on the lender's own system."</em> A real
+      Micromart borrower opening the ecosystem's My-loan screen is deflected. Same for
+      <code>/api/portal/ladder</code>, which counts Postgres rows. Both live equivalents are
+      already written and tested &mdash; <code>getCustomer360()</code> and
+      <code>checkGraduation()</code> &mdash; so this is wiring, not new SQL.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F7</div>
+    <div>
+      <div class="fh"><h4>Console operations screens read Postgres</h4><span class="chip mod">Accept</span></div>
+      <p>Applications, loans, collections, disbursements, repayments, products and workflows
+      all resolve locally. This is <em>correct</em> &mdash; they are origination surfaces for a book
+      we originate, and Micromart originate in their own core. It is nonetheless 24 screens
+      that must not be opened on a Micromart session during the demonstration. Drive
+      origination from Mular Credit instead, where the book is genuinely ours.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F8</div>
+    <div>
+      <div class="fh"><h4>Interchange scoring and learning run on seeded holdings</h4><span class="chip mod">Accept</span></div>
+      <p><code>seed-holdings.ts</code> and <code>seed-ledger.ts</code> build the overlapping
+      population, the bitemporal ledger, the decision history and the declined applicants that
+      reject inference recovers. The exposure engine itself queries the two live members. Say
+      the distinction out loud on the Score and Learning screens rather than letting somebody
+      find it.</p>
+    </div>
+  </div>
+
+  <div class="group-label">Hygiene &mdash; small, cheap, and each one is visible from the room</div>
+
+  <div class="finding">
+    <div class="id">F9</div>
+    <div>
+      <div class="fh"><h4>The artwork check reports a failure that is not one</h4><span class="chip mod">Cosmetic</span></div>
+      <p><code>verify-live.ts</code> probes six <span class="m">.png</span> masters;
+      <code>artwork.ts</code> serves <span class="m">.webp</span>. PeopleHub's master is a
+      <span class="m">.jpg</span>, so the PNG 404s and the run reports "5/6 artworks". All six
+      doors serve their plate &mdash; confirmed 200, 9,884 bytes. Point the check at the file the
+      app reads.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F10</div>
+    <div>
+      <div class="fh"><h4>The relay-host bundle is untracked</h4><span class="chip mod">Risk</span></div>
+      <p>Eleven files &mdash; the host-verification script, the service installer, both relays and
+      the failure taxonomy &mdash; exist only on this laptop. They are the deployment that makes the
+      cloud work, and the document that explains what to do when it stops. Commit them.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F11</div>
+    <div>
+      <div class="fh"><h4>The ecosystem registry says two systems are not deployed</h4><span class="chip mod">Cosmetic</span></div>
+      <p><code>registry.json</code> carries <span class="m">live: false</span> for the
+      Interchange and the PWA, and a note that
+      <span class="m">portal.servicesuitecloud.com</span> has no DNS record. Both now answer
+      200 with their real titles. The registry is the file every script trusts; a stale one is
+      how a fresh machine gets the wrong idea.</p>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="id">F12</div>
+    <div>
+      <div class="fh"><h4>Founding-cohort books are not reachable from the relay</h4><span class="chip mod">Post-demo</span></div>
+      <p>Ten qualifying entities on the <span class="m">.198</span> server &mdash; NJB, Buy Simu,
+      ATICO and seven more, ~43,000 borrowers between them &mdash; need
+      <code>SERVICESUITE_CONN_BUYSIMU</code> on the relay host to join the exchange. Not
+      demo-critical, and the single highest-value thing to do the week after.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="pb">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>The plan</h2>
+    <span class="note">4 working days</span>
+  </div>
+
+  <p>Ordered so that the cheapest unblocks land first and the one genuinely large piece &mdash;
+  the Analytics Studio &mdash; gets the weekend it needs. Tuesday is rehearsal, not development.</p>
+
+  <div class="day crit">
+    <div class="day-head">
+      <span class="when">Tonight &middot; Fri 28</span>
+      <h3>Unblock the exchange</h3>
+      <span class="cost">&approx; 3 h</span>
+    </div>
+    <div class="task"><span class="t-id">A1</span><span class="t-b"><b>Set <code>MICROMART_FINTECH</code> on salesmaster.</b> Same connection string as <code>SERVICESUITE_CONN_MICROMART</code>. Add it to <code>.env.example</code>, add the slug to <code>warmPools()</code>, restart <span class="m">MicroEazySqlRelay</span>. Verify with <code>npm run interchange:members</code>.</span><span class="t-c">30 m</span></div>
+    <div class="task"><span class="t-id">A2</span><span class="t-b"><b>Publish the two missing members.</b> <code>npm run interchange:publish -- --all</code>. Expect &approx;10,100 tokens for 3002 and &approx;115 for Axe Stawi. Confirm four filters at <span class="m">/api/filters</span>.</span><span class="t-c">1 h</span></div>
+    <div class="task"><span class="t-id">A3</span><span class="t-b"><b>Guard the two <code>onboarding*</code> columns</b> in <code>getGroupBook()</code> so the roll-up survives Axe's older schema.</span><span class="t-c">1 h</span></div>
+    <div class="task"><span class="t-id">A4</span><span class="t-b"><b>Commit <code>relay-host/</code></b> to the meta-repo, land the two documentation edits, and bump the submodule pointers.</span><span class="t-c">30 m</span></div>
+  </div>
+
+  <div class="day">
+    <div class="day-head">
+      <span class="when">Sat 29 &ndash; Sun 30</span>
+      <h3>The Analytics Studio, on live data</h3>
+      <span class="cost">&approx; 14 h</span>
+    </div>
+    <p style="font-size:9.1pt;color:var(--muted);margin-bottom:2.5mm">
+      Build <code>lib/analytics/engine-live.ts</code> answering the same six signatures against
+      Serviceconnect through the relay, and branch on <code>ctx.bridged</code>, which
+      <code>studioContext</code> already resolves. The measure definitions are not guesswork &mdash;
+      <code>analytics/group.ts</code> already reproduces Micromart's own
+      <span class="m">MainDashboard</span> arithmetic, including the 90-day non-performing rule,
+      verified against their live dashboard.
+    </p>
+    <div class="task"><span class="t-id">B1</span><span class="t-b"><b><code>headline</code> + <code>timeSeries</code></b> &mdash; unlocks the board view, portfolio, collections, cashflow, funnel, risk and borrowers. <b>Seven of fifteen surfaces.</b></span><span class="t-c">6 h</span></div>
+    <div class="task"><span class="t-id">B2</span><span class="t-b"><b><code>cube</code></b> by branch, product, officer, region, channel and risk band &mdash; unlocks agents, branches, products, regions, channels. <b>Five more.</b></span><span class="t-c">5 h</span></div>
+    <div class="task"><span class="t-id">B3</span><span class="t-b"><b><code>filterOptions</code> + <code>inceptionDate</code></b> &mdash; the filter bar's real axes, and "since inception" meaning the first loan on <em>this</em> book.</span><span class="t-c">2 h</span></div>
+    <div class="task"><span class="t-id">B4</span><span class="t-b"><b><code>cohorts</code> + the Explorer.</b> <span class="dim">Cut line. Both degrade honestly today; ship them after the demo if Saturday runs long.</span></span><span class="t-c">3 h</span></div>
+  </div>
+
+  <div class="call stop">
+    <div class="k">The alternative, and why not</div>
+    <p>The other route is a nightly mirror of Micromart into Postgres. It is rejected. It makes
+    the studio a <em>stale copy</em> of a book the borrower list next door reads live, which is
+    the exact contradiction a sharp manager will find; it puts 327,709 loans and 1.95 million
+    schedule rows into a database that is not ours to hold; and it is an ETL project, not four
+    days' work. Read through, as everything else in the suite already does.</p>
+  </div>
+
+  <div class="day">
+    <div class="day-head">
+      <span class="when">Mon 31</span>
+      <h3>The console dashboard and the borrower's phone</h3>
+      <span class="cost">&approx; 7 h</span>
+    </div>
+    <div class="task"><span class="t-id">C1</span><span class="t-b"><b>Feed the four modelled panels</b> from B1 and B2. Then remove the <code>simulate()</code> fallback on the bridged path so the dashboard degrades honestly instead of reaching for a cinematic fiction.</span><span class="t-c">4 h</span></div>
+    <div class="task"><span class="t-id">D1</span><span class="t-b"><b>Wire <code>/api/portal/my-loan</code> to <code>getCustomer360()</code></b> and <code>/api/portal/ladder</code> to <code>checkGraduation()</code> for bridged orgs. A Micromart borrower then opens the app and sees their real loan.</span><span class="t-c">3 h</span></div>
+  </div>
+
+  <div class="day">
+    <div class="day-head">
+      <span class="when">Tue 1 Sept</span>
+      <h3>Rehearsal and freeze</h3>
+      <span class="cost">all day</span>
+    </div>
+    <div class="task"><span class="t-id">E1</span><span class="t-b"><b>The full sweep</b> &mdash; <code>test:relay</code>, <code>test:crb:prod</code>, <code>test:desk</code>, <code>test:collectbox</code>, <code>test:live</code>, <code>test:access</code>, <code>interchange:verify</code>. Every one green before anything else happens.</span><span class="t-c">1 h</span></div>
+    <div class="task"><span class="t-id">E2</span><span class="t-b"><b>Point the artwork check at <code>.webp</code></b> (F9) and refresh <code>registry.json</code> (F11).</span><span class="t-c">30 m</span></div>
+    <div class="task"><span class="t-id">E3</span><span class="t-b"><b>Walk the two hours with a timer,</b> on the deployed site, over the public internet, signed in the way a supervisor signs in. Every route compiles on first render &mdash; warm all of them.</span><span class="t-c">2.5 h</span></div>
+    <div class="task"><span class="t-id">E4</span><span class="t-b"><b>Freeze.</b> No deploys after the rehearsal passes. Confirm <code>SQL_RELAY_ALLOW_WRITES</code> unset and both funnel mappings listed.</span><span class="t-c">30 m</span></div>
+  </div>
+
+  <div class="call warn">
+    <div class="k">If the weekend slips</div>
+    <p>B4 goes first &mdash; the Explorer and cohorts degrade honestly and nobody asks for them
+    unprompted. B2 goes second, which costs five ranking surfaces but keeps the board view,
+    portfolio and collections live. <strong>B1 is not negotiable:</strong> without it the
+    Analytics act opens on an empty book, and that is the one moment in two hours where the
+    room would stop believing the rest.</p>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="pb">
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <h2>The two hours</h2>
+    <span class="note">120 min &middot; seven acts</span>
+  </div>
+
+  <p>Built so the argument compounds. The floor first, because it is undeniable and it is
+  theirs. The borrower's phone in the middle, because it turns a lender's tool into a market.
+  The exchange last, because it only means something once the room has seen five systems read
+  one book.</p>
+
+  <div class="tw"><table class="show">
+    <thead><tr>
+      <th class="clk">Clock</th><th style="width:12mm">Min</th>
+      <th style="width:38mm">Act</th><th>The beat, and the line that carries it</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="clk">0:00</td><td class="mins">8</td>
+        <td class="act">The topology<span class="where">/suite, cold</span></td>
+        <td class="beat">Open the launcher and say nothing for twenty seconds. Six tiles, each
+        carrying a number read when the page rendered. Then the relay in one diagram: their
+        database has no internet route, so we moved the socket, not the application.
+        <span class="say">"Every figure on this page was read from your SQL Server when it
+        loaded. Nothing here is seeded, cached or remembered."</span></td>
+      </tr>
+      <tr>
+        <td class="clk">0:08</td><td class="mins">22</td>
+        <td class="act">ConnectDesk<span class="where">/desk &rarr; /queue &rarr; a case &rarr; /shadow</span></td>
+        <td class="beat">The floor as it stands this minute. Their seven queues, their
+        commission bands, their agents ranked by cash rather than dials. Sort by
+        <b>longest untouched</b> &mdash; the sort that finds the book going quietly cold. Open a
+        case: every loan, every call, every payment, merged from five sources. Pick a
+        disposition, show the "This will" block, submit, then show the composed SQL sitting
+        unexecuted in the shadow queue.
+        <span class="say">"Everything ConnectDesk would write to your database, in full, held
+        for you to read first. Arming it is one environment variable."</span></td>
+      </tr>
+      <tr>
+        <td class="clk">0:30</td><td class="mins">16</td>
+        <td class="act">Lending Console<span class="where">/console &rarr; borrowers &rarr; field</span></td>
+        <td class="beat">The dashboard against their own MainDashboard figures &mdash; same OLB,
+        same PQS, same 90-day rule, because we reproduced their arithmetic rather than
+        inventing ours. Then the borrower list: 17,021 customers, paged out of their server,
+        never copied. Finish on the field worklist &mdash; the borrowers with no location, which is
+        an operations problem nobody has been able to see.</td>
+      </tr>
+      <tr>
+        <td class="clk">0:46</td><td class="mins">15</td>
+        <td class="act">Analytics Studio<span class="where">board &rarr; portfolio &rarr; collections &rarr; group</span></td>
+        <td class="beat">The board view in the order a board asks: how big, is it going bad,
+        is money coming in, who brings it, what sells. Every figure compared against the same
+        elapsed days last period. Close on the group roll-up.
+        <span class="say">"You run four entities on one server and you have never seen them
+        side by side, because your own dashboard scopes to whoever signed in."</span></td>
+      </tr>
+      <tr>
+        <td class="clk">1:01</td><td class="mins">13</td>
+        <td class="act">PeopleHub &amp; Ledgerly<span class="where">/people/officers &rarr; /books/journal</span></td>
+        <td class="beat">Officers sorted by <b>weakest coverage</b> &mdash; the thirteen with a book
+        on the floor who took no payment in thirty days. Then the journal: three years and 6.4
+        million postings that nothing has ever read, each row linking to its case on the floor.
+        <span class="say">"This needed your roster, your ledger and your collections floor in
+        one query. No system in this building can currently produce it."</span></td>
+      </tr>
+      <tr>
+        <td class="clk">1:14</td><td class="mins">17</td>
+        <td class="act">Micro Eazy<span class="where">the phone, on the projector</span></td>
+        <td class="beat">Install it from the home screen. Verify a phone, see a real loan,
+        run the M-Pesa statement crunch, pull a live Metropol report &mdash; 8 of 8 services
+        entitled, from a whitelisted address &mdash; then Ratiba and an STK prompt landing on the
+        handset. Finish on the limit ladder and the decision explanation.
+        <span class="say">"Same book, same second, borrower's side."</span></td>
+      </tr>
+      <tr>
+        <td class="clk">1:31</td><td class="mins">19</td>
+        <td class="act">The Interchange<span class="where">consent &rarr; exposure &rarr; log &rarr; governance</span></td>
+        <td class="beat">The consent gate refusing a query with no reference. Then an exposure
+        check across four member books, answered without any member learning who asked, and
+        without the registry ever holding a national ID. Show the hash-chained log and try to
+        tamper with it. Name the seeded surfaces before anyone asks.
+        <span class="say">"Nothing is pooled. Identity is destroyed at the edge. What crosses
+        is a token and four numbers."</span></td>
+      </tr>
+      <tr>
+        <td class="clk">1:50</td><td class="mins">10</td>
+        <td class="act">The bridge<span class="where">/desk/pipeline</span></td>
+        <td class="beat">The close, and it is one number. 95,409 loans on their collections
+        floor; not one of them is entity 3005. Walk the six sections as the argument they are
+        laid out to be &mdash; the gap, the mechanism, the 98% agreement with their own nightly
+        ageing job, the queues, the commission, and the customers who would arrive tomorrow.
+        Press <b>Preview</b>. Statements compose. Nothing runs.
+        <span class="say">"We did not invent an ageing rule. We reproduced yours and measured
+        the agreement."</span></td>
+      </tr>
+    </tbody>
+    <tbody class="tot">
+      <tr><td class="clk">2:00</td><td class="mins">120</td><td class="act">Questions</td>
+      <td class="beat">Budget nothing. If the room is engaged the questions have already been
+      arriving since 0:30, and the acts above absorb them.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 7 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">07</span>
+    <h2>Wednesday morning</h2>
+    <span class="note">before the room fills</span>
+  </div>
+
+  <div class="cols2">
+    <div>
+      <h4 style="margin-bottom:2mm">On salesmaster</h4>
+      <pre>Get-Service MicroEazySqlRelay, MicroEazyCrbRelay
+tailscale funnel status   <b># BOTH 443 and :8443</b></pre>
+      <p style="font-size:9.1pt">A bare <code>tailscale funnel 8787</code> takes 443 and
+      silently unpublishes the CRB relay. Bureau calls then fail the quiet way &mdash; dropped at
+      Metropol's edge, no <span class="m">api_code</span>, nothing in a log.</p>
+    </div>
+    <div>
+      <h4 style="margin-bottom:2mm">From anywhere</h4>
+      <pre>npm run test:relay      <b># ALL CHECKS PASSED</b>
+npm run test:crb:prod   <b># 8/8 entitled</b>
+npm run test:live       <b># 14 live, 0 degraded</b>
+npm run interchange:members <b># 4 filters</b></pre>
+      <p style="font-size:9.1pt">Then open all six subdomains once. First render of each route
+      compiles; after that everything is 1.5&ndash;4&thinsp;s.</p>
+    </div>
+  </div>
+
+  <ul class="plain">
+    <li><strong>Do it during working hours.</strong> The floor's numbers reset at midnight EAT.
+    At 09:00 you see a day building; at 00:30 you see almost nothing.</li>
+    <li><strong>Say the write posture out loud early.</strong> <code>SQL_RELAY_ALLOW_WRITES</code>
+    unset, <code>COLLECTBOX_POSTING_ENABLED</code> unset, pipeline and mirror both
+    <span class="m">false</span>. It is a strength, not a caveat, and saying it first stops it
+    being asked as a suspicion later.</li>
+    <li><strong>If the amber banner appears</strong> it now means exactly one thing: the relay
+    is not answering. Host asleep, off the tailnet, or the funnel dropped.
+    <code>npm run test:relay</code> separates the four cases by name.</li>
+    <li><strong>Afterwards</strong> &mdash; <code>npx tsx scripts/setup-desk-demo.ts --suspend</code>.
+    Those three sign-ins open a real lender's book.</li>
+  </ul>
+</section>
+
+<!-- 8 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">08</span>
+    <h2>What we will not claim</h2>
+    <span class="note">say it before it is found</span>
+  </div>
+
+  <p>The suite's credibility rests on every screen degrading honestly, and that only works if
+  the person presenting does the same. Four things to name from the front.</p>
+
+  <ul class="plain">
+    <li><strong>PeopleHub has three empty tables and says so.</strong> Payroll, leave and
+    contracts. We will not invent a payroll figure &mdash; and the reason to say that out loud is
+    that it is the same promise that makes the balances trustworthy.</li>
+    <li><strong>Their data stops in places.</strong> Promises end November 2024, tasks August
+    2025, call detail records September 2023. These are findings about their process, not gaps
+    in ours. Show them; they are worth money to the room.</li>
+    <li><strong>The Interchange's scoring and learning screens run on a seeded population.</strong>
+    The exposure engine queries live member books; the model training history does not exist
+    yet because the exchange is six days old. Name the boundary on the screen it applies to.</li>
+    <li><strong>Nine indexes are proposed and none applied.</strong> <code>loanSchedule</code>
+    (1.95m rows), <code>Loans</code> (338k), <code>CallLogs</code> (1.34m) and
+    <code>PayedAmount</code> (1.15m) carry no indexes at all. It is their database, so it is
+    their decision &mdash; and their own reporting is almost certainly paying the same tax.</li>
+  </ul>
+</section>
+
+<footer>
+  <span>The Run In &middot; Micro Eazy execution plan</span>
+  <span>Evidence gathered 28 August 2026 against live systems</span>
+</footer>
+
+</div>

@@ -1,0 +1,15 @@
+{
+  "name": "microeazy-relay-host",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The SQL relay and the CRB relay, extracted from birgenai-lms for deployment on a relay host. See README.md.",
+  "scripts": {
+    "relay": "tsx scripts/sql-relay.ts",
+    "relay:crb": "node scripts/crb-relay.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "mssql": "^11.0.1",
+    "tsx": "^4.23.0"
+  }
+}
