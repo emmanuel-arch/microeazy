@@ -91,7 +91,7 @@ export default function CreateAccount({ onDone }: { onDone?: (nationalId: string
         >
           <span
             className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-            style={{ background: "color-mix(in oklab, var(--navy) 12%, transparent)", color: "var(--navy)" }}
+            style={{ background: "color-mix(in oklab, var(--navy) 12%, transparent)", color: "var(--navy-ink)" }}
           >
             <Camera className="h-[18px] w-[18px]" strokeWidth={2.2} />
           </span>

@@ -22,52 +22,78 @@
 // return it to the default, and the server re-derives the totals on accept —
 // this screen is a proposal, not a decision. That is exactly what lets us give
 // the customer real freedom: nothing here can create a schedule the lender has
-// not agreed to.
+// not agreed to. LoanAgreement is where that distinction is made visible, and
+// it says so on the page when the two differ.
+//
+// ── WHERE THE ROWS COME FROM ────────────────────────────────────────────────
+// The product step hands over a Quote, and its rows arrive here already in
+// integer cents summing exactly to the total — lib/quote.ts uses the server's
+// own rounding and remainder convention, so a schedule that balances here is
+// one the server would have produced. Opened without a quote (support jumping
+// straight to ?step=schedule) it falls back to the live Micro Eazy shape, so
+// the screen is never a blank workspace.
 // ─────────────────────────────────────────────────────────────────────────────
 import { useMemo, useState } from "react";
 import { ArrowRight, RotateCcw, SkipForward, Wand2, Info } from "lucide-react";
 import { LiquidButton } from "../../components/ui/LiquidButton";
+import { exact, money, periodCount, shortDate } from "../../lib/format";
+import type { Quote } from "../../lib/quote";
 import {
-  applyPreset, balance, isBalanced, remaining, setRow, skip, sum, toCents, toKes,
+  applyPreset, balance, isBalanced, remaining, setRow, skip, sum, toCents,
   type Preset, type Row,
 } from "../../lib/schedule/reshape";
 
 /** The shape the ServiceSuite preview produces for a 5,000 Micro Eazy loan:
- *  10 weekly instalments of 912.50, total 9,125. Replaced by the offer. */
-const TERMS = { principal: 5_000, interest: 4_125, upfrontFee: 450, unit: "week" as const };
-const TOTAL_CENTS = toCents(TERMS.principal + TERMS.interest);
-
-const START = new Date("2026-09-06T00:00:00");
-const INITIAL: Row[] = Array.from({ length: 10 }, (_, i) => {
-  const d = new Date(START);
+ *  10 weekly instalments of 912.50, total 9,125. Used only when this screen is
+ *  opened without a quote in hand. */
+const DEMO = { principal: 5_000, interest: 4_125, unit: "week", periods: 10 };
+const DEMO_TOTAL_CENTS = toCents(DEMO.principal + DEMO.interest);
+const DEMO_START = new Date("2026-09-06T00:00:00");
+const DEMO_ROWS: Row[] = Array.from({ length: DEMO.periods }, (_, i) => {
+  const d = new Date(DEMO_START);
   d.setDate(d.getDate() + i * 7);
-  return { seq: i + 1, dueDate: d.toISOString(), cents: TOTAL_CENTS / 10 };
+  return { seq: i + 1, dueDate: d.toISOString(), cents: DEMO_TOTAL_CENTS / DEMO.periods };
 });
 
-const kes = (cents: number) =>
-  `KSh ${toKes(cents).toLocaleString("en-KE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const kesShort = (cents: number) => `KSh ${Math.round(toKes(cents)).toLocaleString("en-KE")}`;
-const day = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "short" });
-
 const PRESETS: { id: Preset; label: string; note: string }[] = [
-  { id: "even", label: "Even", note: "The same every week" },
+  { id: "even", label: "Even", note: "The same every time" },
   { id: "front", label: "More now", note: "Heavier early, lighter later" },
   { id: "back", label: "More later", note: "Lighter early, heavier later" },
 ];
 
-export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => void }) {
-  const [rows, setRows] = useState<Row[]>(INITIAL);
+/** "week" → "Weeks". The unit is the product's, so a monthly loan does not talk
+ *  about weeks — the kind of mismatch that makes a customer distrust the maths
+ *  in front of them even when it is right. */
+const plural = (unit: string) => {
+  const u = unit.toLowerCase().replace(/s$/, "");
+  return `${u.charAt(0).toUpperCase()}${u.slice(1)}s`;
+};
+
+export default function ScheduleEditor({
+  /** What the product step priced. Absent when this screen is opened directly. */
+  quote,
+  onDone,
+}: {
+  quote?: Quote | null;
+  onDone?: (rows: Row[]) => void;
+}) {
+  const initial = quote?.rows ?? DEMO_ROWS;
+  const totalCents = useMemo(() => sum(initial), [initial]);
+  const principal = quote?.principal ?? DEMO.principal;
+  const interest = quote?.totalInterest ?? DEMO.interest;
+  const unit = quote?.unit ?? DEMO.unit;
+
+  const [rows, setRows] = useState<Row[]>(initial);
   const [preset, setPreset] = useState<Preset | null>("even");
 
-  const left = remaining(rows, TOTAL_CENTS);
-  const ok = isBalanced(rows, TOTAL_CENTS);
+  const left = remaining(rows, totalCents);
+  const ok = isBalanced(rows, totalCents);
   const biggest = useMemo(() => Math.max(...rows.map((r) => r.cents), 1), [rows]);
 
   const edit = (seq: number, kesValue: string) => {
     const n = Number(kesValue.replace(/[^\d.]/g, ""));
     setPreset(null);
-    setRows((rs) => setRow(rs, seq, toCents(Number.isFinite(n) ? n : 0), TOTAL_CENTS));
+    setRows((rs) => setRow(rs, seq, toCents(Number.isFinite(n) ? n : 0), totalCents));
   };
 
   return (
@@ -78,9 +104,11 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint">Total to repay</p>
-              <p className="tnum mt-1 text-[30px] font-bold leading-none tracking-[-0.03em]">{kesShort(TOTAL_CENTS)}</p>
+              <p className="tnum mt-1 text-[30px] font-bold leading-none tracking-[-0.03em]">
+                {money(totalCents / 100)}
+              </p>
               <p className="mt-1.5 text-[12px] text-ink-soft">
-                {kesShort(toCents(TERMS.principal))} borrowed · {kesShort(toCents(TERMS.interest))} interest
+                {money(principal)} borrowed · {money(interest)} interest
               </p>
             </div>
             <div className="text-right">
@@ -89,7 +117,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
                 className="tnum mt-1 text-[22px] font-bold leading-none tracking-[-0.02em]"
                 style={{ color: ok ? "var(--green-ink)" : left > 0 ? "var(--ink)" : "#e11d48" }}
               >
-                {ok ? "Balanced" : kes(Math.abs(left))}
+                {ok ? "Balanced" : exact(Math.abs(left) / 100)}
               </p>
               {!ok && (
                 <p className="mt-1 text-[11px] font-medium" style={{ color: left > 0 ? "var(--ink-faint)" : "#e11d48" }}>
@@ -107,7 +135,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
                   key={p.id}
                   onClick={() => {
                     setPreset(p.id);
-                    setRows((rs) => applyPreset(rs, TOTAL_CENTS, p.id));
+                    setRows((rs) => applyPreset(rs, totalCents, p.id));
                   }}
                   title={p.note}
                   className="rounded-full border px-3.5 py-2 text-[12.5px] font-semibold transition-colors"
@@ -123,7 +151,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
             })}
             {!ok && (
               <button
-                onClick={() => setRows((rs) => balance(rs, TOTAL_CENTS))}
+                onClick={() => setRows((rs) => balance(rs, totalCents))}
                 className="flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[12.5px] font-semibold"
                 style={{ borderColor: "var(--line-strong)", color: "var(--ink)" }}
               >
@@ -133,7 +161,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
             <button
               onClick={() => {
                 setPreset("even");
-                setRows(INITIAL);
+                setRows(initial);
               }}
               className="flex items-center gap-1.5 rounded-full px-2.5 py-2 text-[12.5px] font-semibold text-ink-faint"
             >
@@ -159,7 +187,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
                 </span>
 
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13px] font-medium leading-tight">{day(r.dueDate)}</span>
+                  <span className="block text-[13px] font-medium leading-tight">{shortDate(r.dueDate)}</span>
                   {/* The bar is the whole reason this reads as SHAPING rather
                       than as filling in ten boxes: you can see the plan. */}
                   <span
@@ -182,8 +210,8 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
                   <span className="text-[11px] font-semibold text-ink-faint">KSh</span>
                   <input
                     inputMode="decimal"
-                    aria-label={`Amount for instalment ${r.seq}, due ${day(r.dueDate)}`}
-                    value={toKes(r.cents).toFixed(2)}
+                    aria-label={`Amount for instalment ${r.seq}, due ${shortDate(r.dueDate)}`}
+                    value={(r.cents / 100).toFixed(2)}
                     onChange={(e) => edit(r.seq, e.target.value)}
                     onFocus={(e) => e.currentTarget.select()}
                     className="tnum w-[5.5rem] bg-transparent py-2.5 text-right text-[14px] font-semibold outline-none"
@@ -193,10 +221,10 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
                 <button
                   onClick={() => {
                     setPreset(null);
-                    setRows((rs) => skip(rs, r.seq, TOTAL_CENTS));
+                    setRows((rs) => skip(rs, r.seq, totalCents));
                   }}
                   disabled={r.cents === 0}
-                  title="Skip this week — move it to the next one"
+                  title={`Skip this ${unit} — move it to the next one`}
                   aria-label={`Skip instalment ${r.seq}`}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-ink-faint transition-colors disabled:opacity-30"
                 >
@@ -214,11 +242,11 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
           <p className="text-[13px] font-semibold">Your plan</p>
           <dl className="mt-3 space-y-2 text-[12.5px]">
             {[
-              ["Weeks", String(rows.length)],
-              ["Weeks you pay", String(rows.filter((r) => r.cents > 0).length)],
-              ["Largest week", kesShort(Math.max(...rows.map((r) => r.cents)))],
-              ["Smallest week", kesShort(Math.min(...rows.map((r) => r.cents)))],
-              ["Clear date", day(rows[rows.length - 1].dueDate)],
+              [plural(unit), String(rows.length)],
+              [`${plural(unit)} you pay`, String(rows.filter((r) => r.cents > 0).length)],
+              [`Largest ${unit}`, money(Math.max(...rows.map((r) => r.cents)) / 100)],
+              [`Smallest ${unit}`, money(Math.min(...rows.map((r) => r.cents)) / 100)],
+              ["Clear date", shortDate(rows[rows.length - 1].dueDate)],
             ].map(([k, v]) => (
               <div key={k} className="flex items-baseline justify-between gap-3">
                 <dt className="text-ink-faint">{k}</dt>
@@ -231,7 +259,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
             >
               <dt className="font-semibold">Adjusted total</dt>
               <dd className="tnum font-bold" style={{ color: ok ? "var(--green-ink)" : "#e11d48" }}>
-                {kes(sum(rows))}
+                {exact(sum(rows) / 100)}
               </dd>
             </div>
           </dl>
@@ -239,8 +267,8 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
           <p className="mt-3 flex items-start gap-2 rounded-lg p-2.5 text-[11.5px] leading-snug text-ink-soft"
             style={{ background: "var(--surface-sunk)" }}>
             <Info className="mt-px h-3.5 w-3.5 shrink-0 text-ink-faint" />
-            Changing the shape does not change what you owe or when the loan clears. Your lender reviews the plan
-            before the money moves.
+            Changing the shape does not change what you owe or when the loan clears — it is still{" "}
+            {periodCount(rows.length, unit)}. Your lender reviews the plan before the money moves.
           </p>
         </section>
 
@@ -251,7 +279,7 @@ export default function ScheduleEditor({ onDone }: { onDone?: (rows: Row[]) => v
           disabled={!ok}
           onClick={() => onDone?.(rows)}
         >
-          {ok ? "Use this plan" : left > 0 ? `Place ${kes(left)} more` : `Remove ${kes(-left)}`}
+          {ok ? "Use this plan" : left > 0 ? `Place ${exact(left / 100)} more` : `Remove ${exact(-left / 100)}`}
         </LiquidButton>
       </aside>
     </div>

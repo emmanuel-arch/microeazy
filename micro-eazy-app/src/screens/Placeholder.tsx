@@ -12,7 +12,7 @@ export default function Placeholder({ title }: { title: string }) {
         <section className="card flex flex-col items-center gap-3 px-5 py-12 text-center">
           <span
             className="grid h-12 w-12 place-items-center rounded-2xl"
-            style={{ background: "color-mix(in oklab, var(--navy) 10%, transparent)", color: "var(--navy)" }}
+            style={{ background: "color-mix(in oklab, var(--navy) 10%, transparent)", color: "var(--navy-ink)" }}
           >
             <Construction className="h-5 w-5" strokeWidth={2} />
           </span>

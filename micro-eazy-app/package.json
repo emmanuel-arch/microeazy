@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test:schedule": "node scripts/test-schedule.mjs"
+    "test:schedule": "node scripts/test-schedule.mjs",
+    "test:quote": "node scripts/test-quote.mjs",
+    "test": "npm run test:schedule && npm run test:quote"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

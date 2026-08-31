@@ -18,6 +18,11 @@ import { ThemeProvider } from "./lib/theme";
 import Home from "./screens/Home";
 import Placeholder from "./screens/Placeholder";
 import Onboarding from "./screens/onboarding/Onboarding";
+import Welcome from "./screens/Welcome";
+import Repay from "./screens/Repay";
+import WhyThisDecision from "./screens/WhyThisDecision";
+import Ladder from "./screens/Ladder";
+import Exposure from "./screens/Exposure";
 
 function Wordmark() {
   return (
@@ -36,8 +41,12 @@ function Wordmark() {
   );
 }
 
-/** Routes that own the whole screen — no nav, no way out but forward or back. */
-const FOCUSED = ["/join"];
+/** Routes that own the whole screen — no nav, no way out but forward or back.
+ *
+ *  The front door is here for the same reason onboarding is: a person who has
+ *  not signed in yet has nothing to navigate TO, and four tabs under a sign-in
+ *  form are four ways to leave before starting. */
+const FOCUSED = ["/join", "/welcome"];
 
 function Shell() {
   const { pathname } = useLocation();
@@ -74,9 +83,16 @@ function Shell() {
         >
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/join" element={<Onboarding />} />
-            <Route path="/repay" element={<Placeholder title="Repay" />} />
-            <Route path="/score" element={<Placeholder title="Your score" />} />
+            <Route path="/repay" element={<Repay />} />
+            {/* The Score tab opens on the DECISION, not on a dial. A number
+                without its reasons is the thing customers ring up about, and
+                the ladder and the credit file hang off it as the two questions
+                that follow: how did it get here, and who else can see it. */}
+            <Route path="/score" element={<WhyThisDecision />} />
+            <Route path="/ladder" element={<Ladder />} />
+            <Route path="/exposure" element={<Exposure />} />
             <Route path="/loans" element={<Placeholder title="Your loans" />} />
             <Route path="/you" element={<Placeholder title="You" />} />
             <Route path="*" element={<Placeholder title="Not found" />} />

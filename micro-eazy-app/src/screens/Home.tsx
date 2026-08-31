@@ -24,6 +24,7 @@
 // has said, what they might want to learn. On a phone that same split becomes
 // simple vertical order, because a phone has no right-hand side.
 // ─────────────────────────────────────────────────────────────────────────────
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight, Banknote, Gauge, ShieldCheck, FileText, Landmark, ChevronRight,
   CalendarClock, MessageSquareText, Radio,
@@ -69,10 +70,12 @@ const SCHEDULE: { n: number; due: string; amount: number; status: "PAID" | "NEXT
 ];
 
 const ACTIONS = [
-  { icon: Banknote, label: "New loan", note: "Decision in minutes", tint: "#5ec22a" },
-  { icon: Landmark, label: "Repay", note: "M-PESA or Ratiba", tint: "#5b8cff" },
-  { icon: Gauge, label: "My score", note: "Out of 900", tint: "#f0a92b" },
-  { icon: FileText, label: "Statements", note: "Crunch a new one", tint: "#a78bfa" },
+  { icon: Banknote, label: "New loan", note: "Decision in minutes", tint: "#5ec22a", to: "/join" },
+  { icon: Landmark, label: "Repay", note: "M-PESA or Ratiba", tint: "#5b8cff", to: "/repay" },
+  { icon: Gauge, label: "My score", note: "Out of 900", tint: "#f0a92b", to: "/score" },
+  // Straight to the one step, not to the top of the wizard. `?step=` is a
+  // presenter and grants nothing — see the note in onboarding/Onboarding.tsx.
+  { icon: FileText, label: "Statements", note: "Crunch a new one", tint: "#a78bfa", to: "/join?step=statement" },
 ];
 
 /** Straight from the lender, not a marketing blast. The distinction matters:
@@ -85,6 +88,10 @@ const MESSAGES = [
 
 export default function Home() {
   const used = customer.limit > 0 ? customer.outstanding / customer.limit : 0;
+  // The commit buttons navigate imperatively rather than being wrapped in a
+  // Link: an <a> around a <button> is two nested interactive elements, which
+  // screen readers announce twice and keyboards tab into twice.
+  const go = useNavigate();
 
   return (
     <>
@@ -138,10 +145,10 @@ export default function Home() {
               </div>
 
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                <LiquidButton icon={Banknote} trailingIcon={ArrowRight} size="lg" block>
+                <LiquidButton icon={Banknote} trailingIcon={ArrowRight} size="lg" block onClick={() => go("/join")}>
                   Apply for a loan
                 </LiquidButton>
-                <LiquidButton variant="metal" size="lg" block>
+                <LiquidButton variant="metal" size="lg" block onClick={() => go("/repay")}>
                   Repay
                 </LiquidButton>
               </div>
@@ -149,8 +156,9 @@ export default function Home() {
 
             <section className="grid grid-cols-2 gap-3">
               {ACTIONS.map((a) => (
-                <button
+                <Link
                   key={a.label}
+                  to={a.to}
                   className="card group flex items-start gap-3 p-4 text-left transition-transform duration-200 active:scale-[0.985]"
                 >
                   <span
@@ -163,15 +171,15 @@ export default function Home() {
                     <span className="block text-[14px] font-semibold leading-tight">{a.label}</span>
                     <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-faint">{a.note}</span>
                   </span>
-                </button>
+                </Link>
               ))}
             </section>
 
             {/* The commitment, not a footnote. */}
-            <button className="card flex w-full items-center gap-3 p-4 text-left">
+            <Link to="/score" className="card flex w-full items-center gap-3 p-4 text-left">
               <span
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-xl"
-                style={{ background: "color-mix(in oklab, var(--navy) 12%, transparent)", color: "var(--navy)" }}
+                style={{ background: "color-mix(in oklab, var(--navy) 12%, transparent)", color: "var(--navy-ink)" }}
               >
                 <Gauge className="h-[18px] w-[18px]" strokeWidth={2.2} />
               </span>
@@ -184,7 +192,7 @@ export default function Home() {
                 </span>
               </span>
               <ChevronRight className="h-4 w-4 shrink-0 text-ink-faint" />
-            </button>
+            </Link>
 
             {/* ── The schedule. ────────────────────────────────────────────
                 Every collections call centre in Kenya exists largely to answer
@@ -201,9 +209,9 @@ export default function Home() {
                 <span className="tnum text-[11.5px] text-ink-faint">
                   {SCHEDULE.filter((s) => s.status === "PAID").length} of {SCHEDULE.length} paid
                 </span>
-                <button className="text-[12px] font-semibold" style={{ color: "var(--green-ink)" }}>
+                <Link to="/repay" className="text-[12px] font-semibold" style={{ color: "var(--green-ink)" }}>
                   See all
-                </button>
+                </Link>
               </div>
 
               <ul>
@@ -281,7 +289,7 @@ export default function Home() {
                   </span>
                 </p>
               ) : (
-                <LiquidButton size="sm" block className="mt-3">
+                <LiquidButton size="sm" block className="mt-3" onClick={() => go("/repay")}>
                   Turn on auto-repay
                 </LiquidButton>
               )}

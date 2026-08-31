@@ -101,7 +101,7 @@ export function Film({ slot, className = "" }: { slot: string; className?: strin
           style={{ background: ready ? "rgb(255 255 255 / 0.95)" : "rgb(255 255 255 / 0.22)" }}
         >
           {ready ? (
-            <Play className="h-6 w-6 translate-x-[2px] fill-current" style={{ color: "var(--navy)" }} />
+            <Play className="h-6 w-6 translate-x-[2px] fill-current" style={{ color: "var(--navy-ink)" }} />
           ) : (
             <Clapperboard className="h-6 w-6 text-white" strokeWidth={1.8} />
           )}

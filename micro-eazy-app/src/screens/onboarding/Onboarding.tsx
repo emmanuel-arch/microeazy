@@ -21,9 +21,14 @@ import { Construction } from "lucide-react";
 import { Sky } from "../../components/shell/Sky";
 import { Stepper } from "../../components/onboarding/Stepper";
 import { customerSteps, type JourneyConfig, type StepId } from "../../lib/journey/steps";
+import type { Quote } from "../../lib/quote";
+import type { Row } from "../../lib/schedule/reshape";
 import CreateAccount from "./CreateAccount";
 import Statement from "./Statement";
+import ProductChoice from "./ProductChoice";
 import ScheduleEditor from "./ScheduleEditor";
+import LoanAgreement from "./LoanAgreement";
+import Ratiba from "./Ratiba";
 
 /** Micromart's day-one configuration. This will come from the lender's own
  *  settings once the console screen lands; the shape is already correct. */
@@ -48,7 +53,21 @@ export default function Onboarding() {
   }, [search, steps]);
 
   const [index, setIndex] = useState(start);
+
+  // ── THE DRAFT ────────────────────────────────────────────────────────────
+  // What the customer has built so far, held by the host rather than by any one
+  // screen. It exists because the later steps are not independent of the
+  // earlier ones: the schedule editor reshapes the chosen product's own rows,
+  // and the agreement has to know whether what it is showing is the plan the
+  // customer asked for. Keeping it here leaves every screen dumb — none of them
+  // knows its own position, so none of them breaks when the order changes.
+  //
+  // It holds a PROPOSAL and never an entitlement. Nothing in it grants
+  // anything: every gate that matters is enforced on the server against the
+  // persisted session, so a draft assembled by hand is a draft, not a loan.
   const [nationalId, setNationalId] = useState<string | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [rows, setRows] = useState<Row[] | null>(null);
 
   const step = steps[index];
   const done = index >= steps.length;
@@ -63,9 +82,10 @@ export default function Onboarding() {
         <div className="relative z-10 -mt-12 px-4">
           <section className="card px-5 py-10 text-center">
             <p className="text-[15px] font-semibold">Onboarding complete</p>
-            <p className="mx-auto mt-2 max-w-[34ch] text-[12.5px] leading-relaxed text-ink-faint">
+            <p className="mx-auto mt-2 max-w-[38ch] text-[12.5px] leading-relaxed text-ink-faint">
               {nationalId ? `ID ${nationalId} verified. ` : ""}
-              The remaining screens land next — statement, limit, product, schedule, agreement.
+              Your agreement is signed and your lender is reviewing it before the money moves. You will get a message
+              either way — there is nothing else for you to do.
             </p>
           </section>
         </div>
@@ -104,8 +124,30 @@ export default function Onboarding() {
               next();
             }}
           />
+        ) : step.id === "product" ? (
+          <ProductChoice
+            onDone={(q) => {
+              setQuote(q);
+              // A new product invalidates a schedule shaped against the old
+              // one — ten weekly rows do not survive a move to four monthly
+              // ones, and carrying them forward would hand the agreement a
+              // plan for a loan nobody chose.
+              setRows(null);
+              next();
+            }}
+          />
         ) : step.id === "schedule" ? (
-          <ScheduleEditor onDone={() => next()} />
+          <ScheduleEditor
+            quote={quote}
+            onDone={(r) => {
+              setRows(r);
+              next();
+            }}
+          />
+        ) : step.id === "consent" ? (
+          <LoanAgreement proposed={rows} onDone={() => next()} />
+        ) : step.id === "ratiba" ? (
+          <Ratiba onDone={next} />
         ) : step.id === "statement" ? (
           <Statement onDone={next} />
         ) : (
@@ -124,7 +166,7 @@ function NotBuiltYet({ id, onSkip }: { id: StepId; onSkip: () => void }) {
     <section className="card flex flex-col items-center gap-3 px-5 py-12 text-center">
       <span
         className="grid h-12 w-12 place-items-center rounded-2xl"
-        style={{ background: "color-mix(in oklab, var(--navy) 10%, transparent)", color: "var(--navy)" }}
+        style={{ background: "color-mix(in oklab, var(--navy) 10%, transparent)", color: "var(--navy-ink)" }}
       >
         <Construction className="h-5 w-5" strokeWidth={2} />
       </span>

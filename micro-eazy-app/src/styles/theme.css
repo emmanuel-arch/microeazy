@@ -25,6 +25,20 @@
 
    Getting this wrong produces a screen that looks fine on a designer's monitor
    and is unreadable in Kenyan afternoon sun, which is where this app is used.
+
+   ── THE INKS ARE PER-THEME, AND THIS WAS LEARNED FROM A SCREENSHOT ───────────
+   --green-ink and --navy are defined here as TYPE ON PAPER, which is what the
+   light theme needs and precisely the wrong thing in the dark one: on the
+   near-black surface #1d7a09 lands around 2.4:1 and #012863 around 1.3:1. In
+   practice that was a "KSh 42,000 earned" figure sinking into its own green
+   tint on the ladder, and a navy icon on the credit file that was a smudge.
+   Both are overridden below for [data-theme="dark"].
+
+   And the division of labour between the two greens is absolute:
+     --green-ink  is TYPE. It is never a fill.
+     --lime       is FILL. A tick or a label sitting ON it is --navy-deep, which
+                  is the same pairing the primary button uses and the only one
+                  that survives both themes without a second token.
    ───────────────────────────────────────────────────────────────────────────── */
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -36,6 +50,10 @@
   --green: #25950c;
   --lime: #77c60b;
   --green-ink: #1d7a09;
+  /* Navy as a FOREGROUND — an icon or a heading, never the header gradient.
+     Split from --navy so the dark theme can lighten the ink without touching
+     the brand colour itself, which stays constant across both. */
+  --navy-ink: #012863;
 
   /* Light: the bank. */
   --bg: #f2f5fb;
@@ -74,6 +92,12 @@
 }
 
 [data-theme="dark"] {
+  /* The brand inks, lifted off the floor. Same hues, enough luminance to be
+     read on near-black: 11.4:1 and 7.9:1 against --surface. See the note at the
+     top of this file for what they looked like before. */
+  --green-ink: #8fdd18;
+  --navy-ink: #7ea6ff;
+
   /* Dark: the cinema. Not grey — navy-black, so the brand reads as a light
      source rather than a sticker on a slate background. */
   --bg: #04060e;
@@ -105,6 +129,7 @@
 @theme inline {
   --color-navy: var(--navy);
   --color-navy-deep: var(--navy-deep);
+  --color-navy-ink: var(--navy-ink);
   --color-green: var(--green);
   --color-lime: var(--lime);
   --color-green-ink: var(--green-ink);
@@ -138,6 +163,15 @@ body {
   text-rendering: optimizeLegibility;
   /* An app, not a document: no rubber-band scroll behind the shell. */
   overscroll-behavior-y: none;
+  /* And none sideways either. The front door stacks four photographs at slight
+     angles, and a rotated rectangle is wider than the box it came from — the
+     geometry is chosen to fit (see components/media/Voices) but sub-pixel
+     rounding still leaves a stray pixel, which on a handset is a page that
+     slides under the thumb.
+
+     `clip`, not `hidden`: `hidden` would make the body a scroll container and
+     break `position: sticky` on every screen that relies on it. */
+  overflow-x: clip;
 }
 
 /* ── SURFACES ────────────────────────────────────────────────────────────────
@@ -210,5 +244,37 @@ body {
   .aurora::before,
   .aurora::after {
     filter: blur(64px);
+  }
+}
+
+
+/* ── THE FRONT DOOR ──────────────────────────────────────────────────────────
+   A word arriving out of focus. It is the only effect on the sign-in screen and
+   it is on exactly one block of copy — the promise beside the photograph. The
+   temptation with something this cheap is to put it on the heading, and then on
+   the buttons, at which point the door has a loading animation rather than a
+   moment of arrival.
+
+   Opacity and filter only: a mid-range Android compositing four photo layers
+   underneath this has nothing to spare for a transform per word. */
+
+@keyframes voice-word {
+  from { opacity: 0; filter: blur(9px); transform: translateY(4px); }
+  to   { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+.voice-word {
+  opacity: 0;
+  animation: voice-word 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* It animates FROM opacity 0, so switching the animation off without restoring
+   the end state leaves the promise invisible rather than still. */
+@media (prefers-reduced-motion: reduce) {
+  .voice-word {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 }
