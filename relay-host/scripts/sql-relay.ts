@@ -122,7 +122,18 @@ const server = createServer(async (req, res) => {
   // this endpoint is public, and "which hosts can I see" is not something an
   // unauthenticated caller gets to ask. Use `npm run relay:check` for that.
   if (req.method === "GET" && (url === "/health" || url === "/")) {
-    return send(res, 200, { ok: true, service: "sql-relay", since: started.toISOString(), served, refused });
+    // `writes` is what a console reads to decide whether to OFFER a write at
+    // all. It is not a secret: an unauthenticated caller learns only that this
+    // host would refuse them, and it saves an officer from doing the whole
+    // reconciliation and being turned away at the last step.
+    return send(res, 200, {
+      ok: true,
+      service: "sql-relay",
+      since: started.toISOString(),
+      served,
+      refused,
+      writes: ALLOW_WRITES,
+    });
   }
 
   if (req.method !== "POST" || !url.startsWith("/query")) {
