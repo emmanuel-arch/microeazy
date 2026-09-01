@@ -121,9 +121,38 @@
         "live": true,
         "rootDirectory": ".",
         "domains": ["portal.servicesuitecloud.com"],
-        "note": "A flat Vite project — Root Directory is the repo root. vercel.json rewrites everything to / for client-side routing, and /api/* to the Suite at lms.servicesuitecloud.com so the borrower's SameSite=Lax cookie stays same-origin. THE DOMAIN IS SETTLED: portal.servicesuitecloud.com is this project's, microeazy.servicesuitecloud.com is the SUITE's. They are different labels because only one Vercel project can hold a hostname, and the label is reserved in connected-suite/src/lib/suite/hosts.ts so no lender can be issued it. AS OF 2026-08-27 portal.servicesuitecloud.com HAS NO DNS RECORD — the live app is on micro-eazy-pwa.vercel.app, and microeazy.servicesuitecloud.com answers DEPLOYMENT_NOT_FOUND, so the Suite has lost its canonical host too. Add the CNAME and attach the domain in Vercel; nothing in the code needs to change."
+        "note": "A flat Vite project — Root Directory is the repo root. vercel.json rewrites everything to / for client-side routing, and /api/* to the Suite at lms.servicesuitecloud.com so the borrower's SameSite=Lax cookie stays same-origin. THE DOMAIN IS SETTLED: portal.servicesuitecloud.com is this project's, microeazy.servicesuitecloud.com is the SUITE's. They are different labels because only one Vercel project can hold a hostname, and the label is reserved in connected-suite/src/lib/suite/hosts.ts so no lender can be issued it. AS OF 2026-09-01 portal.servicesuitecloud.com IS LIVE and serving this project — the domain is attached and the earlier no-DNS-record note above is superseded. This app is slated for REPLACEMENT by the 'app' system below; see micro-eazy-app/DEPLOY.md for why that cutover has not happened, and keep this project deployed until it has — it is the rollback."
       },
       "provenance": "Copied from TallamTitus/micromart-client-pwa. Re-homed under this account as its own repo so it can be deployed and evolved independently."
+    },
+
+    {
+      "id": "app",
+      "name": "Micro Eazy (rebuild)",
+      "short": "App",
+      "purpose": "The borrower realm, rebuilt. Same promise as 'pwa' — verify once, apply, track and repay — designed phone-first rather than adapted down from a dashboard theme.",
+      "path": "micro-eazy-app",
+      "repo": "https://github.com/emmanuel-arch/micro-eazy-app",
+      "branch": "main",
+      "stack": "vite",
+      "port": 5174,
+      "install": "npm install",
+      "dev": "npm run dev -- --port {{port}}",
+      "build": "npm run build",
+      "start": "npm run preview -- --port {{port}}",
+      "buildOutput": "dist",
+      "readyPath": "/",
+      "signIn": [{ "label": "Borrower", "path": "/" }],
+      "env": { "file": ".env", "example": ".env.example" },
+      "database": "none — talks to the Suite over HTTP",
+      "deploy": {
+        "platform": "vercel",
+        "live": false,
+        "rootDirectory": ".",
+        "domains": [],
+        "note": "NOT DEPLOYED, AND NOT YET DEPLOYABLE AS A REPLACEMENT. The scaffolding is complete — vercel.json proxies /api/* to lms.servicesuitecloud.com and falls back to the SPA shell, and vite-plugin-pwa emits a worker whose autoUpdate/clientsClaim/skipWaiting combination is what lets it displace the worker the 'pwa' project has already registered on customer devices (a service worker is replaced by another worker at the same scope, never by deploying different files). What is missing is the APP: there is no sign-in or OTP screen, and every screen except ProductChoice renders src/lib/api/samples.ts — one fictional customer. Taking portal.servicesuitecloud.com today would show every borrower a balance that is not theirs and leave them unable to sign in or repay. Wire src/lib/api/portal.ts through the screens first; then move the domain off the 'pwa' project, since only one Vercel project can hold a hostname."
+      },
+      "provenance": "Written from scratch beside 'pwa', on port 5174 so the two can be run side by side and compared. Not related to TallamTitus/micromart-client-pwa."
     },
 
     {

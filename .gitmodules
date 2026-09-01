@@ -14,3 +14,7 @@
 	path = pbx-auth
 	url = https://github.com/skegode/PBXAuthentication
 	branch = master
+[submodule "app"]
+	path = micro-eazy-app
+	url = https://github.com/emmanuel-arch/micro-eazy-app.git
+	branch = main
