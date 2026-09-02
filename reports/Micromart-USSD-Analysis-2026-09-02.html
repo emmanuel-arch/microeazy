@@ -1,0 +1,2051 @@
+<title>The USSD Channel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   THE USSD CHANNEL — print report, A4.
+   Palette is grounded in the subject: the handset screen (dark slate-green,
+   phosphor ink) and the two words the protocol is made of, CON and END.
+   Neutrals carry a faint green bias so they sit with the signal colour
+   rather than against it.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --paper:      #ffffff;
+  --ink:        #16191c;
+  --ink-2:      #4a5157;
+  --ink-3:      #7b8288;
+  --wash:       #f3f5f3;
+  --wash-2:     #e9ede9;
+  --rule:       #dbe0dc;
+  --rule-firm:  #b9c1bb;
+
+  --signal:     #1f7a3f;   /* CON — the session continues */
+  --halt:       #a3301c;   /* END — the session is over */
+  --amber:      #8f6510;
+
+  --screen:     #1b201d;   /* the handset screen */
+  --screen-ink: #d5e4d2;
+  --screen-dim: #8ba086;
+
+  --book-main:    #15629e; /* entity 3002 — Micromart Africa */
+  --book-fintech: #b06f16; /* entity 3005 — Micromart Fintech */
+
+  --serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --sans:  "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono:  "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+@page {
+  size: A4;
+  margin: 14mm 13mm 15mm;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 10pt;
+  line-height: 1.52;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── The two-column measure: text at ~72 characters, notes alongside ────── */
+
+.block { padding-right: 53mm; }
+.block > .note {
+  float: right;
+  clear: right;
+  width: 46mm;
+  margin-right: -53mm;
+  margin-bottom: 4mm;
+}
+
+
+p { margin: 0 0 3.2mm; }
+p.tight { margin-bottom: 1.6mm; }
+
+/* ── Masthead ───────────────────────────────────────────────────────────── */
+
+.masthead {
+  border-top: 2.5pt solid var(--ink);
+  padding-top: 4mm;
+  margin-bottom: 9mm;
+}
+.kicker {
+  font-family: var(--mono);
+  font-size: 7.5pt;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--signal);
+  margin: 0 0 3mm;
+}
+h1 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 30pt;
+  line-height: 1.02;
+  letter-spacing: -0.022em;
+  margin: 0 0 4mm;
+  text-wrap: balance;
+}
+.standfirst {
+  font-size: 11.5pt;
+  line-height: 1.44;
+  color: var(--ink-2);
+  max-width: 148mm;
+  margin: 0 0 6mm;
+}
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8mm;
+  border-top: 0.5pt solid var(--rule);
+  padding-top: 2.5mm;
+  font-family: var(--mono);
+  font-size: 7.5pt;
+  color: var(--ink-3);
+}
+.byline b { color: var(--ink-2); font-weight: 500; }
+
+/* ── Headings ───────────────────────────────────────────────────────────── */
+
+h2 {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 16pt;
+  letter-spacing: -0.014em;
+  line-height: 1.12;
+  margin: 0 0 4mm;
+  padding-top: 3mm;
+  border-top: 1.5pt solid var(--ink);
+  text-wrap: balance;
+}
+h2 .num {
+  display: block;
+  font-family: var(--mono);
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--signal);
+  margin-bottom: 1.8mm;
+}
+h3 {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 11pt;
+  letter-spacing: -0.008em;
+  margin: 6mm 0 2.4mm;
+  text-wrap: balance;
+}
+h4 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 8pt;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 5mm 0 2mm;
+}
+h2, h3, h4 { break-after: avoid-page; }
+section { break-inside: auto; }
+.part { break-before: page; }
+
+/* ── Margin notes ───────────────────────────────────────────────────────── */
+
+.note {
+  font-family: var(--sans);
+  font-size: 7.8pt;
+  line-height: 1.42;
+  color: var(--ink-2);
+  border-left: 1.5pt solid var(--signal);
+  padding-left: 3mm;
+  break-inside: avoid-page;
+}
+.note b {
+  display: block;
+  font-family: var(--mono);
+  font-size: 7pt;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--signal);
+  margin-bottom: 1.2mm;
+}
+.note.verified { border-left-color: var(--book-main); }
+.note.verified b { color: var(--book-main); }
+.note + .note { margin-top: 4mm; }
+
+/* A note that belongs to a table reads better as its footnote. */
+.tnote {
+  font-family: var(--sans);
+  font-size: 7.6pt;
+  line-height: 1.42;
+  color: var(--ink-2);
+  border-top: 0.4pt solid var(--rule);
+  padding-top: 2mm;
+  margin: -1mm 0 5mm;
+  break-inside: avoid-page;
+}
+.tnote b {
+  font-family: var(--mono);
+  font-size: 7pt;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--book-main);
+  margin-right: 2mm;
+}
+
+/* ── The handset screen: the document's recurring instrument ────────────── */
+
+.screen {
+  background: var(--screen);
+  color: var(--screen-ink);
+  font-family: var(--mono);
+  font-size: 8pt;
+  line-height: 1.5;
+  padding: 3.5mm 4mm;
+  border-radius: 1.5mm;
+  white-space: pre-wrap;
+  margin: 0 0 1.6mm;
+  break-inside: avoid-page;
+}
+.screen .tag {
+  color: var(--screen);
+  background: #7ec98e;
+  font-weight: 600;
+  padding: 0 1mm;
+  border-radius: 0.6mm;
+}
+.screen .tag.end { background: #e5836e; }
+.screen .dim { color: var(--screen-dim); }
+.screen-cap {
+  font-family: var(--sans);
+  font-size: 7.6pt;
+  color: var(--ink-3);
+  margin: 0 0 4mm;
+}
+.screens {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  margin-bottom: 4mm;
+  break-inside: avoid-page;
+}
+.screens > div { min-width: 0; display: flex; flex-direction: column; }
+.screens > div .screen { flex: 1 0 auto; }
+
+/* ── Code ───────────────────────────────────────────────────────────────── */
+
+pre {
+  font-family: var(--mono);
+  font-size: 7.2pt;
+  line-height: 1.5;
+  background: var(--wash);
+  border-left: 1.5pt solid var(--rule-firm);
+  padding: 2.8mm 3.5mm;
+  margin: 0 0 3.5mm;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  break-inside: avoid-page;
+}
+pre.bad  { border-left-color: var(--halt); }
+pre.good { border-left-color: var(--signal); }
+pre .c { color: var(--ink-3); }
+pre .k { color: var(--book-main); font-weight: 500; }
+pre .x { color: var(--halt); font-weight: 500; }
+pre .g { color: var(--signal); font-weight: 500; }
+.mono {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  letter-spacing: -0.01em;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--wash);
+  padding: 0 0.7mm;
+  border-radius: 0.6mm;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--sans);
+  font-size: 8pt;
+  margin: 0 0 4mm;
+  break-inside: avoid-page;
+}
+thead th {
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 7pt;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  border-bottom: 1pt solid var(--ink);
+  padding: 0 3mm 1.5mm 0;
+  vertical-align: bottom;
+}
+tbody td {
+  border-bottom: 0.4pt solid var(--rule);
+  padding: 1.7mm 3mm 1.7mm 0;
+  vertical-align: top;
+  line-height: 1.36;
+}
+tbody tr:last-child td { border-bottom: 0.8pt solid var(--rule-firm); }
+/* Numeric columns hug the right edge only when they ARE the right edge;
+   otherwise they need a gutter or the next heading runs into them. */
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); padding-right: 4mm; padding-left: 5mm; }
+td.num:last-child, th.num:last-child { padding-right: 0; }
+td.mono { font-family: var(--mono); font-size: 7.4pt; }
+table.compact tbody td { padding: 1.1mm 3mm 1.1mm 0; }
+
+/* ── Severity chips ─────────────────────────────────────────────────────── */
+
+.chip {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 6.8pt;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.5mm 1.6mm;
+  border-radius: 0.8mm;
+  white-space: nowrap;
+}
+.chip.crit { background: #f6e3df; color: var(--halt); }
+.chip.high { background: #f7ecd8; color: var(--amber); }
+.chip.med  { background: var(--wash-2); color: var(--ink-2); }
+
+/* ── Findings ───────────────────────────────────────────────────────────── */
+
+.finding {
+  border-top: 0.8pt solid var(--rule-firm);
+  padding-top: 3mm;
+  margin-top: 5mm;
+  break-inside: avoid-page;
+}
+.finding-head {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  margin-bottom: 2.4mm;
+}
+.finding-id {
+  font-family: var(--mono);
+  font-size: 8pt;
+  font-weight: 600;
+  color: var(--halt);
+  white-space: nowrap;
+}
+.finding-head h3 { margin: 0; flex: 1; }
+
+/* ── Stat tiles ─────────────────────────────────────────────────────────── */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4mm;
+  margin: 0 0 5mm;
+  break-inside: avoid-page;
+}
+.stat { border-top: 1.5pt solid var(--ink); padding-top: 2mm; }
+.stat .v {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 17pt;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  display: block;
+  margin-bottom: 1.4mm;
+}
+.stat .l {
+  font-family: var(--sans);
+  font-size: 7.6pt;
+  line-height: 1.34;
+  color: var(--ink-2);
+}
+.stat.halt { border-top-color: var(--halt); }
+.stat.halt .v { color: var(--halt); }
+.stat.sig { border-top-color: var(--signal); }
+.stat.sig .v { color: var(--signal); }
+
+/* ── The chart ──────────────────────────────────────────────────────────── */
+
+.chart { margin: 0 0 3mm; break-inside: avoid-page; }
+.chart-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 9pt;
+  margin: 0 0 0.8mm;
+}
+.chart-sub {
+  font-family: var(--sans);
+  font-size: 7.6pt;
+  color: var(--ink-3);
+  margin: 0 0 3mm;
+}
+.legend {
+  display: flex;
+  gap: 5mm;
+  font-family: var(--sans);
+  font-size: 7.6pt;
+  color: var(--ink-2);
+  margin-bottom: 3mm;
+}
+.legend span { display: inline-flex; align-items: center; gap: 1.5mm; }
+.swatch { width: 3mm; height: 3mm; border-radius: 0.6mm; display: inline-block; }
+.rows { display: grid; gap: 2.6mm; }
+.row-lab {
+  font-family: var(--mono);
+  font-size: 7.2pt;
+  color: var(--ink-2);
+  margin-bottom: 1mm;
+  letter-spacing: 0.02em;
+}
+.pair { display: grid; gap: 1.2mm; }
+.bar-track {
+  display: grid;
+  grid-template-columns: 1fr 9mm;
+  align-items: center;
+  gap: 2mm;
+  height: 3.4mm;
+}
+.bar-bed { background: var(--wash); height: 3.4mm; border-radius: 0.9mm; position: relative; }
+.bar {
+  height: 3.4mm;
+  border-radius: 0 1.2mm 1.2mm 0;
+  min-width: 0.4mm;
+}
+.bar.zero { width: 1.1mm !important; background: var(--rule-firm); border-radius: 0.55mm; }
+.bar-val {
+  font-family: var(--mono);
+  font-size: 7.2pt;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+.bar-val.nil { color: var(--ink-3); }
+.axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 6.6pt;
+  color: var(--ink-3);
+  border-top: 0.4pt solid var(--rule);
+  padding-top: 1mm;
+  margin-top: 2mm;
+  margin-right: 11mm;
+}
+
+/* ── Callout ────────────────────────────────────────────────────────────── */
+
+.callout {
+  background: var(--wash);
+  border-left: 2pt solid var(--signal);
+  padding: 3.5mm 4mm;
+  margin: 0 0 4mm;
+  break-inside: avoid-page;
+}
+.callout.halt { border-left-color: var(--halt); }
+.callout p:last-child { margin-bottom: 0; }
+.callout .lead {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 9.5pt;
+  display: block;
+  margin-bottom: 1.6mm;
+}
+
+/* ── Lists ──────────────────────────────────────────────────────────────── */
+
+ol, ul { margin: 0 0 3.5mm; padding-left: 5mm; }
+li { margin-bottom: 1.6mm; }
+ol.steps { list-style: none; padding-left: 0; counter-reset: s; }
+ol.steps > li {
+  counter-increment: s;
+  position: relative;
+  padding-left: 8mm;
+  margin-bottom: 3mm;
+  break-inside: avoid-page;
+}
+ol.steps > li::before {
+  content: counter(s, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.3mm;
+  font-family: var(--mono);
+  font-size: 8pt;
+  font-weight: 600;
+  color: var(--signal);
+}
+ol.steps > li b { font-family: var(--sans); font-size: 9.5pt; }
+
+.lede { font-size: 10.5pt; color: var(--ink-2); }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+hr.soft { border: 0; border-top: 0.4pt solid var(--rule); margin: 5mm 0; }
+
+/* ── Full-measure elements reclaim the gutter ────────────────────────────
+   Last in the sheet on purpose: several component rules below set a margin
+   shorthand, which resets margin-right and pins the element to the narrow
+   measure. A table also needs its width restated, because width:100%
+   resolves against the padded container, not the reclaimed one. */
+.wide       { margin-right: -53mm !important; clear: right; }
+table.wide  { width: calc(100% + 53mm); }
+</style>
+
+<div class="masthead">
+  <p class="kicker">Micro&nbsp;Eazy · Channel Analysis · 2 September 2026</p>
+  <h1>The USSD Channel</h1>
+  <p class="standfirst">
+    How Africa's Talking drives <code>ATusersUssdApI</code>, why a Micromart Fintech
+    customer is offered Micromart Africa's menu, and what it takes to turn one
+    lender's USSD app into something every Micro&nbsp;Eazy client can dial.
+  </p>
+  <div class="byline">
+    <span><b>Subject</b> skegode/ATusersUssdApI · .NET 9</span>
+    <span><b>Evidence</b> live read, Micromart ServiceSuite</span>
+    <span><b>Status</b> in production</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block">
+  <h2 class="wide"><span class="num">§ 0</span>What was found</h2>
+
+  <p class="lede">
+    <strong>There is no hardcoded 3002.</strong> The string does not appear in the
+    C# and it does not appear in any of the eight stored procedures the service
+    calls. Micromart's report is accurate about the symptom and wrong about the
+    cause, and that distinction matters, because the actual causes are four
+    separate defects that a search-and-replace would not have touched.
+  </p>
+
+  <div class="note verified">
+    <b>Verified live</b>
+    Every figure in this document was read from Micromart's ServiceSuite database
+    on 2&nbsp;September&nbsp;2026 through the Connected Suite's read-only
+    connection. The queries are reproduced in the appendix.
+  </div>
+
+  <p>
+    What a Micromart Fintech customer sees when they choose <em>Borrow Loan</em> is
+    a six-item category menu — <span class="mono">BUSINESS LOAN-DAILY</span>,
+    <span class="mono">SCHOOL FEES LOAN</span>, <span class="mono">SALARY LOAN</span>
+    and the rest. That list is Micromart Africa's product taxonomy. It is shown to
+    the Fintech customer because the query behind it has no entity filter and the
+    table behind <em>that</em> has no entity column. Four of those six categories
+    contain nothing the Fintech book can sell. The customer picks one, gets a
+    header with no options beneath it, and concludes the service is broken.
+  </p>
+
+  <p>
+    That is the presenting complaint. Underneath it the service has a deeper
+    problem: <strong>it has no concept of which book it is serving.</strong> The
+    entity is re-derived from the phone number at four separate call sites, by two
+    different rules, one of which returns a literal zero for exactly the customers
+    who most need it to be right. The PIN — the only credential in the system — is
+    read and written with no entity filter at all.
+  </p>
+
+  <div class="stats wide">
+    <div class="stat sig">
+      <span class="v">15,472</span>
+      <span class="l">borrowers hold a USSD PIN across the three books this service can reach. It is live and in daily use.</span>
+    </div>
+    <div class="stat halt">
+      <span class="v">4 of 6</span>
+      <span class="l">loan categories offered to a Fintech customer contain no product that customer can be sold.</span>
+    </div>
+    <div class="stat halt">
+      <span class="v">44</span>
+      <span class="l">phone numbers exist in more than one book. Every one of them can neither borrow nor safely set a PIN.</span>
+    </div>
+    <div class="stat halt">
+      <span class="v">0</span>
+      <span class="l">loans carrying the USSD service's own signature have ever been booked on the Fintech book. 25 carry it on 3002.</span>
+    </div>
+  </div>
+
+  <h3 class="wide">The defects, in the order they should be fixed</h3>
+
+  <table class="wide">
+    <thead>
+      <tr>
+        <th style="width:11mm">ID</th>
+        <th>Defect</th>
+        <th style="width:52mm">Effect on a Fintech customer</th>
+        <th style="width:20mm">Severity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mono">F1</td>
+        <td>The category menu is read from a global table with no entity filter</td>
+        <td>Sees 3002's taxonomy; four of six choices are dead ends</td>
+        <td><span class="chip crit">Critical</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F2</td>
+        <td>The PIN is read and written with no entity predicate</td>
+        <td>Setting a PIN overwrites the PIN on every book that shares the number</td>
+        <td><span class="chip crit">Critical</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F3</td>
+        <td>Multi-book customers are asked for products under entity&nbsp;<code>0</code></td>
+        <td>Empty product menu, always</td>
+        <td><span class="chip crit">Critical</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F4</td>
+        <td>The level router has no multi-book branch at level 5</td>
+        <td>Multi-book customers can never complete a loan application</td>
+        <td><span class="chip crit">Critical</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F5</td>
+        <td>Lender selection is not scoped to the operator's own entities</td>
+        <td>Two Micromart numbers are offered Axe Capital's book by name</td>
+        <td><span class="chip crit">Critical</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F6</td>
+        <td>The <code>EntityUnits</code> gate inside the product proc is invisible to the app</td>
+        <td>529 Fintech borrowers in the wrong branch see no products at all</td>
+        <td><span class="chip high">High</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F7</td>
+        <td>The KES&nbsp;3,000 minimum is enforced in SQL and discarded in C#</td>
+        <td>A KES&nbsp;2,000 application is confirmed and silently dropped</td>
+        <td><span class="chip high">High</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F8</td>
+        <td>The endpoint is unauthenticated and the PIN has no attempt limit</td>
+        <td>A four-digit PIN is brute-forceable by anyone who can reach the URL</td>
+        <td><span class="chip high">High</span></td>
+      </tr>
+      <tr>
+        <td class="mono">F9</td>
+        <td>The STK response is discarded; the log writer is not concurrency-safe</td>
+        <td>"Wait for the M-Pesa prompt" when no prompt was sent; intermittent 500s</td>
+        <td><span class="chip med">Medium</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    Sections 1 and 2 explain the channel and the code, because the fixes in
+    section&nbsp;4 only make sense once the shape of a USSD session is clear.
+    Section&nbsp;3 is the evidence. Sections 5 and 6 answer the strategic
+    question — reuse this repository, or start a clean one — and the answer is
+    <em>both, in that order</em>.
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ 1</span>How Africa's Talking USSD actually works</h2>
+
+  <p class="lede">
+    USSD is not a protocol you implement. It is a protocol Safaricom implements,
+    Africa's Talking translates, and you answer. Your entire surface area is
+    <strong>one HTTP endpoint that receives a form post and returns a string.</strong>
+    Everything difficult about USSD follows from how little that string is allowed
+    to be.
+  </p>
+
+  <h3>1.1 · The channel</h3>
+
+  <p>
+    Africa's Talking leases a service code from the operator and sublets a slice of
+    it to you. Micromart's customers dial something of the form
+    <code>*384*NNNN#</code>: <code>*384#</code> is the shortcode Africa's Talking
+    operates on Safaricom, and <code>NNNN</code> is the channel assigned to a
+    single application. You register one callback URL against that channel in the
+    AT dashboard. From then on, every keypress by every customer on that code
+    arrives at that URL.
+  </p>
+
+  <p>
+    That last sentence is the whole tenancy story, and section&nbsp;6 turns on it:
+    <strong>the channel is one-to-one with the callback URL, and the callback URL
+    is one-to-one with a deployment.</strong> Two lenders on one deployment means
+    two channels pointing at the same URL — which is fine, and is exactly how this
+    becomes reusable, provided the code reads the field that tells them apart.
+  </p>
+
+  <div class="note">
+    <b>The dial string</b>
+    <code>*384*NNNN#</code> is an Africa's Talking sublet. A lender who wants their
+    own <code>*XYZ#</code> must apply to the operator directly — months, and a fee.
+    For every client after Micromart, an AT channel is the practical choice.
+  </div>
+
+  <h3>1.2 · The four fields</h3>
+
+  <p>
+    The gateway posts <code>application/x-www-form-urlencoded</code> with four
+    fields. There are no others, and there is no body, no JSON, and no header worth
+    reading.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:24mm">Field</th><th>What it carries</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="mono">sessionId</td><td>Opaque string, stable for the life of one dialogue, new on every dial. The only handle you get on "this conversation".</td></tr>
+      <tr><td class="mono">serviceCode</td><td>The code the customer dialled. <strong>The tenant discriminator</strong> — see §6.1. This service reads it once, to write it to a log file.</td></tr>
+      <tr><td class="mono">phoneNumber</td><td>MSISDN in <code>+2547XXXXXXXX</code> form. Asserted by the network, not by the handset — the one genuinely trustworthy field.</td></tr>
+      <tr><td class="mono">text</td><td>Everything the customer has typed this session, joined by <code>*</code>. Empty on the first request.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.3 · CON and END</h3>
+
+  <p>
+    You reply with <code>text/plain</code>. The first four characters decide what
+    the handset does with the rest:
+  </p>
+
+  <div class="screens">
+    <div>
+      <div class="screen"><span class="tag">CON</span> Enter your PIN
+<span class="dim">└ input box shown · session stays open</span></div>
+      <p class="screen-cap">The customer can type. Your next request will carry what they typed.</p>
+    </div>
+    <div>
+      <div class="screen"><span class="tag end">END</span> Your loan balance is 4,500
+<span class="dim">└ message shown · session destroyed</span></div>
+      <p class="screen-cap">No input box. The dialogue is over and the sessionId will never return.</p>
+    </div>
+  </div>
+
+  <p>
+    There is no third option. There is no way to send a message and keep the
+    session open without asking for input, no way to push a screen the customer did
+    not ask for, and no way to reopen a session you ended. <code>END</code> is
+    irreversible, which is why every error path in this service — including
+    recoverable ones like a mistyped PIN — costs the customer the whole dialogue.
+  </p>
+
+  <h3>1.4 · The cumulative string is the state</h3>
+
+  <p>
+    This is the idea everything else rests on. Africa's Talking keeps no state on
+    your behalf beyond the session's existence. Instead, <strong>every request
+    re-sends the complete input history</strong>, asterisk-delimited, from the top.
+  </p>
+
+  <p>
+    A customer who dials in, enters PIN <code>1234</code>, chooses
+    <em>Borrow Loan</em>, picks category 2, product 1, and types 5000 generates
+    <em>six</em> HTTP requests, each carrying strictly more than the last:
+  </p>
+
+  <pre>  <span class="c">request</span>   <span class="c">text=</span>                   <span class="c">what you must return</span>
+  1         <span class="c">(empty)</span>                 CON Welcome … enter your PIN
+  2         1234                    CON 1. Check Balance / 2. Pay / 3. Borrow
+  3         1234*3                  CON Select Category
+  4         1234*3*2                CON Select Product Code
+  5         1234*3*2*1              CON Enter Amount
+  6         1234*3*2*1*5000         END Your request has been received</pre>
+
+  <div class="note">
+    <b>Consequence</b>
+    The service is stateless by construction. It never has to remember anything —
+    but it also has to re-validate the PIN, re-resolve the customer, and
+    re-establish which book it is in, on every single keypress. This service does
+    exactly that, and it is where the entity bugs live.
+  </div>
+
+  <p>
+    Two properties follow directly. First, <strong>navigation depth is
+    <code>text.Split('*').Length</code></strong> — the service can route purely on
+    how many selections have been made, which is precisely what
+    <code>HandleMainFlow</code> does. Second, <strong>the PIN is re-sent in
+    plaintext on every request</strong> and is re-verified against a bcrypt hash
+    each time. Six requests, six bcrypt verifications, each deliberately costly.
+    At work factor 12 that is real latency inside a session with a hard timeout.
+  </p>
+
+  <h3>1.5 · The screen budget</h3>
+
+  <p>
+    A USSD screen is capped at <strong>182 characters</strong> by GSM&nbsp;03.38,
+    and handsets in the field routinely render less. Overflow is not wrapped or
+    paginated — it is truncated, silently, by equipment you do not control.
+  </p>
+
+  <p>
+    Micromart's category screen, measured against the live table, is
+    <strong>159 characters</strong>. It fits, with 23 characters of headroom.
+    Adding a seventh product category — a perfectly ordinary business request —
+    overflows it and truncates the menu mid-item on some handsets. Any reusable
+    version of this service has to treat 182 as a budget it enforces, with
+    pagination as a first-class feature rather than something bolted on when a
+    client complains.
+  </p>
+
+  <div class="screen">                                    <span class="dim">chars</span>
+<span class="tag">CON</span> Select Category:                 <span class="dim">21</span>
+1) BUSINESS LOAN-DAILY               <span class="dim">22</span>
+2) BUSINESS LOAN-WEEKLY              <span class="dim">23</span>
+3) BUSINESS LOAN-MONTHLY             <span class="dim">24</span>
+4) SCHOOL FEES LOAN                  <span class="dim">19</span>
+5) SALARY LOAN                       <span class="dim">15</span>
+6) ASSET LOAN                        <span class="dim">14</span>
+0. Back                              <span class="dim"> 8</span>
+00. Exit                             <span class="dim">10</span>
+<span class="dim">─────────────────────────────────────────</span>
+<span class="dim">                            total   159 / 182</span></div>
+  <p class="screen-cap">
+    The live category screen. Every one of these six lines is drawn from a table
+    with no entity column — see F1.
+  </p>
+
+  <h3>1.6 · Sessions end without telling you</h3>
+
+  <p>
+    The operator enforces a maximum session duration — on Safaricom Kenya this is
+    conventionally around three minutes, and it should be confirmed for Micromart's
+    specific channel rather than assumed. When it expires,
+    <strong>no callback is made.</strong> Your service does not learn that the
+    customer walked away; the requests simply stop.
+  </p>
+
+  <p>
+    The same is true of the per-request timeout. Africa's Talking waits a few
+    seconds for your HTTP response and then abandons the session. This is the
+    single most important operational constraint on the design, and it rules out
+    exactly the thing a loan application wants to do: call a credit bureau, run a
+    score, wait. Anything slow must be queued and answered with
+    <code>END … is being processed</code> — which is, correctly, what this service
+    does.
+  </p>
+
+  <h3>1.7 · What the gateway does not give you</h3>
+
+  <table>
+    <thead><tr><th style="width:38mm">You do not get</th><th>What that means for the design</th></tr></thead>
+    <tbody>
+      <tr><td>Authentication</td><td>AT posts unsigned. Anyone who learns the callback URL can post any <code>phoneNumber</code> they like. Mitigation is IP allow-listing plus a shared secret in the path or a header — see F8.</td></tr>
+      <tr><td>Idempotency</td><td>A retried or duplicated request is indistinguishable from a real one. A booking endpoint reached at the last level of a menu must be idempotent on <code>sessionId</code>, or a network hiccup books two loans.</td></tr>
+      <tr><td>Delivery confirmation</td><td>You never learn whether your <code>END</code> screen was displayed.</td></tr>
+      <tr><td>Rich input</td><td>Digits and <code>*</code>. No letters in practice, no confirmation dialogs, no back button — which is why <code>0</code> and <code>00</code> have to be invented in application code.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ 2</span>How this service implements it</h2>
+
+  <p class="lede">
+    <code>ATusersUssdApI</code> is a single-controller .NET 9 web API — 936 lines
+    across 16 files, one endpoint, no tests, no authentication, and a database
+    contract of four tables and eight stored procedures. It is small enough to hold
+    in your head, which is a genuine virtue and the main argument for porting it
+    rather than rewriting from a specification.
+  </p>
+
+  <h3>2.1 · The request lifecycle</h3>
+
+  <p>
+    Every keypress from every customer enters at
+    <code>POST /ussd/service</code> and runs the same six steps:
+  </p>
+
+  <ol class="steps">
+    <li><b>Normalise the MSISDN.</b> <code>PhoneHelper.Normalize</code> strips
+      non-digits, takes the last nine, and prefixes <code>254</code>. Correct, total,
+      and — importantly — the same transformation the stored procedures apply
+      internally, so the two agree.</li>
+    <li><b>Log, if there is input.</b> A file append to
+      <code>C:\Logs\ussd\</code>. See F9: the writer is a singleton with no lock.</li>
+    <li><b>Check PIN status.</b> One query. If the borrower has no PIN yet, the
+      request is diverted into the enrolment flow and never reaches the menu.</li>
+    <li><b>First screen, or main flow.</b> Empty <code>text</code> means the customer
+      has just dialled: greet them by lender name and ask for a PIN.</li>
+    <li><b>Split, normalise back/exit, validate the PIN.</b> The PIN is
+      <code>parts[0]</code>, re-verified with bcrypt on every request.</li>
+    <li><b>Route on depth.</b> <code>parts.Length</code> selects one of five level
+      handlers. This is the whole navigation model.</li>
+  </ol>
+
+  <div class="note">
+    <b>An honest strength</b>
+    Steps 1, 4 and 6 are well judged. Routing on <code>parts.Length</code> rather
+    than on a persisted session cursor is the right call for a stateless gateway,
+    and it is why the service survives an AT retry without corrupting anything.
+  </div>
+
+  <h3>2.2 · The one piece of server state, and why it barely matters</h3>
+
+  <p>
+    There is a <code>UssdSession</code> table, written by
+    <code>sp_ussdsession</code>, which increments a level counter per
+    <code>(sessionId, phoneNumber)</code>. It is used for one purpose only:
+    <strong>PIN enrolment</strong>, where the customer has typed a new PIN and a
+    repeat, and the service needs to know which of the two prompts it is on.
+  </p>
+
+  <p>
+    Every other screen ignores it entirely and derives position from
+    <code>text</code>. This is not an inconsistency worth fixing so much as one
+    worth noticing: the enrolment flow could be derived from <code>text</code> too,
+    and then the table — and the write on every enrolment keypress — disappears.
+  </p>
+
+  <h3>2.3 · Back and exit</h3>
+
+  <p>
+    USSD has no back button, so <code>0</code> and <code>00</code> are conventions
+    the application invents. <code>NormalizeParts</code> implements them by
+    <em>rewriting history</em>: it walks the parts array and pops the previous
+    selection whenever it meets a <code>0</code>.
+  </p>
+
+  <pre class="good"><span class="c">// text = "1234*3*2*0" → parts = [1234, 3] → back at the categories</span>
+<span class="k">for</span> (<span class="k">int</span> i = 1; i &lt; rawParts.Length; i++) {
+    <span class="k">if</span> (rawParts[i] == <span class="g">"0"</span>) {
+        <span class="k">if</span> (list.Count &gt; 1) list.RemoveAt(list.Count - 1);  <span class="c">// back</span>
+        <span class="k">else</span> <span class="k">return</span> (list.ToArray(), <span class="g">true</span>);   <span class="c">// nothing to go back to → exit</span>
+    }
+    <span class="k">else</span> list.Add(rawParts[i]);
+}</pre>
+
+  <p>
+    This is the cleverest code in the repository and it is correct. It has one
+    consequence worth naming: <strong><code>0</code> is reserved at every level,
+    including the amount prompts.</strong> A customer who types <code>0</code> as a
+    repayment amount goes back a screen instead. That is defensible — zero is not a
+    valid amount — but a customer typing <code>00</code> as an amount exits the
+    session, and neither behaviour is explained on screen.
+  </p>
+
+  <h3>2.4 · Two customer shapes, and only one of them works</h3>
+
+  <p>
+    <code>sp_checkCustomerCompomany</code> counts the borrower rows carrying this
+    phone number and returns a sentinel:
+  </p>
+
+  <table class="compact">
+    <thead><tr><th style="width:16mm">Returns</th><th style="width:30mm">Meaning</th><th>Menu path</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">-1</td><td>Not registered</td><td><code>END</code> — visit a branch</td></tr>
+      <tr><td class="mono">-2</td><td>One book</td><td>Straight to Balance / Pay / Borrow. <strong>Works.</strong></td></tr>
+      <tr><td class="mono">-3</td><td>More than one book</td><td>"Select Lender" first, then the same three. <strong>Broken at three separate points</strong> — F3, F4, F5.</td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    Note what the count is <em>not</em> scoped by. It counts rows across every
+    entity on a shared ServiceSuite instance — Micromart Africa, Micromart Fintech,
+    Axe Capital, and anyone else who lands there. That is the root of F5.
+  </p>
+
+  <h3>2.5 · The database contract</h3>
+
+  <p>
+    The service owns almost no logic. Nearly everything of consequence lives in
+    stored procedures, which means <strong>a fix that touches entity scoping is a
+    SQL change as much as a C# change</strong> — and a change to procedures that
+    other systems may also call.
+  </p>
+
+  <table class="wide compact">
+    <thead>
+      <tr>
+        <th style="width:44mm">Procedure or table</th>
+        <th style="width:26mm">Entity-scoped?</th>
+        <th>What it does, and what is wrong with it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="mono">Borrowers</td><td><span class="chip med">has EntityId</span></td><td>Identity, PIN, branch (<code>EntityUnit</code>), limit. The app queries it with <code>TOP 1</code> and no <code>ORDER BY</code>.</td></tr>
+      <tr><td class="mono">Products</td><td><span class="chip med">has EntityId</span></td><td>Also carries <code>EntityUnits</code>, a comma-joined branch list — a second scope the app knows nothing about.</td></tr>
+      <tr><td class="mono">ProductCategories</td><td><span class="chip crit">no EntityId</span></td><td><strong>The table at the heart of F1.</strong> Six global rows. Nothing about it can be entity-scoped without going through <code>Products</code>.</td></tr>
+      <tr><td class="mono">UssdSession</td><td>n/a</td><td>Enrolment cursor only.</td></tr>
+      <tr><td class="mono">sp_checkCustomerCompomany</td><td><span class="chip crit">no</span></td><td>Counts borrower rows across <em>all</em> entities → F5.</td></tr>
+      <tr><td class="mono">sp_CompanyName</td><td><span class="chip high">TOP 1</span></td><td>Names the lender on the welcome screen via an unordered <code>TOP 1</code>. Can greet a dual-book customer with the wrong brand.</td></tr>
+      <tr><td class="mono">GetCustomerCompanies</td><td><span class="chip crit">no</span></td><td>Lists every entity the number appears under, joined to <code>BsEntity</code>. Returns the raw <code>EntityId</code> as the menu key.</td></tr>
+      <tr><td class="mono">sp_ussdGetproducts</td><td><span class="chip med">yes, plus units</span></td><td>Filters on <code>EntityId</code>, <code>CategoryId</code>, <code>IsActive</code> <em>and</em> a <code>CHARINDEX</code> over <code>EntityUnits</code> → F6.</td></tr>
+      <tr><td class="mono">sp_GetolbOrLoanLimit</td><td><span class="chip med">yes</span></td><td>Correctly scoped on both <code>PhoneNumber</code> and <code>EntityId</code>. The model the rest should follow.</td></tr>
+      <tr><td class="mono">sp_UssdInsertLoan</td><td><span class="chip med">yes</span></td><td>Enforces a KES 3,000 floor and returns a decline code the app discards → F7.</td></tr>
+      <tr><td class="mono">sp_GetUssdStkParams</td><td><span class="chip med">yes</span></td><td>Per-entity Daraja credentials. Rows exist for both 3002 and 3005 — the payment path is correctly tenanted.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lead">The pattern worth extracting</span>
+    <p>
+      <code>sp_GetolbOrLoanLimit</code> and <code>sp_GetUssdStkParams</code> are
+      both correct: they take <code>@EntityId</code> and they use it. The procedures
+      that are wrong are wrong in the same way — they were written when there was
+      one book. Every fix in §4 is a variation on giving the other procedures the
+      parameter these two already have.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ 3</span>The entity problem, measured</h2>
+
+  <p class="lede">
+    Micromart runs two books on one ServiceSuite instance:
+    <strong>3002, Micromart Africa Limited</strong>, the established SME lender, and
+    <strong>3005, Micromart Fintech</strong>, where the Micro&nbsp;Eazy products live.
+    Both are reachable from the same USSD deployment and the same database
+    connection. The entity is not a label on the data — it is an identity boundary,
+    and the same phone number in the two books can belong to two different people.
+  </p>
+
+  <table class="wide compact">
+    <thead><tr><th>Book</th><th class="num">Borrowers</th><th class="num">With a USSD PIN</th><th class="num">Loans</th><th class="num">Products</th><th class="num">On the USSD menu</th></tr></thead>
+    <tbody>
+      <tr><td>3002 · Micromart Africa Limited</td><td class="num">142,757</td><td class="num">12,473</td><td class="num">276,518</td><td class="num">34</td><td class="num">27</td></tr>
+      <tr><td>3005 · Micromart Fintech</td><td class="num">17,022</td><td class="num">2,968</td><td class="num">61,549</td><td class="num">3</td><td class="num">2</td></tr>
+      <tr><td>3003 · Axe Capital <span style="color:var(--ink-3)">(same instance)</span></td><td class="num">2,454</td><td class="num">31</td><td class="num">—</td><td class="num">37</td><td class="num">0</td></tr>
+    </tbody>
+  </table>
+
+  <p class="tnote wide">
+    <b>Both books are live</b>
+    The most recent loan on 3002 was booked at 11:20 and on 3005 at 10:05, on the
+    morning this was written. Whatever is changed here is changed underneath a
+    working credit channel. Axe Capital shares the instance but not the shortcode
+    — it appears here because §3 F5 shows that today it is reachable from it.
+  </p>
+
+  <!-- ── F1 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F1</span>
+      <h3>The category menu is not scoped to anything</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+  </div>
+
+  <p>
+    <code>GetLoanCategories</code> is four lines and contains the complaint in
+    full:
+  </p>
+
+  <pre class="bad"><span class="k">using var</span> cmd = <span class="k">new</span> SqlCommand(<span class="x">"SELECT ID, CategoryName FROM ProductCategories"</span>, con);</pre>
+
+  <p>
+    No <code>WHERE</code>, no <code>@EntityId</code>, no join to
+    <code>Products</code>. And it could not have one:
+    <code>ProductCategories</code> has six columns —
+    <code>ID</code>, <code>CategoryName</code>, and four audit fields — and
+    <strong>no entity column at all</strong>. It is a global taxonomy that predates
+    the second book.
+  </p>
+
+  <p>
+    So every customer of every lender on the instance is shown the same six
+    categories. Replaying <code>sp_ussdGetproducts</code> against the live tables
+    for a real, PIN-enrolled borrower in each book shows what is actually behind
+    each of those six doors:
+  </p>
+
+  <div class="chart wide">
+    <p class="chart-title">Products a customer is actually offered, by category</p>
+    <p class="chart-sub">Replay of <code>sp_ussdGetproducts</code> for a PIN-enrolled borrower in each book. A row with no bar is a category shown on the menu with nothing behind it.</p>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--book-main)"></i> 3002 · Micromart Africa</span>
+      <span><i class="swatch" style="background:var(--book-fintech)"></i> 3005 · Micromart Fintech</span>
+    </div>
+    <div class="rows">
+
+      <div>
+        <div class="row-lab">1) BUSINESS LOAN-DAILY</div>
+        <div class="pair">
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="row-lab">2) BUSINESS LOAN-WEEKLY</div>
+        <div class="pair">
+          <div class="bar-track"><div class="bar-bed"><div class="bar" style="width:100%;background:var(--book-main)"></div></div><span class="bar-val">6</span></div>
+          <div class="bar-track"><div class="bar-bed"><div class="bar" style="width:16.7%;background:var(--book-fintech)"></div></div><span class="bar-val">1</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="row-lab">3) BUSINESS LOAN-MONTHLY</div>
+        <div class="pair">
+          <div class="bar-track"><div class="bar-bed"><div class="bar" style="width:50%;background:var(--book-main)"></div></div><span class="bar-val">3</span></div>
+          <div class="bar-track"><div class="bar-bed"><div class="bar" style="width:16.7%;background:var(--book-fintech)"></div></div><span class="bar-val">1</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="row-lab">4) SCHOOL FEES LOAN</div>
+        <div class="pair">
+          <div class="bar-track"><div class="bar-bed"><div class="bar" style="width:50%;background:var(--book-main)"></div></div><span class="bar-val">3</span></div>
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="row-lab">5) SALARY LOAN</div>
+        <div class="pair">
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="row-lab">6) ASSET LOAN</div>
+        <div class="pair">
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+          <div class="bar-track"><div class="bar-bed"><div class="bar zero"></div></div><span class="bar-val nil">0</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="axis"><span>0</span><span>products offered</span><span>6</span></div>
+  </div>
+
+  <p>
+    A Fintech customer is offered six categories and can buy from two of them. They
+    are shown <span class="mono">SCHOOL FEES LOAN</span> because Micromart Africa
+    sells school fees loans. That is the literal, precise sense in which
+    <strong>"a customer in 3005 gets the products of 3002"</strong> — not the
+    product list, which is correctly filtered, but the taxonomy above it, which is
+    not filtered at all.
+  </p>
+
+  <p>
+    The main book is not well served either: three of its six categories are also
+    empty. Nobody should ever be shown a menu item that leads nowhere, and today
+    both books are.
+  </p>
+
+  <!-- ── F2 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F2</span>
+      <h3>The PIN is read and written across every book at once</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+  </div>
+
+  <p>
+    Enrolment writes the new PIN like this:
+  </p>
+
+  <pre class="bad"><span class="k">new</span> SqlCommand(<span class="x">"UPDATE Borrowers SET USSDPIN = @pin WHERE PhoneNumber = @phone"</span>, con);</pre>
+
+  <div class="note verified">
+    <b>The overlap, exactly</b>
+    44 distinct phone numbers span more than one book: 43 across Micromart 3002 and
+    3005, 2 across Micromart 3002 and Axe Capital 3003. One number appears in all
+    three, which is why the pairs sum to 45.
+  </div>
+
+  <p>
+    No <code>EntityId</code>. No <code>TOP 1</code>. For a phone number present in
+    two books, <strong>this overwrites the credential on both</strong> — including
+    the row belonging to a different person. Validation has the mirror-image
+    defect, reading <code>SELECT TOP 1 UssdPin … WHERE PhoneNumber = @mobile</code>
+    with no entity predicate and no <code>ORDER BY</code>, so it authenticates
+    against whichever book the query plan happens to reach first.
+  </p>
+
+  <p>
+    Forty-four numbers are in this position today. That is a small number and a
+    serious one: the fix is one <code>AND EntityId = @EntityId</code>, and the
+    consequence of leaving it is that one customer's PIN change silently changes
+    another customer's PIN.
+  </p>
+
+
+
+  <!-- ── F3 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F3</span>
+      <h3>Multi-book customers are asked for the products of entity zero</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+  </div>
+
+  <p>
+    <code>GetEntityId.EntityId</code> has two behaviours. For a single-book
+    customer it looks the entity up from <code>Borrowers</code>. For a multi-book
+    customer it returns <code>selectedEntity</code> — the value the caller passed
+    in — unchanged. Which makes the caller's argument load-bearing:
+  </p>
+
+  <pre class="bad"><span class="c">// ServiceController.GetProducts — reached by BOTH customer shapes</span>
+<span class="k">int</span> entityId = _getEntityId.EntityId(req.phoneNumber,
+                                     customerStatus,
+                                     <span class="x">0</span>,        <span class="x">// ← the entity</span>
+                                     constr);
+
+<span class="c">// For a MultiCompany customer, EntityId() returns this argument</span>
+<span class="c">// unchanged. So the proc runs as sp_ussdGetproducts @EntityId = 0</span>
+<span class="c">// and returns nothing — while the lender the customer actually</span>
+<span class="c">// selected sits unread in parts[1].</span></pre>
+
+  <p>
+    <code>CheckBalance</code> passes the same literal zero. It happens to be
+    harmless there — the multi-book balance path is handled separately, one branch
+    earlier — but it is the same latent mistake in a second place.
+  </p>
+
+  <p>
+    This is the closest thing in the repository to the complaint as reported. It is
+    not a hardcoded 3002; it is a hardcoded 0. The effect is not that the customer
+    gets the wrong book's products, but that they get a header and no products at
+    all.
+  </p>
+
+  <!-- ── F4 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F4</span>
+      <h3>A multi-book customer can never finish a loan application</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+  </div>
+
+  <p>
+    The two customer shapes need different menu depths, because the multi-book
+    customer spends one selection choosing a lender:
+  </p>
+
+  <table class="compact">
+    <thead><tr><th style="width:20mm">Depth</th><th>Single book</th><th>Multi book</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">1</td><td>Main menu</td><td>Select lender</td></tr>
+      <tr><td class="mono">2</td><td>Category list</td><td>Main menu</td></tr>
+      <tr><td class="mono">3</td><td>Product list</td><td>Category list</td></tr>
+      <tr><td class="mono">4</td><td>Enter amount</td><td>Product list</td></tr>
+      <tr><td class="mono">5</td><td><strong>Book the loan</strong></td><td>Enter amount — <strong>not implemented</strong></td></tr>
+      <tr><td class="mono">6</td><td>—</td><td>Book the loan — <strong>no handler exists</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    <code>HandleLevel5</code> opens with
+    <code>if (customerStatus == CustomerStatus.SingleCompany)</code> and has no
+    corresponding multi-book branch, so it falls through to
+    <code>END Invalid selection.</code> There is no <code>HandleLevel6</code> at
+    all; the router's default arm returns <code>END Invalid input.</code>
+  </p>
+
+  <p>
+    Combined with F3, the multi-book borrow flow is broken twice over — it shows an
+    empty product list, and had the list been populated, the application could not
+    have been submitted. The 43 customers who hold accounts in both Micromart books
+    cannot borrow over USSD at all.
+  </p>
+
+  <!-- ── F5 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F5</span>
+      <h3>One lender's customers are offered another lender's book</h3>
+      <span class="chip crit">Critical</span>
+    </div>
+  </div>
+
+  <p>
+    <code>sp_checkCustomerCompomany</code> counts borrower rows for a phone number
+    with no entity restriction, and <code>GetCustomerCompanies</code> then lists
+    every entity that number appears under, joined to <code>BsEntity</code> for the
+    display name. Neither knows which lender's USSD code was dialled — because, as
+    §1.2 noted, <code>serviceCode</code> is never read.
+  </p>
+
+  <p>
+    Two Micromart numbers also exist in Axe Capital's book. Those customers, dialling
+    Micromart's code, are shown a lender menu that names Axe Capital, and selecting
+    it queries <code>sp_GetolbOrLoanLimit</code> against entity 3003 — returning an
+    Axe Capital loan balance to whoever is holding that SIM.
+  </p>
+
+  <div class="screens wide">
+    <div>
+      <div class="screen"><span class="tag">CON</span> Select Lender
+3002. MICROMART AFRICA LIMITED
+3005. MICROMART FINTECH
+0. Exit</div>
+      <p class="screen-cap">
+        What the code produces today. Note that the menu keys <em>are</em> the raw
+        entity ids — the customer is expected to key <code>3005</code>, not
+        <code>2</code> — because <code>HandleLevel2</code> parses the keypress
+        directly as an <code>EntityId</code>.
+      </p>
+    </div>
+    <div>
+      <div class="screen"><span class="tag">CON</span> Select Lender
+3002. MICROMART AFRICA LIMITED
+3003. AXE CAPITAL
+3005. MICROMART FINTECH
+0. Exit</div>
+      <p class="screen-cap">
+        What two Micromart customers are shown. A different lender's brand,
+        reachable from Micromart's shortcode, with that lender's balance behind it.
+      </p>
+    </div>
+  </div>
+
+  <p>
+    On a shared ServiceSuite instance this is a tenancy breach rather than a
+    cosmetic bug, and it will get worse with every lender added to the instance,
+    not better.
+  </p>
+
+  <!-- ── F6 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F6</span>
+      <h3>The branch gate inside the product proc strands 529 Fintech borrowers</h3>
+      <span class="chip high">High</span>
+    </div>
+  </div>
+
+  <p>
+    <code>sp_ussdGetproducts</code> applies a scope the C# has no idea exists. It
+    looks up the borrower's branch and requires the product to list that branch:
+  </p>
+
+  <pre class="bad">SET @EntityUnit = (SELECT EntityUnit FROM Borrowers
+                   WHERE EntityId = @EntityId AND PhoneNumber = @Phone)
+
+SELECT ID, ProductName, UssdOrder FROM Products
+WHERE IsActive = 1 AND CategoryId = @CategoryId AND EntityId = @EntityId
+  <span class="x">AND CHARINDEX(',' + CONVERT(VARCHAR(MAX), @EntityUnit) + ',',
+                CONCAT(',', EntityUnits, ',')) &gt; 0</span></pre>
+
+  <p>
+    Micromart Fintech's two USSD-visible products both carry
+    <code>EntityUnits = '0,129'</code>. Its borrowers are distributed across four
+    branches:
+  </p>
+
+  <table class="compact">
+    <thead><tr><th>Branch (EntityUnit)</th><th class="num">Borrowers</th><th>Listed on the products?</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">129</td><td class="num">16,493</td><td><span class="chip med">yes — products appear</span></td></tr>
+      <tr><td class="mono">35</td><td class="num">417</td><td><span class="chip crit">no — empty menu</span></td></tr>
+      <tr><td class="mono">25</td><td class="num">108</td><td><span class="chip crit">no — empty menu</span></td></tr>
+      <tr><td class="mono">1</td><td class="num">4</td><td><span class="chip crit">no — empty menu</span></td></tr>
+    </tbody>
+  </table>
+
+  <p>
+    <strong>529 Fintech borrowers — 3.1% of the book — reach the product menu and
+    are shown nothing</strong>, in the two categories that do have products.
+    Nothing in the application layer can detect this: the proc returns zero rows
+    and the app renders a header. Worse, if the borrower has no row for the entity
+    being queried at all, <code>@EntityUnit</code> is <code>NULL</code>, the
+    <code>CHARINDEX</code> comparison evaluates to <code>NULL</code>, and the
+    predicate silently excludes everything — which is the mechanism by which F3's
+    entity zero produces an empty menu rather than an error.
+  </p>
+
+  <p>
+    This is a data fix, not a code fix, and it should be Micromart's call: either
+    add branches 1, 25 and 35 to the two products' <code>EntityUnits</code>, or
+    move those 529 borrowers into branch 129. But the application should also stop
+    rendering an empty menu — see §4.3.
+  </p>
+
+  <!-- ── F7 ─────────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F7</span>
+      <h3>The KES 3,000 floor is enforced, then thrown away</h3>
+      <span class="chip high">High</span>
+    </div>
+  </div>
+
+  <p>
+    <code>sp_UssdInsertLoan</code> declines anything under KES&nbsp;3,000 and
+    returns a row saying so. Its own header comment is explicit that the app
+    ignores it — and it does:
+  </p>
+
+  <pre class="bad"><span class="c">-- in the proc</span>
+IF (@Principal &lt; 3000)
+BEGIN
+    SELECT 0 AS LoanID, 9 AS Code,
+           <span class="g">'Amount applied must be at least 3000'</span> AS Response;
+    RETURN
+END
+
+<span class="c">// in the controller</span>
+cmd.<span class="x">ExecuteNonQuery</span>();          <span class="c">// ← the decline row is discarded</span>
+<span class="k">return</span> <span class="g">"END Your request has been received and is being processed."</span>;</pre>
+
+  <p>
+    A customer applying for KES&nbsp;2,000 is told their application succeeded.
+    Nothing is booked, nothing is queued, and no one is notified. The floor is not
+    surfaced anywhere on the amount screen either, so there is no way for the
+    customer to have known.
+  </p>
+
+  <p>
+    The same procedure accepts a <code>@SelectedPeriod</code> parameter that the
+    USSD flow never collects, so every USSD loan takes whatever tenor
+    <code>sp_InsertLoan</code> defaults to. That is worth a conversation with
+    Micromart before it is treated as a defect — it may be deliberate.
+  </p>
+
+  <!-- ── F8 / F9 ────────────────────────────────────────────────────────── -->
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F8</span>
+      <h3>The endpoint is open and the PIN has no attempt limit</h3>
+      <span class="chip high">High</span>
+    </div>
+  </div>
+
+  <p>
+    <code>POST /ussd/service</code> has no authentication filter, no IP
+    restriction, and no shared secret. Africa's Talking does not sign its posts, so
+    something has to stand in for that, and nothing does. Anyone who discovers the
+    URL can post any <code>phoneNumber</code> with any <code>text</code>.
+  </p>
+
+  <p>
+    They still need the PIN — but the PIN is four digits, there is no lockout, no
+    attempt counter, and no rate limit. Ten thousand posts exhausts the keyspace
+    for a chosen customer, after which the attacker can read balances, trigger STK
+    prompts, and submit loan applications in that customer's name. Bcrypt at work
+    factor 12 is the only thing slowing this down, and it was chosen to protect the
+    hash at rest, not to serve as a rate limiter.
+  </p>
+
+  <p>
+    Three mitigations, in order of value: allow-list Africa's Talking's egress
+    addresses at the firewall or reverse proxy; move the callback to an
+    unguessable path segment carrying a shared secret; and add a per-MSISDN attempt
+    counter that locks the PIN after five failures. The first two are configuration
+    and can be done this week.
+  </p>
+
+  <div class="finding wide">
+    <div class="finding-head">
+      <span class="finding-id">F9</span>
+      <h3>Two smaller defects that will show up under load</h3>
+      <span class="chip med">Medium</span>
+    </div>
+  </div>
+
+  <p>
+    <strong>The STK response is discarded.</strong>
+    <code>InitiateStkPush</code> returns <code>"Failed to retrieve STK
+    parameters."</code> when the entity has no Daraja row, and returns Safaricom's
+    raw response body otherwise. <code>InitiatePayment</code> ignores the return
+    value entirely and reports success unless an exception was thrown. A rejected
+    STK push — wrong shortcode, expired passkey, throttled — reads to the customer
+    as <em>"Wait for the M-Pesa prompt"</em>. Both Micromart books currently have
+    valid rows, so this is latent rather than active, and it will become active the
+    first time a new lender is onboarded without one.
+  </p>
+
+  <p>
+    <strong>The log writer is not concurrency-safe.</strong>
+    <code>WriteLog</code> is registered as a singleton and opens the day's file
+    with <code>FileShare.Read</code> on every request that carries input — which is
+    most of them. Two concurrent sessions means the second request throws
+    <code>IOException</code> and returns a 500, which Africa's Talking renders to
+    the customer as a dead session. This is invisible at low volume and guaranteed
+    at high volume. It also writes to <code>C:\Logs\ussd\</code>, a hardcoded path
+    that ties the service to a Windows host.
+  </p>
+
+  <p>
+    Relatedly, <code>Payments</code> constructs <code>new HttpClient()</code> per
+    STK push, exhausting sockets under load. All three are standard fixes: a lock
+    or a logging framework, and an injected <code>IHttpClientFactory</code>.
+  </p>
+
+  <h3 class="wide">What the ledger says</h3>
+
+  <div class="note verified">
+    <b>A by-product worth collecting</b>
+    All 25 carry <code>Loans.ChannelUsed = 1</code> — the first hard evidence for
+    any value of a column the analytics studio renders as raw codes, for want of a
+    lookup table. It proves containment, not equivalence: channel 1 holds 99,415
+    loans on 3002 alone.
+  </div>
+
+  <p>
+    Every loan this service books passes through <code>sp_UssdInsertLoan</code>,
+    which stamps it <code>CreatedBy = 483993</code> — a synthetic user id standing
+    in for the channel. That signature makes USSD-originated lending countable, and
+    the count is the shortest possible statement of the problem:
+  </p>
+
+  <table class="wide compact">
+    <thead><tr><th>Loans stamped <code>CreatedBy = 483993</code></th><th class="num">3002 · Micromart Africa</th><th class="num">3005 · Micromart Fintech</th></tr></thead>
+    <tbody>
+      <tr><td>Booked through USSD</td><td class="num">25</td><td class="num">0</td></tr>
+      <tr><td>Most recent</td><td class="num">2 Sep 2026, 11:42</td><td class="num">—</td></tr>
+    </tbody>
+  </table>
+
+  <p class="tnote wide">
+    <b>Read conservatively</b>
+    <code>sp_UssdInsertLoan</code> was revised recently to track the BuySimu build,
+    so this counts loans booked since that revision rather than every USSD loan
+    ever written. The asymmetry is the point, not the absolute number.
+  </p>
+
+  <div class="callout halt wide">
+    <span class="lead">The channel works. It has never worked for the Fintech book.</span>
+    <p>
+      Twenty-five applications reached the ledger, the most recent at 11:42 on the
+      morning this was written — so the endpoint, the PIN gate, the product lookup
+      and the booking path all function. Not one of them landed on 3005. That is
+      exactly what F1, F3 and F6 predict, and it is what Micromart reported from
+      the other end of the phone.
+    </p>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ 4</span>The fix</h2>
+
+  <p class="lede">
+    Every defect from F1 to F6 is the same defect wearing different clothes:
+    <strong>the entity is re-derived, late, at each call site, instead of being
+    resolved once and carried.</strong> This is precisely the shape of the bug
+    already fixed in the borrower PWA, where four different notions of "entity"
+    coexisted in one app and only one of them was right. The remedy there was a
+    single module that owns the answer. The remedy here is the same.
+  </p>
+
+  <h3>4.1 · Resolve once, at the top, and carry it</h3>
+
+  <p>
+    The controller already has everything it needs by line 4 of
+    <code>HandleUssd</code>: the normalised MSISDN, the service code, and the text.
+    Resolve the book there, once, and pass it down. Nothing below should ever call
+    <code>GetEntityId</code> again.
+  </p>
+
+  <pre class="good"><span class="c">/// The book this session is in. Resolved once per request, never re-derived.</span>
+<span class="k">public sealed record</span> UssdContext(
+    <span class="k">string</span> Phone,
+    <span class="k">int</span>    EntityId,      <span class="c">// the book. Never 0, never guessed.</span>
+    <span class="k">int</span>    EntityUnit,    <span class="c">// the branch — sp_ussdGetproducts needs it</span>
+    <span class="k">string</span> LenderName,
+    <span class="k">bool</span>   MultiBook);
+
+<span class="c">/// Resolution order, most authoritative first:</span>
+<span class="c">///   1. the entity the customer explicitly selected this session</span>
+<span class="c">///   2. the entities this SERVICE CODE may serve  (§6.1 — closes F5)</span>
+<span class="c">///   3. the borrower's own row, when there is exactly one</span>
+<span class="c">/// If none of those yields exactly one book, ASK. Never fall through to a</span>
+<span class="c">/// literal, and never to an unordered TOP 1.</span></pre>
+
+  <div class="note">
+    <b>Why this matters more than the individual fixes</b>
+    Patch F1–F6 one by one and they come back with the next feature. Introduce
+    <code>UssdContext</code> and there is no longer a place to put the bug: there
+    is one entity in scope and it was resolved before the routing began.
+  </div>
+
+  <p>
+    Two rules make the difference between this holding and quietly rotting again:
+  </p>
+
+  <ol>
+    <li><strong>An unresolved entity is an error, not a zero.</strong> The reason
+      F3 was invisible for so long is that entity <code>0</code> produces an empty
+      menu, and an empty menu is indistinguishable from "this customer has no
+      eligible products". Fail loudly instead.</li>
+    <li><strong>No <code>TOP 1</code> without an <code>ORDER BY</code>.</strong>
+      There are three of them today, in <code>GetEntityId</code>,
+      <code>Login.ValidatePin</code> and <code>sp_CompanyName</code>. Each returns
+      whichever row the query plan reaches first, which is stable until the day an
+      index changes and then is not.</li>
+  </ol>
+
+
+
+  <h3>4.2 · The C# changes</h3>
+
+  <table class="wide compact">
+    <thead><tr><th style="width:11mm">ID</th><th style="width:46mm">Where</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">F2</td><td class="mono">ServiceController.ConfirmNewPin</td><td>Add <code>AND EntityId = @entityId</code> to the <code>UPDATE</code>. One line, and the highest-value line in this table.</td></tr>
+      <tr><td class="mono">F2</td><td class="mono">Login.ValidatePin / UssdPinStatus</td><td>Take the entity as a parameter; add it to both <code>WHERE</code> clauses; drop the bare <code>TOP 1</code>.</td></tr>
+      <tr><td class="mono">F3</td><td class="mono">ServiceController.GetProducts</td><td>Read the selected entity from <code>parts[1]</code> for multi-book customers instead of passing <code>0</code>. Better: take it from <code>UssdContext</code> and delete the argument.</td></tr>
+      <tr><td class="mono">F4</td><td class="mono">HandleLevel5 / HandleLevel6</td><td>Add the multi-book branch at level 5 (prompt for amount) and a level 6 handler (book the loan). Both are near-copies of the existing single-book arms with the index shifted by one.</td></tr>
+      <tr><td class="mono">F7</td><td class="mono">ServiceController.HandleLevel5</td><td><code>ExecuteScalar</code> instead of <code>ExecuteNonQuery</code>; branch on the returned code; surface the decline text. Also state the minimum on the amount screen.</td></tr>
+      <tr><td class="mono">F9</td><td class="mono">InitiatePayment</td><td>Inspect the string <code>InitiateStkPush</code> returns and the Safaricom <code>ResponseCode</code> before promising a prompt.</td></tr>
+      <tr><td class="mono">F9</td><td class="mono">WriteLog</td><td>Replace with <code>ILogger</code> and a rolling file sink, or take a lock. Remove the hardcoded <code>C:\Logs\ussd\</code>.</td></tr>
+      <tr><td class="mono">F9</td><td class="mono">Payments</td><td>Inject <code>IHttpClientFactory</code>; stop constructing <code>HttpClient</code> per call.</td></tr>
+      <tr><td class="mono">F8</td><td class="mono">Program.cs / hosting</td><td>IP allow-list, secret path segment, PIN attempt counter. Also reconsider <code>UseHttpsRedirection()</code> — if AT is registered against an <code>http</code> URL, the redirect can cost the POST body.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.3 · The SQL changes</h3>
+
+  <p>
+    F1 and F5 cannot be fixed in C# alone. Both need the procedures to learn about
+    the entity.
+  </p>
+
+  <pre class="good"><span class="c">-- F1: categories that actually contain something this customer can be sold.</span>
+<span class="c">-- New proc rather than an edit, so nothing else that reads ProductCategories</span>
+<span class="c">-- is affected. ProductCategories keeps no EntityId; Products supplies the scope.</span>
+CREATE PROCEDURE dbo.sp_UssdGetCategories
+    @EntityId INT, @Phone VARCHAR(20)
+AS
+BEGIN
+    DECLARE @Unit INT = (SELECT EntityUnit FROM Borrowers
+                         WHERE EntityId = @EntityId
+                           AND PhoneNumber = @Phone);
+
+    SELECT DISTINCT c.ID, c.CategoryName
+    FROM   ProductCategories c
+    JOIN   Products p ON p.CategoryId = c.ID
+    WHERE  p.EntityId = @EntityId
+      AND  p.IsActive = 1
+      AND  p.UssdOrder IS NOT NULL
+      AND  CHARINDEX(',' + CONVERT(VARCHAR(MAX), @Unit) + ',',
+                     CONCAT(',', p.EntityUnits, ',')) &gt; 0
+    ORDER BY c.ID;
+END</pre>
+
+  <p>
+    Note what this does beyond fixing F1. Because it applies the same
+    <code>EntityUnits</code> and <code>IsActive</code> predicates as
+    <code>sp_ussdGetproducts</code>, <strong>a category can no longer be listed
+    unless the product list behind it will be non-empty</strong> — which closes the
+    user-visible half of F6 for free. A Fintech customer in branch 35 sees no
+    categories at all rather than six that lead nowhere, and the service can say
+    so plainly instead of showing a header over emptiness.
+  </p>
+
+  <p>
+    On the live data this reduces the Fintech category menu from six items to two —
+    <span class="mono">BUSINESS LOAN-WEEKLY</span> and
+    <span class="mono">BUSINESS LOAN-MONTHLY</span> — and the main book's from six
+    to three. It also drops the screen from 159 characters to well under half the
+    budget.
+  </p>
+
+  <pre class="good"><span class="c">-- F5: only the books this operator is allowed to serve.</span>
+<span class="c">-- @AllowedEntities is a comma list supplied by the app from the service-code</span>
+<span class="c">-- registry (§6.1), so Axe Capital can never appear on Micromart's shortcode.</span>
+ALTER PROCEDURE dbo.GetCustomerCompanies
+    @phone VARCHAR(20), @AllowedEntities VARCHAR(200)
+AS
+BEGIN
+    SET @phone = '254' + RIGHT(@phone, 9);
+    SELECT bs.ID, bs.EntityName
+    FROM   Borrowers b
+    JOIN   BsEntity  bs ON bs.ID = b.EntityId
+    WHERE  b.PhoneNumber = @phone
+      AND  CHARINDEX(',' + CONVERT(VARCHAR(20), b.EntityId) + ',',
+                     ',' + @AllowedEntities + ',') &gt; 0
+    ORDER BY bs.EntityName;
+END</pre>
+
+  <p>
+    <code>sp_checkCustomerCompomany</code> needs the same treatment — its count
+    must be restricted to the allowed entities, or a customer with one Micromart
+    account and one Axe account will still be misclassified as multi-book and sent
+    down the broken path.
+  </p>
+
+  <p>
+    Finally, the lender menu should present <em>ordinals</em>, not entity ids. A
+    customer should key <code>1</code> or <code>2</code>, and the service should
+    map that back to the entity. Keying <code>3005</code> works today only because
+    <code>HandleLevel2</code> parses the keypress as an <code>EntityId</code>
+    directly, which is also what makes the menu unsafe to reorder.
+  </p>
+
+  <h3>4.4 · What not to change</h3>
+
+  <div class="callout halt">
+    <span class="lead">Leave these alone until someone confirms them</span>
+    <p>
+      <strong>The <code>EntityUnits</code> data.</strong> Adding branches 1, 25 and
+      35 to the Fintech products makes 529 borrowers eligible for credit they are
+      not eligible for today. That is a lending decision, not a bug fix. Surface it
+      to Micromart and let them decide.
+    </p>
+    <p>
+      <strong>The <code>@SelectedPeriod</code> default.</strong> USSD loans
+      currently take <code>sp_InsertLoan</code>'s default tenor. Collecting a period
+      on the menu changes the terms of every USSD loan booked afterwards.
+    </p>
+    <p>
+      <strong>The Triple-DES / MD5 <code>Decipher</code>.</strong> It is weak, and
+      it is what the existing <code>Stkparams</code> ciphertext was written with.
+      Replacing the algorithm requires re-encrypting live Daraja credentials for
+      every entity; do that as its own migration, never as part of this work.
+    </p>
+  </div>
+
+  <p>
+    This is the same restraint applied to <code>registerFCM</code> in the PWA,
+    where <code>PhoneNumber: fcmToken</code> looked like swapped fields but could
+    not be corrected without knowing what the backend had actually been storing.
+    Fixing what is provably wrong and flagging what merely looks wrong is the
+    difference between a safe change and an outage.
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ 5</span>Reuse this repository, or start a new one?</h2>
+
+  <p class="lede">
+    <strong>Both — in that order.</strong> Patch this one in place for Micromart,
+    because it is carrying live traffic and 15,472 enrolled PINs. Build a new one
+    for everybody else, because this one cannot be made multi-tenant without
+    becoming a different program.
+  </p>
+
+  <h3>5.1 · Why not simply fix this one and reuse it</h3>
+
+  <table class="wide">
+    <thead><tr><th style="width:44mm">Obstacle</th><th>Why it blocks reuse</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>It is somebody else's repository</td>
+        <td><code>skegode/ATusersUssdApI</code> is upstream, the same relationship the ecosystem has with <code>PBXAuthentication</code>: tracked read-only, never pushed to. Every ecosystem change would be a pull request into a repo whose release cadence we do not control.</td>
+      </tr>
+      <tr>
+        <td>It is a single-tenant deployment artifact</td>
+        <td>One connection string in <code>appsettings.json</code>, one log path, one publish profile pointing at a named person's Desktop. Adding a lender means a second deployment, a second server, a second set of credentials to rotate.</td>
+      </tr>
+      <tr>
+        <td>Tenancy is not a parameter anywhere</td>
+        <td><code>serviceCode</code> arrives on every request and is written to a log file. There is no registry, no per-tenant configuration, and no place to put one that is not a new module.</td>
+      </tr>
+      <tr>
+        <td>The menu is hard-coded C#</td>
+        <td>Five level handlers with the menu tree expressed as <code>switch</code> arms and string concatenation. A lender who wants a different menu order needs a code change and a redeploy.</td>
+      </tr>
+      <tr>
+        <td>No tests, and a live channel underneath</td>
+        <td>276,518 loans on one book and 61,549 on the other, both booking today. Restructuring it is not a refactor, it is an outage risk.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 · The recommendation</h3>
+
+  <ol class="steps">
+    <li>
+      <b>Patch <code>ATusersUssdApI</code> in place, minimally.</b>
+      F2, F3, F5 and F1 — the four that are actively wrong for Micromart — plus the
+      F8 configuration mitigations. No restructuring, no <code>UssdContext</code>
+      refactor if it cannot be done safely, no new dependencies. Two to three days
+      including a rehearsal against a copy of the database. This is the deliverable
+      Micromart is asking for.
+    </li>
+    <li>
+      <b>Stand up <code>micro-eazy-ussd</code> as a new ecosystem repository.</b>
+      Multi-tenant from the first commit, registered in
+      <code>ecosystem/registry.json</code> like every other system, with the tenant
+      model of §6 rather than one bolted on later. Port the parts of this service
+      that are genuinely good — and there are several — and rebuild the rest.
+    </li>
+    <li>
+      <b>Prove it on the second lender, not on Micromart.</b>
+      Point a new Africa's Talking channel at it for whichever client comes next.
+      Micromart migrates only once the new service has run somebody else's book for
+      a month. Their channel is the one thing in this picture that must not break.
+    </li>
+  </ol>
+
+  <h3>5.3 · What to port, what to leave</h3>
+
+  <table class="wide compact">
+    <thead><tr><th style="width:31%">Port as-is</th><th style="width:31%">Port with changes</th><th>Leave behind</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>
+          <code>PhoneHelper.Normalize</code> — correct and total<br><br>
+          <code>NormalizeParts</code> back/exit semantics<br><br>
+          Routing on <code>parts.Length</code><br><br>
+          The CON/END discipline<br><br>
+          Queue-and-confirm for anything slow
+        </td>
+        <td>
+          The five-level menu tree → menu-as-data (§6.3)<br><br>
+          The PIN gate → add entity scope and a lockout<br><br>
+          The STK call → check the response<br><br>
+          <code>sp_GetolbOrLoanLimit</code> and <code>sp_GetUssdStkParams</code>, which are already correctly scoped
+        </td>
+        <td>
+          <code>WriteLog</code> and <code>C:\Logs\ussd\</code><br><br>
+          The <code>UssdSession</code> table — derive enrolment position from <code>text</code><br><br>
+          <code>GetEntityId</code> in its entirety — replaced by the resolver<br><br>
+          <code>LoanApplication.InsertLoan</code>, which is dead code calling a proc nothing invokes<br><br>
+          The MD5 + Triple-DES <code>Decipher</code>, in the new service only, with fresh credentials
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>5.4 · What to build it in</h3>
+
+  <p>
+    <strong>TypeScript, as its own small service.</strong> The reason to rebuild at
+    all is to inherit the ecosystem's tenant discipline, and that discipline is
+    already written down in
+    <code>connected-suite/src/lib/enterprise/connections.ts</code> — an org
+    registry mapping a slug to an <code>EntityId</code> and a connection string,
+    resolved server-side, with the client never seeing a raw entity id. Rewriting
+    that in C# to keep the .NET stack means maintaining two copies of the one thing
+    that must never disagree.
+  </p>
+
+  <p>
+    Against that, one real constraint: <strong>USSD has a latency budget of a few
+    seconds and no room for an extra hop.</strong> The Connected Suite reaches
+    ServiceSuite over a relay when direct TDS is unavailable, and a relay round
+    trip inside a USSD session is a session that dies. The new service should hold
+    a direct TDS connection from a host with a route to the database, with the
+    relay as failover only — the same "list of roads" the suite already
+    implements, ordered differently because the deadline is harder.
+  </p>
+
+  <p>
+    If that route cannot be guaranteed, the argument flips: keep .NET, deploy it
+    beside ServiceSuite on IIS, and port <code>connections.ts</code>'s <em>model</em>
+    rather than its code. The tenancy design in §6 is language-independent; it is
+    the discipline that has to carry over, not the syntax.
+  </p>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ 6</span>Making it reusable across the ecosystem</h2>
+
+  <p class="lede">
+    A Micro&nbsp;Eazy client buying "the USSD product" should get a shortcode, a row
+    in a registry, and their own menu — with no fork, no redeploy, and no second
+    server. Three changes get there, and the first one is already sitting in the
+    request payload.
+  </p>
+
+  <h3>6.1 · <code>serviceCode</code> is the tenant key, and it is free</h3>
+
+  <p>
+    Africa's Talking already tells you, on every single request, which shortcode the
+    customer dialled. One channel per lender, one callback URL for all of them, and
+    the tenant is <code>request.serviceCode</code>. This service captures the field
+    in <code>UssdRequest</code> and uses it exactly once — to write it to a log
+    line.
+  </p>
+
+  <pre class="good"><span class="c">// The registry. One entry per lender — mirrors ORGS in connections.ts.</span>
+<span class="k">export const</span> CHANNELS = {
+  <span class="g">"*384*4001#"</span>: { slug: <span class="g">"micromart"</span>,
+                  entities: [3002, 3005],
+                  conn: <span class="g">"SERVICESUITE_CONN_MICROMART"</span> },
+
+  <span class="g">"*384*4002#"</span>: { slug: <span class="g">"axe"</span>,
+                  entities: [3003, 3004],
+                  conn: <span class="g">"SERVICESUITE_CONN_AXE"</span> },
+
+  <span class="g">"*384*4003#"</span>: { slug: <span class="g">"njb"</span>,
+                  entities: [3],
+                  conn: <span class="g">"SERVICESUITE_CONN_BUYSIMU"</span> },
+};
+
+<span class="c">// Resolution becomes a lookup instead of a guess, and F5 becomes impossible:</span>
+<span class="c">// a book that is not in this channel's `entities` cannot be reached from it,</span>
+<span class="c">// however many books the customer's phone number appears in.</span></pre>
+
+  <p>
+    Two things fall out of this immediately. The lender-selection menu can be
+    intersected with the channel's entities, which closes F5 by construction rather
+    than by a <code>WHERE</code> clause someone has to remember. And a single
+    deployment serves every client, because the connection string, the entity list
+    and the branding all hang off the same lookup.
+  </p>
+
+  <div class="note">
+    <b>Onboarding, after this change</b>
+    Request a channel from Africa's Talking, point it at the existing callback,
+    add one registry row, add the connection string to the environment. No
+    deployment, no code.
+  </div>
+
+  <h3>6.2 · One entity model, shared with the rest of the ecosystem</h3>
+
+  <p>
+    The registry above is deliberately the same shape as
+    <code>ORGS</code> in <code>connections.ts</code>: a slug, a default
+    <code>EntityId</code>, an env var holding the connection string, an env var
+    that overrides the entity per deployment. The USSD service should not invent a
+    second one. Where the two must differ is that a channel maps to a
+    <em>list</em> of entities rather than one, because a lender with two books
+    genuinely has two and the customer picks.
+  </p>
+
+  <p>
+    The rule the whole ecosystem already follows, and which this service should
+    adopt verbatim: <strong>one connection per organisation, scoped by
+    EntityId.</strong> Both Micromart books live on one SQL Server; the entity is
+    what scopes the read, not the credential.
+  </p>
+
+  <h3>6.3 · Menus as data</h3>
+
+  <p>
+    The five level handlers encode Micromart's menu as C# control flow. The next
+    lender will want a different order, different wording, Swahili, or a product
+    tree one level shallower. Express the tree as data instead — a list of screens,
+    each with a prompt, a source (static, or a query), and a target — and the level
+    handlers collapse into one interpreter that walks the tree using
+    <code>parts.Length</code> as the cursor. The screen budget of §1.5 becomes a
+    property the interpreter enforces, with pagination for free.
+  </p>
+
+  <p>
+    This is also what makes the <code>0</code>/<code>00</code> convention testable.
+    Today it is correct; there is nothing stopping the next edit from breaking it.
+  </p>
+
+  <h3>6.4 · Next steps, in order</h3>
+
+  <table class="wide compact">
+    <thead><tr><th style="width:8mm"></th><th style="width:60mm">Step</th><th style="width:22mm">Effort</th><th>Unblocks</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">01</td><td>Confirm the AT channel, session timeout and callback URL for Micromart's shortcode</td><td>hours</td><td>Everything — and it is currently undocumented</td></tr>
+      <tr><td class="mono">02</td><td>Patch F2 (PIN entity scope) and F3 (entity zero)</td><td>1 day</td><td>The credential bug and the empty product menu</td></tr>
+      <tr><td class="mono">03</td><td>Add <code>sp_UssdGetCategories</code>; point the app at it</td><td>1 day</td><td>F1 and the visible half of F6 — the reported complaint</td></tr>
+      <tr><td class="mono">04</td><td>Scope <code>GetCustomerCompanies</code> and <code>sp_checkCustomerCompomany</code> to allowed entities</td><td>1 day</td><td>F5, the cross-lender leak</td></tr>
+      <tr><td class="mono">05</td><td>IP allow-list plus a secret path segment on the callback</td><td>hours</td><td>F8's first two mitigations — configuration only</td></tr>
+      <tr><td class="mono">06</td><td>Take the <code>EntityUnits</code> question to Micromart for a decision</td><td>—</td><td>The 529 stranded Fintech borrowers</td></tr>
+      <tr><td class="mono">07</td><td>Fix F4 (multi-book levels 5 and 6) and F7 (the KES 3,000 floor)</td><td>2 days</td><td>The 43 dual-book customers; silent application drops</td></tr>
+      <tr><td class="mono">08</td><td>Create <code>micro-eazy-ussd</code>; register it in <code>ecosystem/registry.json</code></td><td>1 day</td><td>The rebuild has somewhere to live</td></tr>
+      <tr><td class="mono">09</td><td>Build the channel registry and the entity resolver; port the good parts</td><td>1 week</td><td>Multi-tenancy, and F1–F6 by construction</td></tr>
+      <tr><td class="mono">10</td><td>Menu-as-data interpreter with a 182-character budget and pagination</td><td>1 week</td><td>Per-lender menus with no redeploy</td></tr>
+      <tr><td class="mono">11</td><td>Run the next client's channel on the new service; leave Micromart where it is</td><td>—</td><td>Proof, without risking a live book</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="lead">The one thing to decide first</span>
+    <p>
+      Steps 02–07 patch a repository we do not own, on a live channel, for one
+      client. Steps 08–11 build the thing every client after Micromart will use.
+      They are independent and can run in parallel, but only if it is agreed up
+      front that <strong>the patches are deliberately throwaway</strong> — no
+      refactoring, no architecture, nothing that needs porting later. Otherwise the
+      patch work quietly becomes the rebuild, on somebody else's repository, under
+      a live shortcode.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════ -->
+
+<section class="block part">
+  <h2 class="wide"><span class="num">§ A</span>Appendix — the verification queries</h2>
+
+  <p>
+    Every figure in §3 came from these, run against Micromart's ServiceSuite through
+    the Connected Suite's read-only connection on 2&nbsp;September&nbsp;2026. They
+    are reproduced so the findings can be re-checked, and so the same checks can be
+    run against any other book before that lender is onboarded.
+  </p>
+
+  <h4>Which books this deployment can reach, and how many are enrolled</h4>
+  <pre>SELECT EntityId,
+       COUNT(*) AS borrowers,
+       SUM(CASE WHEN UssdPin IS NOT NULL AND UssdPin &lt;&gt; ''
+                THEN 1 ELSE 0 END) AS withPin
+FROM   Borrowers
+GROUP BY EntityId ORDER BY COUNT(*) DESC;</pre>
+
+  <h4>F2 / F5 — numbers that exist in more than one book</h4>
+  <pre>SELECT a.EntityId AS entA, b.EntityId AS entB, COUNT(*) AS phones
+FROM   Borrowers a
+JOIN   Borrowers b ON b.PhoneNumber = a.PhoneNumber AND a.EntityId &lt; b.EntityId
+WHERE  a.PhoneNumber IS NOT NULL AND LEN(a.PhoneNumber) &gt; 8
+GROUP BY a.EntityId, b.EntityId ORDER BY COUNT(*) DESC;</pre>
+
+  <h4>F1 / F6 — what each category actually offers, per book</h4>
+  <pre><span class="c">-- Replays sp_ussdGetproducts' own predicates for a real enrolled borrower.</span>
+<span class="c">-- Swap 3005 for any entity to check a book before onboarding it.</span>
+SELECT c.ID AS categoryId, c.CategoryName,
+  (SELECT COUNT(*) FROM Products p
+   WHERE p.IsActive = 1 AND p.CategoryId = c.ID AND p.EntityId = 3005
+     AND CHARINDEX(',' + CONVERT(VARCHAR(MAX),
+           (SELECT TOP 1 EntityUnit FROM Borrowers
+            WHERE EntityId = 3005 AND UssdPin IS NOT NULL)) + ',',
+         CONCAT(',', p.EntityUnits, ',')) &gt; 0) AS productsOffered
+FROM ProductCategories c ORDER BY c.ID;</pre>
+
+  <h4>F6 — the branch distribution against the products' EntityUnits</h4>
+  <pre>SELECT EntityUnit, COUNT(*) AS borrowers FROM Borrowers
+WHERE  EntityId = 3005 GROUP BY EntityUnit ORDER BY COUNT(*) DESC;
+
+SELECT ID, ProductName, CategoryId, UssdOrder, IsActive, EntityUnits
+FROM   Products WHERE EntityId = 3005;</pre>
+
+  <h4>Reading the procedures rather than assuming them</h4>
+  <pre>SELECT OBJECT_DEFINITION(OBJECT_ID('dbo.sp_ussdGetproducts'));
+<span class="c">-- and the other seven: sp_checkCustomerCompomany, sp_CompanyName,</span>
+<span class="c">-- GetCustomerCompanies, sp_GetolbOrLoanLimit, sp_UssdInsertLoan,</span>
+<span class="c">-- sp_GetUssdStkParams, sp_ussdsession</span></pre>
+
+  <hr class="soft">
+
+  <p style="font-family:var(--sans);font-size:8pt;color:var(--ink-3)">
+    Source repository: <code>skegode/ATusersUssdApI</code> at <code>343d10b</code> ·
+    16 files, 936 lines · .NET 9 · Dapper, RestSharp, BCrypt.Net, Microsoft.Data.SqlClient.
+    Database evidence read through <code>connected-suite/src/lib/enterprise/mssql.ts</code>
+    under the read-only guard. No writes were made to any book.
+  </p>
+</section>

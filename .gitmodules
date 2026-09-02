@@ -18,3 +18,7 @@
 	path = micro-eazy-app
 	url = https://github.com/emmanuel-arch/micro-eazy-app.git
 	branch = main
+[submodule "ATusersUssdApI"]
+	path = ATusersUssdApI
+	url = https://github.com/skegode/ATusersUssdApI
+	branch = master
