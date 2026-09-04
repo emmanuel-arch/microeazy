@@ -84,6 +84,9 @@ this whole bundle, just `scripts\crb-relay.mjs` and a `.env` one level above it.
 
 ```powershell
 npm install
+
+powershell -ExecutionPolicy Bypass -File check-host.ps1
+
 ```
 
 `package-lock.json` is included, so this installs the exact versions that were
