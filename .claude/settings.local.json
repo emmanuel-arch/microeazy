@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 10 curl -s --max-time 8 -o /dev/null -w \"code=%{http_code} size=%{size_download} redirect=%{redirect_url}\\\\n\" \"http://100.115.241.36/\")",
+      "Bash(timeout 10 curl -s --max-time 8 \"http://100.115.241.36/\")",
+      "Bash(timeout 10 curl -sI --max-time 8 \"http://100.115.241.36/\")"
+    ]
+  }
+}
