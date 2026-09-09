@@ -93,11 +93,44 @@ rather than Micromart's shelf.
 
 ### What changed
 
+### One book was the wrong shape
+
+My first pass pinned the build to 3005. That was wrong, and it would have locked
+out every Micromart Africa customer. **This app serves both books**, and which
+one a customer is on is a fact about the customer, not about the build.
+
+The original brief said exactly this: look the customer up, in both → contact
+admin, in one → scope to it, in neither → register.
+
+It also turned out that correcting `VITE_ENTITY_ID` could never have worked.
+Four screens — **Login, Password, Register and Settings** — never imported
+`lib/entity` at all. Each carried its own `const entityId = "3002"`. Sign-in was
+pinned to the field book no matter what any env file said, which is why a
+Fintech customer could not log in and why a Fintech password reset went nowhere.
+
 | File | Change |
 |---|---|
+| `src/lib/entity.js` | Rewritten. `MICROMART_ENTITIES` (the books to search), `DEFAULT_ENTITY_ID` (pre-sign-in branding only), `REGISTRATION_ENTITY_ID` (where a new customer joins). Three ideas that were previously one number |
+| `src/lib/signin.js` | **New.** `signInAcrossBooks()` probes every book in parallel and returns `ok` / `ambiguous` / `none` / `unreachable`. `resetPasswordAcrossBooks()` walks them **one at a time** |
+| `src/lib/session.js` | **New.** The session now carries `entityId`; `activeEntityId()` is the single reader |
+| `src/pages/Login.jsx` | Uses the probe. Both books → "contact our office". Neither → the API's own message. Unreachable → says so |
+| `src/pages/Password.jsx` | Uses the sequential reset. Also now *shows* failures — it used to log to the console and leave a stopped spinner |
+| `src/pages/Settings.jsx` | Change-password targets the signed-in customer's book |
+| `src/pages/Register.tsx` | New registrations join `REGISTRATION_ENTITY_ID` (3005) |
+| `Loan.jsx`, `LoanApplication.jsx`, `notificationPermission.js`, `App.jsx` | Read `activeEntityId()` instead of a build constant |
 | `src/lib/realm.js` | **New.** A cutover guard — see below |
 | `src/main.jsx` | Calls `enforceRealm()` before React renders |
-| `.env` | Dev entity `3002` → `3005`, matching `.env.production` |
+| `.env`, `.env.production` | `VITE_ENTITY_ID` → `VITE_ENTITY_IDS=3002,3005` + `VITE_REGISTRATION_ENTITY_ID=3005` |
+
+**Why the reset path is sequential.** Login has no side effect, so asking both
+books at once is free. Reset mints a password and sends an SMS — a parallel
+probe would send a dual-book customer two different passwords with no way to
+tell which is which. It stops at the first book that answers.
+
+That does mean a genuinely dual-book customer is reset on the first book only
+and never learns they are on two. Detecting that without a side effect needs an
+account-existence endpoint the API does not have. It is transitional: scripts 04
+and 05 remove the case itself, which is the real fix.
 
 **Why the realm guard matters more than it looks.** This is a backend swap on
 devices that are already installed. Every customer's `localStorage` holds a
@@ -112,20 +145,26 @@ build that now talks to Micromart.
 this app owns when the stamp does not match. Customers sign in once more, on
 first open. That is the correct trade.
 
-### Verify — I built it and checked the output
+### Verify — built and checked
 
 ```
-42 × https://micromartafrica.co.ke     (was 42 × live.testapps.co.ke)
+41 × https://micromartafrica.co.ke   (was 42 × live.testapps.co.ke)
  0 × testapps
- entity 3005, apiRealm present
+ 0 × hard-coded "3002" / "3005" outside lib/entity.js
+ [3002,3005] present, apiRealm present, "exists on both" copy present
 ```
+
+`eslint` is clean on all four new files. The rest of `src/` carries pre-existing
+lint debt (25 problems in four files nobody touched here); I did not widen it.
 
 ### Ship
 
 `npm ci && npm run build`, then deploy `dist/` to the `pwa.servicesuitecloud.com`
 project. **Check the Vercel dashboard env vars before building there** — this is
-the same class of fault as §1: a dashboard value overrides `.env.production`
-silently. `VITE_ENTITY_ID` must be `3005` or absent, never empty.
+the same class of fault as §1: a dashboard value silently overrides
+`.env.production`. `VITE_ENTITY_IDS` must be `3002,3005` or absent — and the old
+`VITE_ENTITY_ID` (singular) should be **deleted** from the dashboard, because it
+no longer means anything and will mislead the next person who reads it.
 
 ---
 
@@ -154,23 +193,107 @@ handler at all**, so every throw became a 500 with nothing in the log.
 
 `dotnet build` — 0 warnings, 0 errors.
 
-### Not fixed, and deliberately
+### F1 — the four dead ends — also fixed
 
-From the 2 September channel analysis: **F1** (the category menu reads a global
-table with no entity column — needs a schema decision), **F4** (no multi-book
-branch at level 5), **F5** (lender selection not scoped to the operator's own
-entities), **F7** (the KES 3,000 minimum enforced in SQL and discarded in C#),
-**F8** (the endpoint is unauthenticated and the PIN has no attempt limit).
+The category menu was `SELECT ID, CategoryName FROM ProductCategories`, with no
+filter at all. That table has **no EntityId column**, so every customer of every
+company saw all six entries. For a Fintech customer, read live on 9 September:
 
-**F8 is the one I would do next.** A 4-digit PIN with no lockout, on an
-unauthenticated URL, is brute-forceable by anyone who can reach it.
+| | Category | Fintech products |
+|---|---|---|
+| 1 | BUSINESS LOAN-DAILY | 0 |
+| 2 | BUSINESS LOAN-WEEKLY | 1 |
+| 3 | BUSINESS LOAN-MONTHLY | 1 |
+| 4 | SCHOOL FEES LOAN | 0 |
+| 5 | SALARY LOAN | 0 — and 0 on *every* book |
+| 6 | ASSET LOAN | 0 — and 0 on *every* book |
 
-### ⚠ Confirm before deploying
+Four of six were dead ends. No schema change was needed after all: the menu now
+applies the **same predicate `sp_ussdGetproducts` applies** — entity, active,
+USSD-enabled, and the borrower's own branch via `EntityUnits` — so the menu and
+the list it leads to cannot disagree, and a category that would render an empty
+screen never appears. An entirely empty shelf now says so instead of showing a
+header with nothing under it.
 
-The channel analysis describes the dial string as `*384*NNNN#`. You dial
-`*483*490#`. Those are different service codes and I could not verify from here
-which deployment answers yours. Fixing the wrong one would look like fixing
-nothing.
+### F8 — brute force — fixed, in two halves
+
+| | |
+|---|---|
+| `Models/PinAttemptLimiter.cs` | **New.** 5 wrong PINs in 15 minutes holds that number for 15 minutes. Checked *before* the bcrypt comparison, so a held number costs an attacker a dictionary lookup rather than a deliberately expensive hash — otherwise the defence is its own denial-of-service |
+| `ServiceController.cs` | Optional shared secret on the callback URL. Register it as `https://<host>/ussd/service?k=<secret>` and set `Ussd:CallbackSecret` to match |
+
+Two deliberate choices worth knowing:
+
+- **It holds the attempt, not the account.** Locking a customer's record on
+  failed attempts against an unauthenticated endpoint hands anyone a way to lock
+  every customer out by dialling their numbers wrong five times.
+- **The secret is opt-in.** Unset, nothing is enforced and behaviour is
+  unchanged. Mandatory would mean a deploy that forgot the config takes the
+  whole channel down for real customers — and a security control that causes an
+  outage gets switched off, after which you have neither.
+
+The tally is in memory, so a restart clears it and two instances behind a load
+balancer each keep their own. That stops the attack that matters — a sustained
+run against one number — without a schema change on a live lender's database.
+
+### Still not fixed
+
+**F4** (no multi-book branch at level 5) and **F5** (lender selection not scoped
+to the operator's own entities) — both only affect customers on more than one
+book, and scripts 04 and 05 remove that population. **F7**, the KES 3,000
+minimum enforced in SQL and discarded in C#, is the one with real money behind
+it: a KES 2,000 application is confirmed to the customer and silently dropped.
+
+### What remains for any of this to take effect
+
+The code is pushed (`skegode/ATusersUssdApI@cf8f22f` and the F1/F8 work after
+it). None of it is running yet. In order:
+
+1. **Confirm `*483*490#` reaches this deployment.** The 2 September channel
+   analysis describes the dial string as `*384*NNNN#`; you dial `*483*490#`.
+   Those are different service codes. Check the Africa's Talking dashboard for
+   which callback URL that code posts to, and that it is this service. Fixing
+   the wrong deployment looks exactly like fixing nothing.
+
+2. **Publish and copy.** `dotnet publish -c Release`. The repo's publish profile
+   targets `C:\Users\Sharon Chepchumba\Desktop\AtUssd`, i.e. someone builds to a
+   folder and copies it onto the host by hand — so whoever owns that machine has
+   to do this, or the profile needs repointing at the real target.
+
+3. **Do not overwrite `appsettings.json` on the server.** It is **gitignored**,
+   so the production `dbConnectionString` exists only on that host and is not in
+   the repository. A publish that copies the whole folder over the top will
+   delete it, and the service will then answer every dial with the new generic
+   error — which is at least a message rather than a 500, but it is still down.
+
+4. **Restart the app pool / service.** .NET caches nothing across a restart, but
+   the old assembly stays loaded until one happens.
+
+5. **Optional, and recommended:** set `Ussd:CallbackSecret` in `appsettings.json`
+   and append `?k=<secret>` to the callback URL registered with Africa's Talking.
+   Do both or neither — the secret is only enforced when it is set, but once set
+   a callback without it gets a 404.
+
+6. **Run [`09-ussd-product-menu.sql`](09-ussd-product-menu.sql)** so Micro Chap
+   Chap can appear at all. It is a data fault, not a code one: `CategoryId` and
+   `UssdOrder` are both NULL, and neither the menu query nor the selector can
+   match a NULL.
+
+Script `07-repair-broken-pins.sql` is now **optional**. The code change already
+treats a hash that is not 60 characters as "no PIN set", so those 40 customers
+are routed into the set-a-PIN screen without it. Running it still tidies the
+data, and costs nothing.
+
+### Then dial it
+
+Your own record is ready: borrower **170497**, entity 3005, unit 129, exactly
+one row for `254758517032`, and a valid 60-character `$2b$` hash. So
+`ResolveEntity` returns 3005 and the fintech shelf is what you will see.
+
+**Your PIN is `1765`** — set by the reset at 12:08 on 8 September (outbox row
+2791806). `6836` is from July 2024 and `9409` from 29 August; both are long
+dead, which is why the PIN screen was never going to let you past even before
+the crash.
 
 ---
 

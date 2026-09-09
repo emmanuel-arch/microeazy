@@ -104,7 +104,8 @@ repos on this machine (a pre-existing ownership problem), so shipping is yours.
 |---|---|---|
 | **OTP 400** | The live bundle sends `lenderSlug: ""`; `??` does not catch an empty string, so twelve borrower routes answered 400 | Client default fixed, plus `PORTAL_DEFAULT_LENDER_SLUG` server-side so a stale handset bundle cannot take the portal down |
 | **No SMS** | `hasSmsProvider` false → `delivered: false`, no code ever sent | New ServiceSuite outbox path writes to `Notifications.dbo.SMS` with `EntityId 3005`, so the code arrives under **Micromart's** sender ID. **Needs the relay armed for writes.** |
-| **Wrong backend** | `pwa.servicesuitecloud.com` calls `live.testapps.co.ke` with `EntityId: 7` | Built and verified: 42 calls to `micromartafrica.co.ke`, entity 3005, zero testapps. Plus a storage realm guard, because this is a backend swap on installed devices |
+| **Wrong backend** | `pwa.servicesuitecloud.com` calls `live.testapps.co.ke` with `EntityId: 7` | Repointed to `micromartafrica.co.ke`, verified in the built bundle. Plus a storage realm guard, because this is a backend swap on installed devices |
+| **One book only** | Four screens carried their own `const entityId = "3002"` and never read the env at all, so no Fintech customer could sign in | The PWA now serves **both** books: it looks a customer up across 3002 and 3005, scopes the session to the one they are on, refuses when they are on both, and offers registration when neither |
 | **USSD 500s** | No exception handler; PIN read and written with no entity predicate; the log writer collided between concurrent sessions | Outermost catch, entity resolved once and threaded down, PIN writes refuse rather than guess, log writer locked. Builds clean |
 | **Demo account** | Believed unwired | Sign-in was already wired and was blocked only by the OTP fault. Borrower **170497** is usable today; [`08-demo-account.sql`](08-demo-account.sql) makes a separate one |
 
