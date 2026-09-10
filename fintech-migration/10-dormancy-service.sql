@@ -209,7 +209,10 @@ BEGIN
         INSERT INTO dbo.Mails (tomail, Subject, Message, CreatedBy, CreatedDate, Status, ScheduleDate, isSent)
         SELECT
             e.EmailAddress,
-            'Your Micromart account has moved to Micromart Fintech',
+            /* Mails.Subject is varchar(50) -- keep this at or under 50 chars.
+               The full 53-char wording overflowed and aborted the whole nightly
+               transaction (error 2628) on 9 and 10 Sep 2026. */
+            'Your account has moved to Micromart Fintech',
             'Dear ' + LTRIM(RTRIM(ISNULL(e.firstName, 'Customer'))) + ',' + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10)
           + 'Your Micromart account has moved to Micromart Fintech. You can now apply for a loan '
           + 'from the comfort of your home - no branch visit and no agent needed.' + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10)

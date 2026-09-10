@@ -8,7 +8,19 @@ Findings and reasoning: [`../reports/The-Fintech-Split-2026-09-08.pdf`](../repor
 
 Every figure in these scripts was read live from `Serviceconnect` on
 100.72.35.56,4230 on **8 September 2026** through the read-only SQL relay.
-Nothing here has been executed against the live database.
+
+> **STATUS as of 10 September 2026 — these scripts HAVE been run.** Verified live:
+> scripts 01–07 were applied on 8 Sep (backup tables 16:13–16:25, identity-lock
+> trigger 16:55, 0 truncated PINs remaining), and 10.1/10.2 installed at 17:08.
+> **Do not re-run 02 or 03** — a second restamp would move rows that are already
+> on 3005. The dormancy job itself has moved nobody yet; see the note below.
+
+> **The nightly job was failing (fixed in this repo, not yet redeployed).** The
+> 02:30 run aborted on 9 and 10 Sep with error 2628: `Mails.Subject` is
+> `varchar(50)` and the subject line was 53 characters. `XACT_ABORT` rolled the
+> whole transaction back each time, so nothing moved and nothing is half-done.
+> Section 10.2 now carries a 43-character subject — **re-run 10.2 alone** (it is
+> `CREATE OR ALTER`) to pick up the fix.
 
 ---
 
@@ -39,6 +51,26 @@ Nothing here has been executed against the live database.
 | 06 | `06-fix-sp-restBorrowerPin.sql` | Removes the hard-coded `3002` from the PIN-reset SMS | — | yes |
 | 07 | `07-repair-broken-pins.sql` | Clears 40 truncated BCrypt hashes | 40 | yes |
 | 10 | `10-dormancy-service.sql` | Installs the log, the procedure and the daily job | — | yes |
+| 11 | `11-move-one-customer.sql` | Installs the **manual** one-customer move. Not part of the sequence — run it whenever you need to move somebody by hand | — | n/a |
+
+### Moving one customer by hand
+
+`11-move-one-customer.sql` installs `sp_MicroEazy_MoveCustomerToFintech` — the
+same move as the nightly job, for one customer you name, without the 60-day
+clock. Dry run is the default:
+
+```sql
+EXEC dbo.sp_MicroEazy_MoveCustomerToFintech @PhoneNumber = '254719112304';
+EXEC dbo.sp_MicroEazy_MoveCustomerToFintech @PhoneNumber = '254719112304', @DryRun = 0;
+```
+
+Accepts `@BorrowerId`, `@PhoneNumber` or `@NationalID` — exactly one, and it
+refuses an identifier that matches more than one active borrower. It checks the
+destination the same way the nightly job does, refuses an identity that already
+exists on the other book (with the message script 05 would have thrown, but
+before doing any work), and **refuses a customer with an open loan** unless you
+pass `@AllowOpenLoans = 1` — the same reasoning that keeps the 58 out of script
+04. Both paths log to `MicroEazyDormancyLog`, so it stays the whole story.
 
 ### Gates that actually matter
 
