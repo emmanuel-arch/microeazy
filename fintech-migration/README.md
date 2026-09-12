@@ -52,6 +52,29 @@ Every figure in these scripts was read live from `Serviceconnect` on
 | 07 | `07-repair-broken-pins.sql` | Clears 40 truncated BCrypt hashes | 40 | yes |
 | 10 | `10-dormancy-service.sql` | Installs the log, the procedure and the daily job | — | yes |
 | 11 | `11-move-one-customer.sql` | Installs the **manual** one-customer move. Not part of the sequence — run it whenever you need to move somebody by hand | — | n/a |
+| 12 | `12-rollback-wrong-dormancy.sql` | Returns the 175 customers the 11 Sep run moved on maturity instead of settlement | ~35,000 | n/a — it *is* the reversal |
+| 13 | `13-fix-dormancy-clock.sql` | Replaces the procedure so the 60-day clock runs from settlement, not maturity | — | yes |
+
+### The dormancy clock was wrong, and 12 + 13 fix it
+
+Script 10 measured the 60 days from `Loans.ExpectedClearDate` — when a loan was
+*due* to finish. Micromart's rule is that it runs from when the customer actually
+finished: the day `LoanCleared` became 1, the day their OLB reached 0. For a
+customer who paid on time those dates are days apart. For an NPL customer who ran
+two years late and then settled, they are years apart — so the job read the
+delinquency itself as evidence of dormancy.
+
+The 11 Sep 02:34 run moved 500 customers. **175 of them had settled within the
+last 60 days**; one cleared a 2022 loan the previous afternoon and was moved that
+night. Run 12 to put those 175 back, then 13 to stop it recurring. The 02:30 job
+calls the procedure by name, so installing 13 is all the next run needs.
+
+`Loans.DateCleared` is not the fix — it is NULL on all 344,332 rows in the book.
+The corrected procedure derives the settlement date from `CustomerStatement`:
+per loan, the last `TransactedDate` at which `LoanBalance` read 0.
+
+Both scripts default to a dry run and both compile clean against the live server.
+Full analysis: [`reports/Dormancy-And-Penalties-2026-09-11.pdf`](../reports/Dormancy-And-Penalties-2026-09-11.pdf).
 
 ### Moving one customer by hand
 

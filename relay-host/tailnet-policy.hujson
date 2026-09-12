@@ -1,0 +1,183 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// TAILNET ACCESS POLICY — tail10c441.ts.net
+//
+// Paste into  https://login.tailscale.com/admin/acls/file  and Save. The editor
+// accepts HuJSON, so these comments survive — which is the point: this file is
+// the only place the estate's topology is written down as an enforced rule
+// rather than as a convention somebody remembers.
+//
+// ── WHAT THIS REPLACES ──────────────────────────────────────────────────────
+// A fresh tailnet ships with:
+//
+//     { "acls": [ { "action": "accept", "src": ["*"], "dst": ["*:*"] } ] }
+//
+// Every node can reach every port on every other node. That is how this tailnet
+// runs today, and it means a workstation, a spare VPS and an IIS box all hold a
+// standing route to two lenders' live SQL Servers. The SQL relay's write
+// allowlist is carefully narrow and completely bypassed by anyone who can open
+// a TDS socket directly. THIS FILE IS THE OTHER HALF OF THAT CONTROL.
+//
+// ── HOW TO ROLL IT OUT WITHOUT LOCKING YOURSELF OUT ─────────────────────────
+// Tags are assigned per device and a device with NO tag matches none of the
+// grants below — so applying this file before tagging anything cuts every node
+// off from every other node. Order matters:
+//
+//   1. Save this file. Nothing changes yet; no device is tagged.
+//   2. Tag the devices (Machines → ⋯ → Edit ACL tags), workstation FIRST so you
+//      keep a way in. A tagged device's key never expires, which is what you
+//      want on a server and is a second reason to do this.
+//   3. Watch Admin → Logs for denied flows for a day before assuming it is done.
+//
+// Reverting is one Save away — keep the default policy above in a scratch file.
+// ─────────────────────────────────────────────────────────────────────────────
+{
+  // ── WHO MAY APPLY A TAG ────────────────────────────────────────────────────
+  // A tag is an identity, not a label: a device wearing `tag:relay` is granted
+  // everything `tag:relay` is granted. Only admins may hand them out.
+  "tagOwners": {
+    "tag:lender-db": ["autogroup:admin"],
+    "tag:relay":     ["autogroup:admin"],
+    "tag:bureau":    ["autogroup:admin"],
+    "tag:iis":       ["autogroup:admin"],
+    "tag:admin-ws":  ["autogroup:admin"],
+    "tag:spare":     ["autogroup:admin"],
+  },
+
+  // ── THE ESTATE, AS OF 11 SEP 2026 ──────────────────────────────────────────
+  // Recorded here because a tag alone does not say which box it is on, and the
+  // which-box question in this estate has been guessed wrong more than once.
+  //
+  //   NODE             ADDRESS           TAG(S)                   ROLE
+  //   servicesuite-in  100.115.241.36    tag:relay tag:iis        THE MAIN HOST — SQL relay
+  //                                                               + interchange broker. Also
+  //                                                               runs IIS and SQL on :4420.
+  //   salesmaster      100.106.100.118   tag:bureau tag:iis       Metropol egress 102.214.69.233
+  //                                                               (on the 2026-08-27 form).
+  //                                                               Runs the CRB relay. DO NOT MOVE.
+  //   services         100.72.35.56      tag:lender-db tag:bureau Micromart's ServiceSuite +
+  //                                                               SQL :4230. Second permitted
+  //                                                               bureau origin.
+  //   axemicro         100.103.154.73    tag:lender-db            Axe's ServiceSuite + SQL :4420.
+  //   servicesuite     100.124.136.83    tag:relay                The SQL relay in production
+  //                                                               today. Drop the tag once the
+  //                                                               cutover to servicesuite-in is
+  //                                                               verified.
+  //   lms              100.92.236.116    tag:bureau               A guest INSIDE the `services`
+  //                                                               box. Egresses 102.210.148.110 —
+  //                                                               the address on Metropol's form.
+  //   vmi3298281       100.125.245.79    tag:spare                Free capacity, Server 2025.
+  //   pc               100.101.186.43    tag:admin-ws             The workstation this repo is on.
+  //
+  // `services` carries TWO tags on purpose. It is a lender database AND, by the
+  // founder's standing rule of 11 Sep 2026, one of the boxes Micromart's bureau
+  // traffic may leave from. Tags compose; that is what they are for.
+  //
+  // ── THE TWO HOSTS AT MICROMART'S SITE ARE NOT INTERCHANGEABLE ──────────────
+  // `lms` is spun up inside `services`, so they share a site and a /24 — and
+  // they present DIFFERENT addresses to the internet. Measured 11 Sep 2026 from
+  // `tailscale status --json`, reading each peer's CurAddr:
+  //
+  //     lms       -> 102.210.148.110:41641    ON Metropol's 2026-08-27 form
+  //     services  -> 102.210.148.124:41641    NOT on it
+  //
+  // So `lms` is the host at that site whose bureau calls Metropol will actually
+  // answer. It is not a spare; it is the working second origin.
+
+  "grants": [
+    // ── 1 · THE ONLY ROUTE TO A LENDER'S BOOK ────────────────────────────────
+    // This is the rule the whole file exists for. TDS to Micromart (:4230) and
+    // Axe (:4420) is reachable from the relay hosts and from nothing else.
+    //
+    // The effect is that the SQL relay's write allowlist becomes the ONLY way
+    // into those databases from this tailnet, rather than merely the polite
+    // way. A leaked relay secret buys the allowlist; it does not buy a socket.
+    {
+      "src": ["tag:relay"],
+      "dst": ["tag:lender-db"],
+      "ip":  ["tcp:4230", "tcp:4420"],
+    },
+
+    // ── 2 · ADMINISTRATION ───────────────────────────────────────────────────
+    // RDP and the local web ports, from the workstation only. Deliberately not
+    // from `tag:spare`: a spare VPS with a standing RDP route to production is
+    // a lateral-movement path with no operational job.
+    {
+      "src": ["tag:admin-ws"],
+      "dst": ["tag:relay", "tag:iis", "tag:bureau", "tag:lender-db", "tag:spare"],
+      "ip":  ["tcp:3389", "tcp:80", "tcp:443"],
+    },
+
+    // ── 3 · BREAK GLASS — READ THIS BEFORE KEEPING IT ────────────────────────
+    // A direct TDS route from the workstation to both lenders. It is how live
+    // reads and one-off verifications are done from the repo today, and pulling
+    // it would break that workflow on the day you apply this file.
+    //
+    // It is also, precisely, the hole rule 1 closes. Keep it while the relay
+    // cutover is in progress; DELETE IT when servicesuite-in is serving and
+    // verified. Verification after that goes through the relay, signed and
+    // logged, like every other caller's does.
+    {
+      "src": ["tag:admin-ws"],
+      "dst": ["tag:lender-db"],
+      "ip":  ["tcp:4230", "tcp:4420"],
+    },
+
+    // ── 4 · THE INTERCHANGE NODE READS ITS OWN MEMBER'S BOOK ─────────────────
+    // Covered by rule 1: the ingest that tokenises a member's book runs on the
+    // relay host and connects over the same TDS ports. No extra grant needed —
+    // noted because its absence otherwise looks like an omission.
+
+    // ── 5 · NOTHING ELSE ─────────────────────────────────────────────────────
+    // No lender database may originate a connection to anything. No spare may
+    // reach production. Two lenders' servers cannot see each other, which is a
+    // promise the Interchange makes to its members and should be true at the
+    // packet level and not only in a diagram.
+  ],
+
+  // ── WHO MAY PUBLISH TO THE PUBLIC INTERNET ─────────────────────────────────
+  // Funnel puts a node on the public internet with a real certificate. Five of
+  // the eight nodes have it enabled today, three of them for nothing. This
+  // attribute is the tailnet-wide gate: a node without it cannot turn Funnel on
+  // at all, whatever is typed on the box.
+  //
+  // Two nodes need it and they are not interchangeable:
+  //   tag:relay   — servicesuite-in, so Vercel can reach the SQL relay.
+  //   tag:bureau  — salesmaster, so Vercel can reach the CRB relay. It must
+  //                 stay there because Metropol answers its egress address; a
+  //                 funnel changes where a relay is REACHED, never where it
+  //                 CALLS FROM.
+  "nodeAttrs": [
+    {
+      "target": ["tag:relay", "tag:bureau"],
+      "attr":   ["funnel"],
+    },
+  ],
+
+  // ── TESTS ──────────────────────────────────────────────────────────────────
+  // These run when you press Save and REFUSE the policy if any fails. They are
+  // the reason a future edit cannot quietly re-open the lender databases: the
+  // denies below are the security properties of this estate, asserted.
+  "tests": [
+    {
+      "src":    "tag:relay",
+      "accept": ["tag:lender-db:4230", "tag:lender-db:4420"],
+      "deny":   ["tag:lender-db:3389", "tag:lender-db:445"],
+    },
+    {
+      // The spare VPS reaches nothing. If this test ever fails, a grant was
+      // widened past its intent.
+      "src":  "tag:spare",
+      "deny": ["tag:lender-db:4230", "tag:lender-db:4420", "tag:relay:8787"],
+    },
+    {
+      // One lender's server cannot reach the other's. The Interchange's whole
+      // claim is that members exchange tokens, never reach into each other.
+      "src":  "tag:lender-db",
+      "deny": ["tag:lender-db:4230", "tag:lender-db:4420", "tag:relay:8787"],
+    },
+    {
+      "src":    "tag:admin-ws",
+      "accept": ["tag:relay:3389", "tag:iis:443"],
+    },
+  ],
+}
