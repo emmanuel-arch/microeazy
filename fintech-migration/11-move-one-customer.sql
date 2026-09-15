@@ -235,7 +235,7 @@ BEGIN
             'Dear ' + LTRIM(RTRIM(ISNULL(o.firstName, 'Customer')))
           + ', your Micromart account has moved to Micromart Fintech. You can now '
           + 'apply for a loan from home - no branch visit, no agent. '
-          + 'App: portal.servicesuitecloud.com  USSD: *483*490# '
+          + 'App: microeazy.servicesuitecloud.com  USSD: *483*490# '
           + 'Dial the USSD code to set your new PIN. PIN yako ni siri yako.',
             o.PhoneNumber, @ToEntity, GETDATE(), 0, GETDATE(), 5
         FROM #one o
@@ -252,7 +252,7 @@ BEGIN
             'Dear ' + LTRIM(RTRIM(ISNULL(o.firstName, 'Customer'))) + ',' + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10)
           + 'Your Micromart account has moved to Micromart Fintech. You can now apply for a loan '
           + 'from the comfort of your home - no branch visit and no agent needed.' + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10)
-          + 'Mobile app:  https://portal.servicesuitecloud.com' + CHAR(13) + CHAR(10)
+          + 'Mobile app:  https://microeazy.servicesuitecloud.com' + CHAR(13) + CHAR(10)
           + 'USSD:        *483*490#' + CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10)
           + 'Dial *483*490# from ' + LTRIM(RTRIM(ISNULL(o.PhoneNumber, 'your registered number')))
           + ' and you will be asked to choose a new PIN. That PIN works on both the USSD '

@@ -15,8 +15,8 @@ pre-existing SID problem), so committing and deploying are yours.
 
 Two separate faults, and fixing either one alone leaves the customer stuck.
 
-**The 400.** I pulled the live bundle from `portal.servicesuitecloud.com` and
-read it. It sends `lenderSlug: ""` on every call:
+**The 400.** I pulled the live Micro Eazy bundle (then also served on `portal.`;
+the app's only host is now `microeazy.servicesuitecloud.com`) and read it. It sends `lenderSlug: ""` on every call:
 
 ```js
 const vo = "", bo = n => JSON.stringify({ lenderSlug: vo, nationalId: n })
@@ -72,7 +72,7 @@ has not been given permission to write to a lender's live database.
 
 ```bash
 # Before: 400 "Choose a lender". After: 200.
-curl -s -X POST https://portal.servicesuitecloud.com/api/portal/otp \
+curl -s -X POST https://microeazy.servicesuitecloud.com/api/portal/otp \
   -H 'Content-Type: application/json' -d '{"phone":"254758517032"}'
 
 # And with the relay armed, delivered should be true.

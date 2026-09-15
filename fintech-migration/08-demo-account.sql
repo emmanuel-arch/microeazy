@@ -106,7 +106,7 @@ FROM dbo.Borrowers WHERE ID = @NewId;
 PRINT '';
 PRINT 'Demo account ready. To use it:';
 PRINT '  1. Dial *483*490# from that handset and set a 4-digit PIN when asked.';
-PRINT '  2. Micro Eazy app: portal.servicesuitecloud.com -- phone, then the SMS';
+PRINT '  2. Micro Eazy app: microeazy.servicesuitecloud.com -- phone, then the SMS';
 PRINT '     code, then the national ID above.';
 PRINT '  3. The shelf it will see is products 30219, 30220 and 30221 (unit 129).';
 
