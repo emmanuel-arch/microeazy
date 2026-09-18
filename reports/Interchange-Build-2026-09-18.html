@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Interchange build report</title>
+<style>
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { size: A4 portrait; margin: 15mm 14mm; }
+  html, body { margin: 0; background: #fcfcfb; color: #14181b;
+    font-family: "Segoe UI", system-ui, sans-serif; font-size: 9.4pt; line-height: 1.5; }
+  h1 { font-size: 23pt; margin: 0 0 2mm; letter-spacing: -0.015em; color: #003868; }
+  h2 { font-size: 12pt; margin: 0 0 2mm; color: #003868; }
+  .sub { font-size: 10.5pt; color: #6b7580; margin: 0 0 7mm; }
+  .lede { color: #6b7580; margin: 0 0 3mm; max-width: 168mm; }
+  .blk { margin-bottom: 7mm; break-inside: avoid; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 6.8pt; text-transform: uppercase; letter-spacing: .1em;
+       color: #6b7580; font-weight: 600; padding: 0 2mm 1.5mm 0; border-bottom: 1.2px solid #003868; }
+  td { padding: 1.7mm 2mm 1.7mm 0; border-bottom: 1px solid #e2e6ea; vertical-align: top; }
+  td.k { font-weight: 600; padding-left: 3mm; }
+  td.n { text-align: right; font-family: Consolas, monospace; font-size: 8.6pt; white-space: nowrap; }
+  .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10mm;
+          padding-bottom: 3.5mm; margin-bottom: 7mm; border-bottom: 2.5px solid #003868; }
+  .lh { text-align: right; font-size: 7.4pt; color: #6b7580; line-height: 1.55; }
+  .wordmark { font-size: 15pt; font-weight: 700; color: #003868; letter-spacing: -0.01em; }
+  .wordmark span { color: #409828; }
+  .tag { font-size: 7.4pt; color: #6b7580; letter-spacing: .04em; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5mm; margin-bottom: 7mm; }
+  .tile { border: 1px solid #e2e6ea; border-radius: 2mm; padding: 3mm; background: #fff; }
+  .tile .v { font-family: Consolas, monospace; font-size: 15pt; font-weight: 700; color: #003868; }
+  .tile .l { font-size: 7.2pt; color: #6b7580; text-transform: uppercase; letter-spacing: .09em; margin-top: 1mm; }
+  .rule { height: 3px; background: linear-gradient(90deg, #003868, #409828); margin: 6mm 0; border-radius: 2px; }
+  .note { border-left: 3px solid #409828; padding: 2mm 0 2mm 4mm; margin: 3mm 0; font-size: 8.8pt; }
+  .note.bad { border-left-color: #b4231d; }
+  .foot { margin-top: 7mm; padding-top: 3mm; border-top: 1px solid #e2e6ea; font-size: 7.2pt; color: #6b7580; }
+  code { font-family: Consolas, monospace; font-size: 8.4pt; }
+</style></head><body>
+
+<div class="head">
+  <div>
+    <div class="wordmark">Inter<span>change</span></div>
+    <div class="tag">Data Exchange Platform · X-Road Architecture</div>
+  </div>
+  <div class="lh">
+    <strong style="color:#14181b">BirgenAI Hub</strong><br>
+    Karen, Langata District<br>Nairobi County, Kenya<br>
+    +254 758 517 032 · birgen@techcrast.co.ke<br>
+    Reg. BN-MJS5BY37 · KRA PIN A016842179G
+  </div>
+</div>
+
+<h1>Build report</h1>
+<p class="sub">Statement Crunch, the lender glossary, report 11 and the bureau captures · 2026-09-18 · demo day Tuesday 22 September</p>
+
+<div class="tiles">
+  <div class="tile"><div class="v">358</div><div class="l">Institutions in the glossary</div></div>
+  <div class="tile"><div class="v">4</div><div class="l">Real statements crunched</div></div>
+  <div class="tile"><div class="v">7</div><div class="l">Bureau reports captured</div></div>
+  <div class="tile"><div class="v">12 / 14</div><div class="l">Report types now real in the gallery</div></div>
+</div>
+
+<div class="blk">
+  <h2>What the crunching engine now does</h2>
+  <p class="lede">
+    Every counterparty on a statement is resolved to an M-PESA shortcode, an account reference and a name, then put
+    against the Central Bank of Kenya's register of 250 digital credit providers,
+    its 40 licensed banks and 15 microfinance banks, and SASRA's
+    deposit-taking SACCOs. A row reading <code>Pay Bill Fuliza M-Pesa to 4145907 - MULAR CREDIT LIMITED Acc. 7981717</code>
+    is now debt service to a licensed provider carrying an account number, not a trip to the shops. Each identification
+    carries its evidence, and a counterparty that looks like a lender but sits on no register is reported as exactly that.
+  </p>
+  <table>
+    <thead><tr>
+      <th style="width:26%">Statement</th><th class="n">Months</th><th class="n">Rows</th><th class="n">Read</th>
+      <th class="n">Income / mo</th><th class="n">Commitments</th><th class="n">Lenders</th><th class="n">Ceiling</th><th class="n">Score</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="k" style="padding-left:0">Elizabeth Charo Washindu</td>
+        <td class="n">6</td>
+        <td class="n">8,841</td>
+        <td class="n">100.0%</td>
+        <td class="n">KES 114,096</td>
+        <td class="n">KES 52,951</td>
+        <td class="n">12</td>
+        <td class="n">nil</td>
+        <td class="n">515 Poor</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">BRIAN KIPKOECH</td>
+        <td class="n">12</td>
+        <td class="n">6,832</td>
+        <td class="n">100.0%</td>
+        <td class="n">KES 350,596</td>
+        <td class="n">KES 92,875</td>
+        <td class="n">2</td>
+        <td class="n">KES 11,500</td>
+        <td class="n">529 Poor</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">DAMARIS WANJIRA NDEGWA</td>
+        <td class="n">12</td>
+        <td class="n">5,578</td>
+        <td class="n">100.0%</td>
+        <td class="n">KES 81,243</td>
+        <td class="n">KES 17,956</td>
+        <td class="n">4 <span style="color:#b4231d">+1?</span></td>
+        <td class="n">KES 1,500</td>
+        <td class="n">578 Poor</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">Emmanuel Kipleting</td>
+        <td class="n">6</td>
+        <td class="n">2,893</td>
+        <td class="n">100.0%</td>
+        <td class="n">KES 84,301</td>
+        <td class="n">KES 14,434</td>
+        <td class="n">3</td>
+        <td class="n">KES 1,500</td>
+        <td class="n">600 Fair</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <strong>Read</strong> is our parse against Safaricom's own printed PAID IN total. All four statements read at 100%,
+    which is what makes the headline checkable: anyone holding the statement can add up page one and get our number.
+    On every one of them Safaricom's own summary does not foot — their printed total differs from the sum of their own
+    rows — and the report prints both figures rather than choosing the one that looks better.
+  </div>
+</div>
+
+<div class="rule"></div>
+
+<div class="blk">
+  <h2>The report</h2>
+  <p class="lede">
+    Ten pages, on the crunch theatre's own dark surface rather than the bureau documents' paper. The order is answer
+    first, evidence second, method last: the instalment ceiling, the score and the four worst flags are above the fold on
+    page one; the statement's own summary and our reconciliation are on page two; the lenders, their registers and the
+    month-by-month commitment calendar follow; the affordability arithmetic is shown step by step; and the last page
+    prints the settings the whole thing was produced on, so a number can be defended a year later.
+  </p>
+  <table>
+    <thead><tr><th style="width:22%">Page</th><th>What it carries</th></tr></thead>
+    <tbody>
+      <tr><td class="k" style="padding-left:0">1 · Cover</td><td style="font-size:8.6pt;color:#6b7580">Comfortable instalment, average monthly income, monthly surplus, existing commitments, the score dial, debt-service ratio now and if granted, and the four worst findings.</td></tr><tr><td class="k" style="padding-left:0">2 · The statement</td><td style="font-size:8.6pt;color:#6b7580">Safaricom&#39;s header and summary reproduced as printed, our parse totalled beside it, the coverage, and where their own arithmetic does not foot.</td></tr><tr><td class="k" style="padding-left:0">3 · Income and expenditure</td><td style="font-size:8.6pt;color:#6b7580">Money in and money out by month with the average-income line drawn on the same axis, the borrowed share inside each bar, and the net position.</td></tr><tr><td class="k" style="padding-left:0">4 · What counts as income</td><td style="font-size:8.6pt;color:#6b7580">The ladder from the printed total to the figure used, the same statement read the other three ways, and the full monthly ledger.</td></tr><tr><td class="k" style="padding-left:0">5 · Where the money goes</td><td style="font-size:8.6pt;color:#6b7580">Categories, largest counterparties, whether this is a trading account, and supplier-shaped spend.</td></tr><tr><td class="k" style="padding-left:0">6–7 · Who else they owe</td><td style="font-size:8.6pt;color:#6b7580">Every credit provider with its register and the evidence, the commitment calendar, unregistered lenders, and debt being serviced off this rail.</td></tr><tr><td class="k" style="padding-left:0">8 · What they can afford</td><td style="font-size:8.6pt;color:#6b7580">Every step of the arithmetic, both routes side by side, and the settings used.</td></tr><tr><td class="k" style="padding-left:0">9 · What moved the score</td><td style="font-size:8.6pt;color:#6b7580">Twelve drivers, each against its own configured maximum.</td></tr><tr><td class="k" style="padding-left:0">10 · Method</td><td style="font-size:8.6pt;color:#6b7580">Source document and its hash, engine version, policy, what differs from the default, where the engine refused to guess, and a QR code that verifies the document.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="blk">
+  <h2>Settings, and why they are settings</h2>
+  <p class="lede">
+    Average monthly income is not a fact. On Elizabeth's statement the four defensible definitions give
+    KES 114,172, KES 53,804, KES 50,666 and KES 57,587 a month — a factor of two. A microfinance lender
+    writing working capital to traders wants the first; a salary-advance lender wants the third; both are right for
+    their own book. The same is true of the instalment ceiling. So all of it is per-member configuration, Geoffrey can
+    change it himself at <code>/policy</code>, and every report prints the settings it was produced on.
+  </p>
+  <p class="lede">
+    What is <em>not</em> configurable is the evidence: what the statement says, what Safaricom's summary totals, which
+    counterparties are on the CBK register, how many months the declared period covers. A member configures how to read
+    the evidence, never what the evidence is.
+  </p>
+</div>
+
+<div class="rule"></div>
+
+<div class="blk">
+  <h2>The bureau pulls</h2>
+  <p class="lede">
+    Seven billed pulls on national ID 30058967, approved as plan item F3, captured verbatim with a SHA-256 over the
+    bytes written. The preview gallery now shows real answers for 12 of the 14 report types; only report 4
+    (Metropol's own PDF, which cannot be anonymised without altering the bureau's document) and report 22
+    (refused, E029, not on the contract) remain.
+  </p>
+  <table>
+    <thead><tr><th style="width:8%">Type</th><th style="width:34%">Report</th><th class="n">Latency</th><th class="n">Indicative</th><th style="width:26%">SHA-256</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="k" style="padding-left:0">1</td>
+        <td>Identity Verification</td>
+        <td class="n">276 ms</td>
+        <td class="n">KES 10</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">6cac762145c9f0144655…</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">2</td>
+        <td>Delinquency Status</td>
+        <td class="n">329 ms</td>
+        <td class="n">KES 10</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">c9bac942260b56191301…</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">5</td>
+        <td>JSON Credit Report</td>
+        <td class="n">502 ms</td>
+        <td class="n">KES 60</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">ed8ec4d8421aeb44d571…</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">6</td>
+        <td>Identity Scrub</td>
+        <td class="n">239 ms</td>
+        <td class="n">KES 15</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">6e7835d45e01dab66749…</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">10</td>
+        <td>Enhanced Credit Info</td>
+        <td class="n">447 ms</td>
+        <td class="n">KES 55</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">35f1c6dd2c595628f140…</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">13</td>
+        <td>Minified Credit Info</td>
+        <td class="n">246 ms</td>
+        <td class="n">KES 20</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">3f522a78dd5445684262…</td>
+      </tr><tr>
+        <td class="k" style="padding-left:0">14</td>
+        <td>Full JSON Credit Report</td>
+        <td class="n">515 ms</td>
+        <td class="n">KES 90</td>
+        <td class="n" style="font-size:7.4pt;color:#6b7580;text-align:left">19aa6e875803c10248f9…</td>
+      </tr>
+      <tr><td colspan="3" class="k" style="padding-left:0;border-top:1.5px solid #003868">Indicative spend</td>
+        <td class="n" style="border-top:1.5px solid #003868;font-weight:700">KES 260</td>
+        <td style="border-top:1.5px solid #003868"></td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    Worth the money for a reason beyond the gallery. A standalone report 1 returns citizenship, clan, ethnic group,
+    occupation, place of birth, registration office and slots for photo, fingerprint and signature — none of which
+    appear in the identity block nested inside report 12. Showing that nested block and calling it Identity
+    Verification understated the product by about two thirds. Also found: within a single report 1 response,
+    <code>date_of_birth</code> and <code>dob</code> disagree by one day.
+  </div>
+</div>
+
+<div class="blk">
+  <h2>Decisions taken, and things found the hard way</h2>
+  <table><tbody><tr>
+    <td style="width:4px;padding:0;background:#b4231d"></td>
+    <td class="k" style="width:33%">Real customer statements were moved out of the web root</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">Three consented M-PESA statements were sitting in public/, which Vercel serves. Their filenames contain the holders&#39; phone numbers, so the URLs were guessable, and the passwords are six digits. They now live in interchange/private/statements/, which is outside the Next.js web root and git-ignored. Nothing was deployed from public/ before the move.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#b4231d"></td>
+    <td class="k" style="width:33%">A bank&#39;s paybill is no longer read as debt service</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">The first cut of the lender matcher counted every payment to Equity&#39;s 247247, KCB&#39;s 522533 and the rest as a loan repayment. A bank&#39;s general paybill takes school fees, rent, deposits and loan repayments through one number and the row does not say which. Counting it all as commitment removed KES 23,921 a month of headroom from one borrower — enough to turn an approvable application into a decline on an assumption. Banks and SACCOs are now only debt service when the row names a loan.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">Fund managers are excluded, not flagged as unlicensed lenders</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">“Nabo Capital Ltd” and “Cytonn Money Market Fund” both trip the CAPITAL legal-form pattern, and the engine duly reported a borrower as servicing an unregistered lender when they were in fact saving. Money to a fund is the opposite signal from money to a lender. Fifteen CMA-licensed managers are now registered specifically to be excluded, and that one fix moved Emmanuel&#39;s score from Poor to Fair.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">The monthly chart and the headline now measure the same thing</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">The bars were drawn from classified-income rows while the cover said “statement total paid in”. The average line floated above every bar and the document could not be checked against itself. Both now use the member&#39;s chosen basis, and both tie to Safaricom&#39;s own printed totals.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#b4231d"></td>
+    <td class="k" style="width:33%">A new console page was rendering without a session</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">proxy.ts derives its protected list from the rights catalogue, but Next.js requires the route matcher to be a static literal, so the two are maintained separately. /policy was added to one and not the other, and the page rendered to anyone who typed the URL. Fixed, and a build-time assertion now fails the next time the two drift — which is the actual fix.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">Four-digit operator codes are enabled on the public deployment</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">Production refuses access codes unless INTERCHANGE_ALLOW_CODE_LOGIN is 1. It is set, because the requirement is that Geoffrey signs in and configures his own settings and a browser cannot produce the Ed25519 signature the real door expects. Five failures lock the operator for fifteen minutes and there is a per-IP ceiling above that. This should go back to 0 the day after the demo.</td>
+  </tr></tbody></table>
+</div>
+
+<div class="blk">
+  <h2>Still outstanding</h2>
+  <table><tbody><tr>
+    <td style="width:4px;padding:0;background:#b4231d"></td>
+    <td class="k" style="width:33%">Metropol&#39;s written answer (E1)</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">Bureau Direct stays Micromart-only until Metropol confirm reports may be pulled for other lenders through an intermediary. This is still the largest commercial risk in the plan and nothing here changes it.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">The Registry still runs on Supabase in Ireland</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">B1–B3 are done, so the move to servicesuite-in can start. Until it does, the p95 target of 400 ms is a measurement of distance, not of the fan-out.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#b4231d"></td>
+    <td class="k" style="width:33%">The CallBox superuser password</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">Still in plain text in a repository, for a Postgres port that answers from the public internet. The Registry moving onto that machine inherits the problem. Rotating it needs coordinating with whoever runs CallBox.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">ODPC registration number</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">Not supplied, so it does not print on any document. A plausible-looking number on a regulated report would be a fabrication.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">SVG and knockout artwork</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">Three PNGs were supplied and everything built so far is derived from them. An SVG master and a white lockup are needed before signage, merchandise or any dark deck.</td>
+  </tr><tr>
+    <td style="width:4px;padding:0;background:#8a5a00"></td>
+    <td class="k" style="width:33%">Statement Crunch in the live portal</td>
+    <td style="font-size:8.6pt;color:#6b7580;line-height:1.5">The engine, the policy layer and the document are done and proven on four real statements. Wiring the upload route, the metering and the theatre into the member portal is the next block of work.</td>
+  </tr></tbody></table>
+</div>
+
+<div class="blk">
+  <h2>Signing in on Tuesday</h2>
+  <table>
+    <thead><tr><th style="width:24%">Who</th><th style="width:20%">Role</th><th style="width:18%">Scope</th><th>Opens</th></tr></thead>
+    <tbody>
+      <tr><td class="k" style="padding-left:0">Birgen Krosovic</td><td>Super admin</td><td>Platform</td><td style="font-size:8.6pt;color:#6b7580">Everything, including governance and every member's settings.</td></tr>
+      <tr><td class="k" style="padding-left:0">Geoffrey Njane</td><td>Member admin</td><td>KE/LENDER/3002</td><td style="font-size:8.6pt;color:#6b7580">Micromart's own surfaces, and <code>/policy</code> to change how his statements are read.</td></tr>
+    </tbody>
+  </table>
+  <div class="note bad">
+    Access codes were sent separately and are not written in this document. Turn
+    <code>INTERCHANGE_ALLOW_CODE_LOGIN</code> back to <code>0</code> once the demo is over — four digits on a public URL
+    is survivable for a week because of the lockout, and is not a permanent arrangement.
+  </div>
+</div>
+
+<div class="foot">
+  Generated by <code>scripts/build-session-report.ts</code> on 2026-09-18. Crunch figures are read from the result JSON
+  in <code>interchange/private/reports/</code>; bureau figures from the capture manifest; glossary counts from
+  <code>lib/statement/lenders.ts</code>. BirgenAI Hub · www.birgenai.co.ke
+</div>
+
+</body></html>
