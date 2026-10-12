@@ -54,6 +54,10 @@ Every figure in these scripts was read live from `Serviceconnect` on
 | 11 | `11-move-one-customer.sql` | Installs the **manual** one-customer move. Not part of the sequence — run it whenever you need to move somebody by hand | — | n/a |
 | 12 | `12-rollback-wrong-dormancy.sql` | Returns the 175 customers the 11 Sep run moved on maturity instead of settlement | ~35,000 | n/a — it *is* the reversal |
 | 13 | `13-fix-dormancy-clock.sql` | Replaces the procedure so the 60-day clock runs from settlement, not maturity | — | yes |
+| 16 | `16-fintech-into-collectbox.sql` | Feeds 3005 into `CollectBox.dbo.CollectionTracker` inside Micromart's own run, so Fintech cases show in CallBox | ~165 cases | yes (`16-17-ROLLBACK-collectbox-feed.sql`) |
+| 17 | `17-fintech-in-callbox-lists.sql` | **Optional.** CallBox's *Not reachable* list and overall dashboard count 3005 for Micromart logins | — | yes (same file) |
+| 18 | `18-disbursement-sms-paybill.sql` | **Urgent.** The Fintech disbursement SMS names 3002's paybill (4038021); one literal becomes 4329635. 18.0b lists payments to reconcile | — | yes (`18-19-ROLLBACK-comms-centre.sql`, R1b) |
+| 19 | `19-comms-centre-sms-templates.sql` | Reminders and the disbursement SMS become editable from the Lending Console (Comms › Reminders / Templates); Geoffrey's 1-4-8-10-13 arrears ladder seeded | — | yes (same rollback, R1–R4) |
 
 ### The dormancy clock was wrong, and 12 + 13 fix it
 
@@ -75,6 +79,86 @@ per loan, the last `TransactedDate` at which `LoanBalance` read 0.
 
 Both scripts default to a dry run and both compile clean against the live server.
 Full analysis: [`reports/Dormancy-And-Penalties-2026-09-11.pdf`](../reports/Dormancy-And-Penalties-2026-09-11.pdf).
+
+### Fintech on the collection tracker (16, 17)
+
+Micromart's CallBox shows a case only when its `CollectionTracker` row carries an
+amount (`Amounttopay > 100`), and that amount is written by one procedure,
+`sp_GeneralCollectionTrackerbooks`, which feeds **3002 only**. It runs every few
+minutes, and each of its six generators opens with a reset that is not scoped to an
+entity. So any Fintech amount written from outside, including the ConnectDesk bridge's
+188 rows of 4 Oct, is zeroed by the next run. On 6 Oct all 1,690 Fintech rows on the
+tracker read `Amounttopay = 0`.
+
+**Never call the generators a second time with 3005.** The second call's reset
+zeroes the main book's floor.
+
+`16` adds `sp_MicroEazy_FeedFintechToCollectBox`, which runs the same six windows for
+3005, and inserts four lines into Micromart's master. The feed then runs inside their
+run: after their 3002 generators and before their post-steps. Micromart's own 01:30
+run (`CollectBox.dbo.CollectionTrackerBoooksMigration`) then sorts the Fintech rows
+into categories and their assigner gives them agents from `LoanCategories.Agents`,
+exactly as it does for main-book rows. Branch needs nothing: CallBox only displays it,
+and every 3005 borrower is in unit 129, Main Office.
+
+Run order: 16.0 (preflight, keep it) → 16.1 → 16.2 → 16.3 (dry run, read it) →
+16.4 with `@Install = 0`, then `1` → 16.6 a few minutes later. 16.5 is optional and
+puts today's cases on the screens before 01:30.
+
+Know before switching it on:
+
+- **Commission.** `RepaymentTrigger` calls `CollectBox.dbo.PtpKnocker` on every
+  payment. Once a Fintech case carries an amount, its payments credit the assigned
+  agent in `PayedAmount` at the band's rate. Today they credit nobody.
+- **Same agents.** Fintech cases go to the agents already listed per category. A
+  dedicated Fintech team would need a change to Micromart's assigner, which runs
+  inside their job and is not readable from our login.
+- **One more scan.** The feed reads `loanSchedule` (a 2M-row heap) once per run.
+  Their generators already read it six times.
+
+`17` is Micromart's call. Every CollectBox login is stamped 3002, and two procedures
+filter on that stamp. In `sp_NotReachable_CallsList`, a Fintech case marked
+*Not reachable* would vanish from CallBox. In `OverallDashboard`, the figures would
+exclude Fintech.
+
+### The SMS centre: paybill fix and editable reminders (18, 19)
+
+**18 first, today.** `sp_DisbursmentNotifications` sends every book's "your loan has
+been disbursed" SMS. Its Fintech block (added 13 Aug) says *Repay via Paybill
+4038021* — Micromart Africa's paybill. Fintech's is 4329635 (the only 3005 row in
+`Transactions.dbo.PAYBILLS`). On 6 Oct, 139 Fintech disbursement messages in 30 days
+carried it, the latest on 5 Oct. A customer who follows it pays into the 3002
+account, where `RepaymentTrigger` allocates by phone inside 3002, and the Fintech
+loan ages into arrears. 18 changes that one literal by surgery on the live text (the
+text is saved first), and 18.0b lists the 3002 payments made since by phones that
+received the wrong SMS — reconcile those by hand.
+
+**19 moves the wording, not the sending.** The reminders keep their job, the
+procedure name and its parameters; the disbursement SMS keeps its caller. What
+changes is where the words come from: `dbo.MicroEazySmsTemplate`, edited on the
+Lending Console. Run order: 19.0 (keep it) → 19.1 → 19.2 → 19.3 → 19.4 with
+`@Install = 0` (compiles only), then `1` → 19.5 with `@Install = 0` (prints the
+procedure), then `1` → 19.6. Best after the day's 08:00 run; 19.4 records the phones
+the old procedure already reminded that day so nobody is texted twice.
+
+What a customer will notice:
+
+- **One reminder per loan per day.** An overdue loan gets the step for its *oldest*
+  unpaid due date and {Amount} is everything overdue on the loan (the old procedure
+  worked per instalment and quoted one instalment's balance).
+- **Geoffrey's ladder replaces day+1 and day+3:** day 1, 4, 8, 10 and 13 overdue. His
+  second message was headed "4 days" twice; its text says 8 days, so it is seeded at 8.
+- **Three of his five texts are over 160 characters for every customer** (day 8, 10,
+  13: 166–192 with typical values) and bill as two SMS each. The console shows the
+  cost on every step; the wording is his to trim.
+- The penalty his day-10 and day-13 texts promise ("after 14 days") is not what the
+  penalty engine does: it charges once per loan, after the product's grace period
+  from **maturity** (sp_GeneralRolloverService). Worth aligning before go-live.
+- "Already texted today" now counts reminders only. It counted any SMS, so the 01:01
+  penalty notice or a receipt silenced that day's reminder.
+
+The console reads and writes these tables through the relay; nothing on it sends a
+reminder. Its preview calls the installed procedure with `@DryRun = 1` hard-coded.
 
 ### Moving one customer by hand
 
