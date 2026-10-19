@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Axe on CallBox: Linkus web and home calling</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  :root { --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --accent:#001247; --orange:#ff8a00; --good:#047857; --warn:#b45309; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.45; margin: 0; background: #fff; }
+  h1 { font-size: 19pt; margin: 0 0 2mm; color: var(--accent); }
+  h2 { font-size: 13pt; margin: 7mm 0 2mm; color: var(--accent); border-bottom: 2px solid var(--orange); padding-bottom: 1mm; }
+  h3 { font-size: 11pt; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2mm; }
+  .sub { color: var(--muted); margin-bottom: 5mm; }
+  ol, ul { margin: 0 0 2mm; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; }
+  table { border-collapse: collapse; width: 100%; margin: 1mm 0 3mm; font-size: 9.6pt; }
+  th, td { border: 1px solid var(--line); padding: 1.6mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; }
+  code { font-family: Consolas, monospace; font-size: 9.4pt; background: #f1f5f9; padding: 0 1mm; border-radius: 1mm; }
+  .box { border: 1px solid var(--line); border-left: 4px solid var(--orange); padding: 2.5mm 3mm; margin: 2mm 0 3mm; background: #fffaf3; }
+  .good { border-left-color: var(--good); background: #f0fdf4; }
+  .warn { border-left-color: var(--warn); background: #fffbeb; }
+  .k { font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Axe on CallBox: Linkus web and home calling</h1>
+<p class="sub">14 October 2026 · CallBox (callbox.servicesuitecloud.com, now served from servicesuite-in, .228) · Axe Micro-Enterprise's P550</p>
+
+<h2>1. What changed</h2>
+<ul>
+  <li><span class="k">Linkus web inside the Riri phone.</span> On a P-Series floor whose supervisor picks <em>Browser phone — Linkus web in the Riri phone</em>, the dock at the bottom right signs the agent's tab in as their extension, through the PBX's web port (8088, already open). Pressing Call anywhere on the desk opens the dock and dials from it. The PBX itself places the call, exactly as Linkus does.</li>
+  <li><span class="k">Two ways to take calls, chosen by the supervisor.</span> Settings → Connections → <em>How agents hear their calls</em>: the browser (Linkus web), or the agent's own phone (MicroSIP, desk handset, Linkus app). An agent can still switch for themselves from the dock (<em>Use desk phone</em> / <em>Use browser</em>).</li>
+  <li><span class="k">Dispositions in the dock.</span> When an Axe call ends, the dock offers ConnectBoxAXE's own outcomes, with the same rules: a promise needs an amount and a day, and a follow-up proposes its time. Saving records the outcome on the ConnectBox record, as the case file's pad does, and closes the pad on the case file.</li>
+  <li><span class="k">Importing ConnectBox's people.</span> Settings → Seats → <em>Bring people in from ConnectBox</em> lists every active ConnectBoxAXE agent and supervisor, then imports them in one click. Each gets a login by the same email, a seat on their ConnectBox extension, and the link to their ConnectBox id. They sign in with the password they use today; ConnectBox's own login checks it the first time. Axe's door asks for no SMS code.</li>
+  <li><span class="k">The sign is created on the server.</span> ConnectBoxAXE puts the PBX's Linkus SDK key inside its web page, and every agent's browser takes one of the PBX's eight tokens. CallBox keeps one token on the server and gives each agent a sign for their own extension only.</li>
+</ul>
+
+<h2>2. Your steps, in order</h2>
+<ol>
+  <li><span class="k">On .228, switch writes on</span> (the "Reading only" banner; the dock's dispositions need it too). In an elevated PowerShell:<br>
+    <code>[IO.File]::AppendAllText("C:\LmsNode\lms.env", "`r`nCONNECTBOX_WRITES_AXE=true`r`n")</code><br>
+    <code>Restart-Service LmsWeb</code><br>
+    Vercel had this switch as a "sensitive" value, which Vercel never shows back. So it never reached <code>lms.env</code> during the move. <code>AXE_DESK_PAY_ENABLED</code> and <code>AXE_SERVICESUITE_CREATED_BY</code> were lost the same way, so Axe's M-Pesa prompt is off until you add them.</li>
+  <li><span class="k">On the PBX: Integrations → Linkus SDK.</span> It is already on, because ConnectBoxAXE uses it. Copy the <em>AccessID</em> and <em>AccessKey</em>. Our API app (Client ID …Yl4K) is refused sign creation (PBX error 10005), so the browser phone needs this second key.</li>
+  <li><span class="k">CallBox → Settings → Connections → Phone system:</span> paste the AccessID and AccessKey into the Linkus web box, set <em>How agents hear their calls</em> to <em>Browser phone — Linkus web in the Riri phone</em>, then Save.</li>
+  <li><span class="k">CallBox → Settings → Seats → Bring people in from ConnectBox:</span> read the plan (who is new, who is linked, any extension that changes), then press <em>Import</em>.</li>
+  <li><span class="k">Test from home:</span> open the dock. The line should read <em>Linkus web · ext 1010 ready</em> (the browser asks for the microphone once). Open an Axe account and press Call. The dock opens and dials. When the call ends, save the outcome in the dock.</li>
+</ol>
+<div class="box warn"><span class="k">One Linkus web sign-in per extension.</span> If an agent is still signed in to Linkus in ConnectBoxAXE and opens CallBox, the newest sign-in wins and the other one is signed out. The dock then says "signed in somewhere else", with a <em>Sign in again</em> button. Move each agent across fully rather than running both.</div>
+
+<h2>3. Calling from home</h2>
+<h3>A. Linkus web (recommended): no router change expected</h3>
+<p>Signalling and SIP travel over <code>wss://pbx.axemicroenterprise.co.ke:8088</code>, which the internet can already reach. Voice uses the PBX's RTP ports. Axe's agents already talk through Linkus web to a PBX that isn't in their office (nine were signed in on 14 Oct), so voice already crosses Axe's router. Extension 1010 is set up exactly like a working agent's: Linkus web client on, NAT on. If a call connects but you hear nothing, forward the RTP range below.</p>
+<h3>B. MicroSIP from home: three changes on Axe's side</h3>
+<table>
+  <tr><th>Where</th><th>Change</th><th>Why</th></tr>
+  <tr><td>Router in front of the PBX</td><td>Forward <code>UDP 5060</code> (SIP) and <code>UDP 10000–12000</code> (RTP, the P-Series default; check PBX → Settings → PBX → SIP → RTP ports) to the PBX's LAN address. Where the router allows it, accept 5060 only from known IPs (your home is <code>41.90.172.32</code> today; home IPs change).</td><td>From the internet only TCP 8088 answers today. SIP OPTIONS on UDP 5060 got no reply on 14 Oct.</td></tr>
+  <tr><td>PBX → Extension 1010 → Security</td><td>Tick <em>Allow Register Remotely</em> (it is <code>0</code> on 1010 and on the agents' extensions). Optionally limit it to allowed IPs.</td><td>Without it the PBX refuses a SIP registration from outside its LAN, even with the ports open.</td></tr>
+  <tr><td>PBX → SIP settings → NAT</td><td>Set the public address to <code>pbx.axemicroenterprise.co.ke</code> (41.139.138.63) and list the PBX's local networks.</td><td>So the PBX gives remote phones its public address for voice. Otherwise there is one-way or no audio.</td></tr>
+</table>
+<p>Protect the open SIP port: switch on the PBX's IP auto-defence, allow Kenya only (Security → Allowed country IPs), keep strong registration passwords, and keep international calling off (it is off on 1010).</p>
+<p><span class="k">MicroSIP account:</span> SIP server and domain <code>pbx.axemicroenterprise.co.ke</code>, username and login <code>1010</code>, password = 1010's <em>Registration Password</em> (PBX → Extension → 1010; not the web login), transport UDP, keep-alive 15 s. MicroSIP on this PC is set to auto-answer <em>all</em> calls. That suits click-to-call, but it also answers inbound calls on its own.</p>
+
+<h2>4. Clear audio</h2>
+<p>ConnectBoxAXE's Linkus was noisy for reasons in its own code. The Riri phone does each of these differently:</p>
+<table>
+  <tr><th>ConnectBoxAXE</th><th>The Riri phone</th></tr>
+  <tr><td>Plays its own 440/480 Hz ring tone over the network's real ringback and Safaricom's announcements</td><td>No synthetic tones: the agent hears the network's own early media; the screen says "ringing"</td></tr>
+  <tr><td>Beeps a call-waiting tone every 3 s into a live conversation when a second call arrives</td><td>Call waiting off: a second call never rings over the customer; the PBX treats the agent as busy</td></tr>
+  <tr><td>Uses whatever microphone settings the SDK asks for</td><td>Echo cancellation, noise suppression and automatic gain set explicitly, mono, on the headset the agent chose</td></tr>
+  <tr><td>Can register the same extension in several tabs</td><td>One tab holds the phone. Other tabs stand by and take over only when it's free, so there's never a double ring or double playback.</td></tr>
+  <tr><td>No record of line quality</td><td>Every Linkus call stores the SDK's own measurements: packet loss and jitter each way, the codec and the ICE result</td></tr>
+</table>
+<p>On the floor: a wired USB headset, not laptop speakers; a wired connection or strong Wi-Fi; nothing large downloading during calls. If the stored figures show loss above about 2% on a line, that link is the cause. Putting OPUS ahead of G.711 for WebRTC on the PBX would then help, because Opus covers lost packets and G.711 does not.</p>
+
+<h2>5. What was verified, and what was not</h2>
+<ul>
+  <li>Verified: the type-check, 43 telephony tests, 54 dialler tests and 80 Axe-floor tests pass, plus a production build. The PBX allows cross-origin requests from CallBox (<code>Access-Control-Allow-Origin: *</code>). CallBox sends no Content-Security-Policy that would block the SDK. ConnectBox's login API answers again. Extension 1010 has the Linkus web client switched on.</li>
+  <li>Not yet tried end to end: a browser signing 1010 in and placing a call. That needs the Linkus SDK key from step 2, and only you can paste it. Step 5 is that test.</li>
+  <li>The import runs on .228 beside the database. It cannot be run from a workstation, because the production database is no longer on Supabase.</li>
+</ul>
+</body>
+</html>
