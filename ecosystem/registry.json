@@ -56,7 +56,7 @@
           "analytics.servicesuitecloud.com   — / rewrites to /suite/analytics/login",
           "peoplehub.servicesuitecloud.com   — / rewrites to /suite/hr/login",
           "ledgerly.servicesuitecloud.com    — / rewrites to /suite/accounting/login",
-          "connectdesk.servicesuitecloud.com — / rewrites to /suite/callcenter/login"
+          "callbox.servicesuitecloud.com — / rewrites to /suite/callcenter/login"
         ],
         "note": "Deployed from the BirgenAI_LMS repo with its environment already mapped. The LOCAL FOLDER was renamed to connected-suite; the remote, the Vercel project and every env var are untouched, because Vercel builds from the repo and has never seen this folder name. Every subdomain above is the SAME deployment — src/proxy.ts rewrites the bare host to that system's branded door. SUITE_COOKIE_DOMAIN=.servicesuitecloud.com is what makes one sign-in carry across all of them."
       }
